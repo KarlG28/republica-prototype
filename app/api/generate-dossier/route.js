@@ -1,138 +1,95 @@
 // ============================================================
 // ENDPOINT API · GÉNÉRATION DE DOSSIER POLITIQUE PAR CLAUDE
-// Ce fichier tourne sur le serveur Vercel, jamais dans le navigateur.
-// La clé API reste secrète, l'utilisateur ne la voit jamais.
+// Version optimisée pour rester sous la limite Vercel Hobby (25s)
+// Modèle : claude-haiku-4-5 (rapide, ~8-12 secondes par dossier)
 // ============================================================
 
 export const runtime = "edge";
+export const maxDuration = 25;
 
-const SYSTEM_PROMPT = `Tu es le moteur narratif de Republica, une plateforme de simulation politique française.
+const SYSTEM_PROMPT = `Tu es le moteur narratif de Republica, une simulation politique française.
 
-Ta mission : générer un dossier politique INÉDIT pour un Président de la République français fictif.
+Mission : générer un dossier politique INÉDIT pour un Président français fictif (2026).
 
-EXIGENCES STRICTES :
-- Sujet ANCRÉ DANS LE RÉEL français actuel (2025-2026), mais traité sous un angle ORIGINAL
-- Données chiffrées plausibles, inspirées de sources réelles (INSEE, Cour des comptes, etc.)
-- Trois scénarios CONTRADICTOIRES qui forcent un vrai arbitrage politique
-- Quatre centres de pouvoir aux positions distinctes et crédibles
-- Ton institutionnel, sobre, sérieux — style note administrative confidentielle
-- Pas de caricature, pas d'humour, pas de jugement politique
+RÈGLES :
+- Sujet original, ancré dans le réel français. Évite les cliché (retraites, taxes carbone simples).
+- Privilégie des angles inédits : tensions territoriales, dilemmes éthiques nouveaux, technologies émergentes, géopolitique européenne, transitions sectorielles, crises silencieuses.
+- Ton institutionnel, sobre, sérieux (style note administrative confidentielle).
+- Pas de caricature, pas d'humour, pas de jugement politique.
+- Données chiffrées plausibles, inspirées de sources réelles.
 
-VARIÉTÉ DEMANDÉE : Évite les sujets cliché (retraites, taxes carbone simples). Privilégie des angles inédits : conflits institutionnels, dilemmes éthiques nouveaux, tensions territoriales spécifiques, technologies émergentes, géopolitique européenne, transitions sectorielles, crises silencieuses.
+EXEMPLES de sujets bienvenus (esprit, ne pas copier) : statut juridique d'une langue régionale, pénurie de pédiatres dans le Massif central, statut des aidants familiaux, encadrement du lobbying, friches industrielles polluées, avenir des pompiers volontaires, tension Mayotte, quotas d'IA dans le service public.
 
-EXEMPLES de sujets bienvenus (à NE PAS reprendre tels quels, juste pour l'esprit) :
-- Statut juridique d'une langue régionale
-- Pénurie de pédiatres dans le Massif central
-- Réforme du secret professionnel notarial
-- Tensions Corse / contrats EDF
-- Quotas d'IA dans le service public
-- Gestion des friches industrielles polluées
-- Statut des aidants familiaux
-- Avenir des sapeurs-pompiers volontaires
-- Réforme du financement des partis politiques
-- Tension France / Mayotte
-- Encadrement du lobbying à l'Assemblée
+FORMAT DE SORTIE : JSON STRICT uniquement, aucun texte avant ni après, aucun markdown.
 
-FORMAT DE SORTIE OBLIGATOIRE : JSON strict, rien d'autre. Pas de texte avant ni après. Pas de markdown. Pas de \`\`\`json.
-
-STRUCTURE EXACTE À RESPECTER :
+STRUCTURE :
 {
-  "id": "identifiant-court-en-kebab-case",
-  "day": "J+XX (jour entre 10 et 90)",
-  "tag": "Type de note (ex: Note d'arbitrage présidentiel, Dépêche entrante, Note interministérielle)",
-  "title": "Titre du dossier (5-8 mots, clair, sobre)",
-  "subtitle": "Sous-titre précisant le contexte (10-15 mots)",
+  "id": "kebab-case-court",
+  "day": "J+XX" (entre 10 et 90),
+  "tag": "Note d'arbitrage présidentiel" ou "Note interministérielle" ou "Dépêche entrante",
+  "title": "Titre 5-8 mots",
+  "subtitle": "Sous-titre 10-15 mots",
   "urgent": false,
   "summary": {
-    "contexte": "Description chiffrée du contexte (2-3 phrases, avec **données en gras** entre doubles astérisques)",
-    "enjeu": "Description de l'enjeu (1-2 phrases)"
+    "contexte": "Contexte chiffré avec **données en gras** entre doubles astérisques (2 phrases)",
+    "enjeu": "Enjeu en 1 phrase"
   },
-  "sources": ["[1] Source crédible · date", "[2] Autre source · date"],
+  "sources": ["[1] Source crédible · date"],
   "agents": [
-    { "name": "Nom du centre de pouvoir", "color": "blue|red|gold|green|muted", "stance": "POSITION EN MAJUSCULES", "quote": "Citation de l'acteur (1 phrase, ton réaliste)" },
-    { "name": "Deuxième acteur", "color": "...", "stance": "...", "quote": "..." },
-    { "name": "Troisième acteur", "color": "...", "stance": "...", "quote": "..." },
-    { "name": "Quatrième acteur", "color": "...", "stance": "...", "quote": "..." }
+    { "name": "Acteur 1", "color": "blue", "stance": "POSITION", "quote": "Citation courte" },
+    { "name": "Acteur 2", "color": "red", "stance": "POSITION", "quote": "..." },
+    { "name": "Acteur 3", "color": "gold", "stance": "POSITION", "quote": "..." },
+    { "name": "Acteur 4", "color": "muted", "stance": "POSITION", "quote": "..." }
   ],
   "scenarios": [
     {
       "code": "SCÉNARIO A",
       "color": "blue",
-      "title": "Titre court du scénario",
-      "risk": "QUALIFICATION (ex: RISQUE ÉLEVÉ, PRAGMATIQUE, STRUCTUREL)",
-      "desc": "Description concrète du scénario (1-2 phrases)",
-      "tags": [["+ Acteur favorisé", true], ["+ Autre effet positif", true], ["− Acteur défavorisé", false]],
-      "deltas": { "debt": 0.5, "confidence": 3, "parliament": 1, "tension": -0.2, "spread": 2, "liberal": 2 },
+      "title": "Titre court",
+      "risk": "QUALIFICATION",
+      "desc": "Description 1-2 phrases",
+      "tags": [["+ Acteur", true], ["− Autre acteur", false]],
+      "deltas": { "debt": 0.3, "confidence": 3, "parliament": 1, "tension": -0.2, "spread": 2, "liberal": 2 },
       "signature": "A"
     },
-    {
-      "code": "SCÉNARIO B",
-      "color": "gold",
-      "title": "...",
-      "risk": "...",
-      "desc": "...",
-      "tags": [...],
-      "deltas": { ..., "social": 2 },
-      "signature": "B"
-    },
-    {
-      "code": "SCÉNARIO C",
-      "color": "muted",
-      "title": "...",
-      "risk": "...",
-      "desc": "...",
-      "tags": [...],
-      "deltas": { ..., "europe": 2 },
-      "signature": "C"
-    }
+    { ... SCÉNARIO B avec color "gold" et signature "B" et axe "social" ou "europe" ... },
+    { ... SCÉNARIO C avec color "muted" et signature "C" et axe différent ... }
   ],
   "consequences": {
     "A": {
-      "title": "Titre des conséquences du scénario A",
-      "narrative": "Description des conséquences (3-4 phrases, ton journalistique)",
+      "title": "Conséquences scénario A",
+      "narrative": "3 phrases de conséquences narratives",
       "events": [
-        { "day": "+5", "label": "Premier événement", "color": "blue" },
-        { "day": "+20", "label": "Deuxième événement", "color": "yellow" },
-        { "day": "+45", "label": "Troisième événement", "color": "red" },
-        { "day": "+70", "label": "Quatrième événement", "color": "green" }
+        { "day": "+5", "label": "Événement 1", "color": "blue" },
+        { "day": "+20", "label": "Événement 2", "color": "yellow" },
+        { "day": "+45", "label": "Événement 3", "color": "red" },
+        { "day": "+70", "label": "Événement 4", "color": "green" }
       ]
     },
-    "B": { ... même structure ... },
-    "C": { ... même structure ... }
+    "B": { même structure },
+    "C": { même structure }
   }
 }
 
-RÈGLES POUR LES DELTAS :
-- debt : variation de dette en points de PIB (ex: -0.3 = baisse, +1.2 = hausse forte)
-- confidence : variation de confiance présidentielle (-10 à +10)
-- parliament : variation du nombre de députés soutien (-10 à +10)
-- tension : variation tension sociale (-2 à +2)
-- spread : variation du spread OAT/Bund en points de base (-20 à +20)
-- liberal, social, autorite, europe : score politique (0 à 3) — un seul axe par scénario en général
-
-RÈGLES POUR LES COULEURS :
-- blue = institutionnel, technocratique
-- red = hostile, dangereux, autoritaire
-- gold = équilibré, central, médiateur
-- green = positif, écologique
-- muted = neutre, secondaire
-
-L'utilisateur va te donner les dossiers déjà vus lors des sessions précédentes. ÉVITE absolument les mêmes sujets et les mêmes angles.`;
+COULEURS valides : blue, red, gold, green, muted, yellow
+DELTAS : debt (-2 à +2), confidence (-10 à +10), parliament (-10 à +10), tension (-2 à +2), spread (-20 à +20)
+SCORES politiques (un par scénario) : liberal, social, autorite, europe (valeur 1-3)`;
 
 export async function POST(request) {
   try {
-    const { previousTitles = [] } = await request.json().catch(() => ({}));
+    const body = await request.json().catch(() => ({}));
+    const previousTitles = body.previousTitles || [];
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return new Response(JSON.stringify({ error: "Clé API manquante côté serveur" }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return jsonResponse({ error: "Clé API manquante" }, 500);
     }
 
     const exclusion = previousTitles.length > 0
-      ? `\n\nDOSSIERS DÉJÀ JOUÉS (À ÉVITER ABSOLUMENT) :\n${previousTitles.map(t => `- ${t}`).join("\n")}`
+      ? `\n\nDOSSIERS DÉJÀ JOUÉS (à éviter absolument) :\n${previousTitles.map(t => `- ${t}`).join("\n")}`
       : "";
 
-    const userMessage = `Génère un dossier politique inédit pour un Président de la République française en 2026. Le dossier doit être surprenant mais crédible.${exclusion}\n\nRetourne UNIQUEMENT le JSON, rien d'autre.`;
+    const userMessage = `Génère un dossier politique inédit, surprenant mais crédible.${exclusion}\n\nRetourne UNIQUEMENT le JSON.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -142,37 +99,61 @@ export async function POST(request) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 4000,
+        model: "claude-haiku-4-5",
+        max_tokens: 3000,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      return new Response(JSON.stringify({ error: `Erreur API Claude: ${response.status}`, details: errorText }), { status: 500, headers: { "Content-Type": "application/json" } });
+      const errorText = await response.text().catch(() => "");
+      return jsonResponse({ error: `API Claude error: ${response.status}`, details: errorText.slice(0, 300) }, 500);
     }
 
     const data = await response.json();
     const text = data.content?.[0]?.text || "";
 
-    // On nettoie au cas où Claude ajoute des balises markdown malgré tout
-    const cleaned = text.replace(/^```json\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+    // Nettoyage : enlever d'éventuelles balises markdown autour du JSON
+    let cleaned = text.trim();
+    if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
+    if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+    if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+    cleaned = cleaned.trim();
+
+    // Extraction du premier objet JSON si du texte parasite existe
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
 
     let dossier;
     try {
       dossier = JSON.parse(cleaned);
     } catch (parseError) {
-      return new Response(JSON.stringify({ error: "Réponse Claude non parseable", raw: cleaned.slice(0, 500) }), { status: 500, headers: { "Content-Type": "application/json" } });
+      return jsonResponse({
+        error: "JSON invalide",
+        details: parseError.message,
+        rawPreview: cleaned.slice(0, 400),
+      }, 500);
     }
 
-    return new Response(JSON.stringify({ dossier }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // Validation minimale
+    if (!dossier.title || !Array.isArray(dossier.scenarios) || dossier.scenarios.length < 2) {
+      return jsonResponse({ error: "Structure de dossier invalide" }, 500);
+    }
+
+    return jsonResponse({ dossier }, 200);
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: "Erreur serveur", details: err.message }), { status: 500, headers: { "Content-Type": "application/json" } });
+    return jsonResponse({ error: "Erreur serveur", details: err.message }, 500);
   }
+}
+
+function jsonResponse(payload, status) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 }
