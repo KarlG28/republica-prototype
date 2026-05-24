@@ -1,79 +1,54 @@
 // ============================================================
-// ENDPOINT API · GÉNÉRATION DE DOSSIER POLITIQUE PAR CLAUDE
-// Version optimisée pour rester sous la limite Vercel Hobby (25s)
-// Modèle : claude-haiku-4-5 (rapide, ~8-12 secondes par dossier)
+// ENDPOINT API · GÉNÉRATION DE DOSSIER PAR CLAUDE
+// Version ultra-optimisée pour rester sous 25s sur Vercel Hobby
 // ============================================================
 
 export const runtime = "edge";
 export const maxDuration = 25;
 
-const SYSTEM_PROMPT = `Tu es le moteur narratif de Republica, une simulation politique française.
+const SYSTEM_PROMPT = `Tu génères un dossier politique français inédit pour une simulation présidentielle (2026).
 
-Mission : générer un dossier politique INÉDIT pour un Président français fictif (2026).
+CONTRAINTES :
+- Sujet original, ancré dans le réel français. Pas de cliché.
+- Ton institutionnel, sobre, sérieux.
+- Données chiffrées plausibles.
+- Ne cite jamais de personne réelle vivante par son nom.
 
-RÈGLES :
-- Sujet original, ancré dans le réel français. Évite les cliché (retraites, taxes carbone simples).
-- Privilégie des angles inédits : tensions territoriales, dilemmes éthiques nouveaux, technologies émergentes, géopolitique européenne, transitions sectorielles, crises silencieuses.
-- Ton institutionnel, sobre, sérieux (style note administrative confidentielle).
-- Pas de caricature, pas d'humour, pas de jugement politique.
-- Données chiffrées plausibles, inspirées de sources réelles.
+EXEMPLES de sujets (à ne PAS reprendre, juste pour l'esprit) : statut juridique d'une langue régionale, pédiatres dans le Massif central, aidants familiaux, encadrement du lobbying, friches industrielles, pompiers volontaires, tension Mayotte, quotas d'IA dans le service public.
 
-EXEMPLES de sujets bienvenus (esprit, ne pas copier) : statut juridique d'une langue régionale, pénurie de pédiatres dans le Massif central, statut des aidants familiaux, encadrement du lobbying, friches industrielles polluées, avenir des pompiers volontaires, tension Mayotte, quotas d'IA dans le service public.
+FORMAT : JSON STRICT uniquement, aucun texte ni markdown autour.
 
-FORMAT DE SORTIE : JSON STRICT uniquement, aucun texte avant ni après, aucun markdown.
-
-STRUCTURE :
+STRUCTURE EXACTE :
 {
-  "id": "kebab-case-court",
-  "day": "J+XX" (entre 10 et 90),
-  "tag": "Note d'arbitrage présidentiel" ou "Note interministérielle" ou "Dépêche entrante",
-  "title": "Titre 5-8 mots",
-  "subtitle": "Sous-titre 10-15 mots",
-  "urgent": false,
-  "summary": {
-    "contexte": "Contexte chiffré avec **données en gras** entre doubles astérisques (2 phrases)",
-    "enjeu": "Enjeu en 1 phrase"
-  },
-  "sources": ["[1] Source crédible · date"],
-  "agents": [
-    { "name": "Acteur 1", "color": "blue", "stance": "POSITION", "quote": "Citation courte" },
-    { "name": "Acteur 2", "color": "red", "stance": "POSITION", "quote": "..." },
-    { "name": "Acteur 3", "color": "gold", "stance": "POSITION", "quote": "..." },
-    { "name": "Acteur 4", "color": "muted", "stance": "POSITION", "quote": "..." }
+  "id":"slug-court",
+  "day":"J+XX",
+  "tag":"Note d'arbitrage présidentiel",
+  "title":"Titre 5-8 mots",
+  "subtitle":"Sous-titre 10-15 mots",
+  "urgent":false,
+  "summary":{"contexte":"Contexte avec **données en gras** (2 phrases)","enjeu":"Enjeu en 1 phrase"},
+  "sources":["[1] Source · date"],
+  "agents":[
+    {"name":"Acteur 1","color":"blue","stance":"POSITION","quote":"Citation courte"},
+    {"name":"Acteur 2","color":"red","stance":"POSITION","quote":"..."},
+    {"name":"Acteur 3","color":"gold","stance":"POSITION","quote":"..."},
+    {"name":"Acteur 4","color":"muted","stance":"POSITION","quote":"..."}
   ],
-  "scenarios": [
-    {
-      "code": "SCÉNARIO A",
-      "color": "blue",
-      "title": "Titre court",
-      "risk": "QUALIFICATION",
-      "desc": "Description 1-2 phrases",
-      "tags": [["+ Acteur", true], ["− Autre acteur", false]],
-      "deltas": { "debt": 0.3, "confidence": 3, "parliament": 1, "tension": -0.2, "spread": 2, "liberal": 2 },
-      "signature": "A"
-    },
-    { ... SCÉNARIO B avec color "gold" et signature "B" et axe "social" ou "europe" ... },
-    { ... SCÉNARIO C avec color "muted" et signature "C" et axe différent ... }
+  "scenarios":[
+    {"code":"SCÉNARIO A","color":"blue","title":"Titre","risk":"QUALIF","desc":"Description 1-2 phrases","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
+    {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2},"signature":"B"},
+    {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2},"signature":"C"}
   ],
-  "consequences": {
-    "A": {
-      "title": "Conséquences scénario A",
-      "narrative": "3 phrases de conséquences narratives",
-      "events": [
-        { "day": "+5", "label": "Événement 1", "color": "blue" },
-        { "day": "+20", "label": "Événement 2", "color": "yellow" },
-        { "day": "+45", "label": "Événement 3", "color": "red" },
-        { "day": "+70", "label": "Événement 4", "color": "green" }
-      ]
-    },
-    "B": { même structure },
-    "C": { même structure }
+  "consequences":{
+    "A":{"title":"...","narrative":"3 phrases","events":[{"day":"+5","label":"Evt 1","color":"blue"},{"day":"+20","label":"Evt 2","color":"yellow"},{"day":"+45","label":"Evt 3","color":"red"},{"day":"+70","label":"Evt 4","color":"green"}]},
+    "B":{"title":"...","narrative":"...","events":[...]},
+    "C":{"title":"...","narrative":"...","events":[...]}
   }
 }
 
-COULEURS valides : blue, red, gold, green, muted, yellow
-DELTAS : debt (-2 à +2), confidence (-10 à +10), parliament (-10 à +10), tension (-2 à +2), spread (-20 à +20)
-SCORES politiques (un par scénario) : liberal, social, autorite, europe (valeur 1-3)`;
+COULEURS : blue, red, gold, green, muted, yellow
+DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20)
+AXES politiques (1 par scénario, valeur 1-3) : liberal, social, autorite, europe`;
 
 export async function POST(request) {
   try {
@@ -85,11 +60,13 @@ export async function POST(request) {
       return jsonResponse({ error: "Clé API manquante" }, 500);
     }
 
-    const exclusion = previousTitles.length > 0
-      ? `\n\nDOSSIERS DÉJÀ JOUÉS (à éviter absolument) :\n${previousTitles.map(t => `- ${t}`).join("\n")}`
+    // On ne garde que les 3 derniers titres pour rester court
+    const recentTitles = previousTitles.slice(-3);
+    const exclusion = recentTitles.length > 0
+      ? ` Évite ces sujets : ${recentTitles.join(", ")}.`
       : "";
 
-    const userMessage = `Génère un dossier politique inédit, surprenant mais crédible.${exclusion}\n\nRetourne UNIQUEMENT le JSON.`;
+    const userMessage = `Génère un dossier politique inédit.${exclusion} JSON uniquement.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -100,7 +77,7 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5",
-        max_tokens: 3000,
+        max_tokens: 2200,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
@@ -108,20 +85,18 @@ export async function POST(request) {
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
-      return jsonResponse({ error: `API Claude error: ${response.status}`, details: errorText.slice(0, 300) }, 500);
+      return jsonResponse({ error: `API Claude: ${response.status}`, details: errorText.slice(0, 200) }, 500);
     }
 
     const data = await response.json();
     const text = data.content?.[0]?.text || "";
 
-    // Nettoyage : enlever d'éventuelles balises markdown autour du JSON
     let cleaned = text.trim();
     if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
     if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
     if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
     cleaned = cleaned.trim();
 
-    // Extraction du premier objet JSON si du texte parasite existe
     const firstBrace = cleaned.indexOf("{");
     const lastBrace = cleaned.lastIndexOf("}");
     if (firstBrace !== -1 && lastBrace !== -1) {
@@ -135,13 +110,12 @@ export async function POST(request) {
       return jsonResponse({
         error: "JSON invalide",
         details: parseError.message,
-        rawPreview: cleaned.slice(0, 400),
+        rawPreview: cleaned.slice(0, 300),
       }, 500);
     }
 
-    // Validation minimale
     if (!dossier.title || !Array.isArray(dossier.scenarios) || dossier.scenarios.length < 2) {
-      return jsonResponse({ error: "Structure de dossier invalide" }, 500);
+      return jsonResponse({ error: "Structure invalide" }, 500);
     }
 
     return jsonResponse({ dossier }, 200);
