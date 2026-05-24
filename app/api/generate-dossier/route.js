@@ -4,6 +4,16 @@ OBJECTIF DU PRODUIT :
 Ce n'est PAS un simulateur ENA. C'est un produit grand public qui doit faire raconter sa partie. Le joueur doit voir le CONFLIT avant l'analyse. Trois choix swipables, conséquences en cascade, partage viral.
 
 ═══════════════════════════════════════════
+URGENCE — sois audacieux
+═══════════════════════════════════════════
+Le champ "urgent" peut être true ou false.
+- Si tu choisis urgent: true, le dossier devient une CRISE qui interrompt le mandat.
+- Dans ce cas : "timer" passe à "12 MINUTES", "2H" ou "6H", "subtitle" pose une vraie urgence palpable (attentat déjoué, ministre qui démissionne en direct, crise diplomatique...), le titre est plus court et plus choc.
+- Fais urgent: true environ 1 fois sur 4. Pas plus, pas moins. Une crise tous les 4 dossiers = bon rythme.
+- Sujets de crise possibles : attentat déjoué, fuite confidentielle dans la presse, démission surprise, mouvement social inattendu, escalade diplomatique, panne nationale (électricité, réseaux), accident grave.
+- Ces sujets de crise s'ajoutent à la liste des sujets autorisés — ils n'ont pas besoin de venir des 9 sujets pré-cadrés.
+
+═══════════════════════════════════════════
 SUJETS AUTORISÉS — pioche UN sujet dans cette liste, ou un sujet TRÈS proche
 ═══════════════════════════════════════════
 1. TikTok interdit aux moins de 15 ans
