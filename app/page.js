@@ -417,6 +417,9 @@ function Loading({ message }) {
 
 function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
   const isUrgent = dossier.urgent;
+  const timer = dossier.timer || "48H";
+  const risks = Array.isArray(dossier.risks) ? dossier.risks : [];
+
   return (
     <Section>
       <Dashboard indicators={indicators} />
@@ -427,36 +430,116 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
         </div>
       )}
 
-      {isUrgent && (
-        <div style={{ background: `${COLORS.red}10`, border: `1px solid ${COLORS.red}40`, padding: 14, marginBottom: 18, borderLeft: `3px solid ${COLORS.red}` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <span style={{ display: "inline-block", width: 8, height: 8, background: COLORS.red, borderRadius: "50%", animation: "pulse 1.5s infinite" }}></span>
-            <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.red, letterSpacing: "0.2em", fontWeight: 600 }}>ÉVÉNEMENT IMPRÉVU · {dossier.day}</span>
+      {/* ═══ BANDEAU TIMER en haut ═══ */}
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 14px",
+        background: isUrgent ? `${COLORS.red}10` : "transparent",
+        border: `1px solid ${isUrgent ? COLORS.red : COLORS.border}`,
+        borderRadius: 4,
+        marginBottom: 18,
+        fontFamily: "ui-monospace, monospace",
+        fontSize: 11,
+        letterSpacing: "0.18em",
+      }}>
+        <span style={{ color: COLORS.textDim }}>
+          {isUrgent ? "⚠ URGENCE ÉLYSÉE" : `JOUR ${dossier.day || "?"}`} · MANDAT EN COURS
+        </span>
+        <span style={{
+          color: isUrgent ? COLORS.red : COLORS.navy,
+          fontWeight: 700,
+        }}>
+          VOUS AVEZ {timer}
+        </span>
+      </div>
+
+      {/* ═══ BLOC 1 : CE QUI SE PASSE ═══ */}
+      <div style={{
+        border: `1px solid ${COLORS.border}`,
+        borderLeft: `3px solid ${isUrgent ? COLORS.red : COLORS.navy}`,
+        padding: "16px 18px",
+        marginBottom: 14,
+        background: "#fff",
+      }}>
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          letterSpacing: "0.2em",
+          color: COLORS.textDim,
+          marginBottom: 10,
+          fontWeight: 600,
+        }}>
+          CE QUI SE PASSE
+        </div>
+        <div style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 22,
+          fontWeight: 600,
+          color: COLORS.navy,
+          lineHeight: 1.25,
+          letterSpacing: "-0.01em",
+        }}>
+          {dossier.title}
+        </div>
+        {dossier.subtitle && (
+          <div style={{
+            fontSize: 14,
+            color: COLORS.textMuted,
+            marginTop: 8,
+            fontStyle: "italic",
+            lineHeight: 1.45,
+          }}>
+            {dossier.subtitle}
           </div>
-          <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 14.5, color: COLORS.navy, lineHeight: 1.55, fontWeight: 500 }}>{dossier.subtitle}</div>
+        )}
+      </div>
+
+      {/* ═══ BLOC 2 : CE QUE VOUS RISQUEZ ═══ */}
+      {risks.length > 0 && (
+        <div style={{
+          border: `1px solid ${COLORS.border}`,
+          borderLeft: `3px solid ${COLORS.gold}`,
+          padding: "14px 18px",
+          marginBottom: 18,
+          background: "#fff",
+        }}>
+          <div style={{
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 10,
+            letterSpacing: "0.2em",
+            color: COLORS.textDim,
+            marginBottom: 10,
+            fontWeight: 600,
+          }}>
+            CE QUE VOUS RISQUEZ
+          </div>
+          <ul style={{
+            margin: 0,
+            padding: 0,
+            listStyle: "none",
+          }}>
+            {risks.map((r, i) => (
+              <li key={i} style={{
+                fontSize: 14,
+                color: COLORS.navy,
+                lineHeight: 1.5,
+                padding: "6px 0",
+                borderTop: i > 0 ? `1px dashed ${COLORS.border}` : "none",
+                display: "flex",
+                gap: 10,
+                alignItems: "flex-start",
+              }}>
+                <span style={{ color: COLORS.gold, fontWeight: 700, flexShrink: 0 }}>—</span>
+                <span>{renderRich(r)}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 
-      <Tag>{dossier.tag} · {dossier.day}</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 27, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, margin: "0 0 4px", letterSpacing: "-0.01em" }}>{dossier.title}</h1>
-      {!isUrgent && <div style={{ fontSize: 13, color: COLORS.textMuted, fontStyle: "italic", marginBottom: 18 }}>{dossier.subtitle}</div>}
-
-      <ExecutiveSummary>
-        <p style={{ margin: "0 0 8px" }}>
-          <strong style={{ color: COLORS.gold, fontWeight: 600 }}>Contexte.</strong> {renderRich(dossier.summary?.contexte)}
-        </p>
-        <p style={{ margin: 0 }}>
-          <strong style={{ color: COLORS.gold, fontWeight: 600 }}>Enjeu.</strong> {renderRich(dossier.summary?.enjeu)}
-        </p>
-        {dossier.sources && dossier.sources.length > 0 && (
-          <Sources>
-            {dossier.sources.map((s, i) => (
-              <div key={i}>{s.split("]").map((part, j) => j === 0 ? <span key={j} style={{ color: COLORS.gold }}>{part}]</span> : part)}</div>
-            ))}
-          </Sources>
-        )}
-      </ExecutiveSummary>
-
+      {/* ═══ LE RESTE : agents + scénarios, inchangé ═══ */}
       <SubTag>Centres de pouvoir · positions exprimées</SubTag>
       <AgentsGrid>
         {dossier.agents?.map((a, i) => (
@@ -464,11 +547,11 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
         ))}
       </AgentsGrid>
 
-      <SubTag>Votre arbitrage · cliquez pour découvrir chaque voie</SubTag>
+      <SubTag>Votre arbitrage · {dossier.scenarios?.length || 0} voies</SubTag>
       {dossier.scenarios?.map((s, i) => (
         <ScenarioButton key={i} code={s.code} color={resolveColor(s.color)} title={s.title} risk={s.risk}
-          desc={s.desc} tags={(s.tags || []).map(t => Array.isArray(t) ? { label: t[0], positive: t[1] } : t)}
-          onClick={() => onSelectScenario(i)} />
+          desc={s.desc} tags={(s.tags || []).map(t => Array.isArray(t) ? t : [t, true])}
+          onClick={() => onSelectScenario(s)} />
       ))}
     </Section>
   );
