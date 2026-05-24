@@ -547,10 +547,10 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
         ))}
       </AgentsGrid>
 
-      <SubTag>Votre arbitrage · {dossier.scenarios?.length || 0} voies</SubTag>
-      {dossier.scenarios?.map((s, i) => (
-        <ScenarioButton key={i} code={s.code} color={resolveColor(s.color)} title={s.title} risk={s.risk}
-          desc={s.desc} tags={(s.tags || []).map(t => Array.isArray(t) ? t : [t, true])}
+  <SubTag>Votre arbitrage · {(dossier.scenarios || []).filter(Boolean).length} voies</SubTag>
+      {(dossier.scenarios || []).filter(Boolean).map((s, i) => (
+        <ScenarioButton key={i} code={s.code || `SCÉNARIO ${i+1}`} color={resolveColor(s.color || "blue")} title={s.title || "Sans titre"} risk={s.risk || ""}
+          desc={s.desc || ""} tags={(s.tags || []).filter(Boolean).map(t => Array.isArray(t) ? t : [t, true])}
           onClick={() => onSelectScenario(s)} />
       ))}
     </Section>
