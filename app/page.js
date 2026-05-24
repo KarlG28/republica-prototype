@@ -104,6 +104,14 @@ const FALLBACK_DOSSIER = {
   },
 };
 
+const FALLBACK_PARTNER_SUMMARY = `Vous avez gouverné cinq décisions sous tension. Voici comment Nouvelle Énergie aurait abordé ces mêmes choix.
+
+Chez Nouvelle Énergie, nous croyons qu'une France plus libre est une France qui respire, décide et agit davantage. Notre boussole : libérer avant d'encadrer, faire confiance avant de contrôler.
+
+Sur les arbitrages économiques, nous aurions libéré l'investissement privé avant d'augmenter l'impôt. Sur les questions de société, nous aurions rendu le pouvoir aux acteurs de terrain. Sur l'Europe, nous aurions porté un message clair : la France propose, l'Europe avance.
+
+Si cette manière de gouverner vous parle, Nouvelle Énergie vous tend la main.`;
+
 // ============================================================
 // COMPOSANT PRINCIPAL
 // ============================================================
