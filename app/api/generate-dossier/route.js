@@ -56,7 +56,9 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
   "title":"Titre 5-8 mots, direct, incarné",
   "subtitle":"Phrase qui pose le conflit en 10-15 mots",
   "urgent":false,
-  "summary":{"contexte":"Contexte avec **chiffres en gras** (2 phrases max, langage normal)","enjeu":"Enjeu en 1 phrase percutante"},
+ "summary":{"contexte":"Contexte avec **chiffres en gras** (2 phrases max, langage normal)","enjeu":"Enjeu en 1 phrase percutante"},
+  "risks":["Premier risque chiffré (ex: 450 M€ de coût)","Deuxième risque concret (ex: Recul du français diplomatique)","Troisième risque politique (ex: Crise avec plusieurs États membres)"],
+  "timer":"48H",
   "sources":["[1] Source · date"],
   "agents":[
     {"name":"Acteur 1","color":"blue","stance":"Centriste","quote":"Citation 10 mots max"},
@@ -75,6 +77,16 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
     "C":{"title":"...","narrative":"...","events":[...]}
   }
 }
+
+═══════════════════════════════════════════
+RISQUES — 3 conséquences immédiates si rien n'est décidé
+═══════════════════════════════════════════
+- Premier : TOUJOURS chiffré (€, %, nombre de personnes...). Met le chiffre en gras avec **.
+- Deuxième : conséquence concrète et palpable, pas abstraite.
+- Troisième : conséquence politique/diplomatique.
+- Chaque risque tient en UNE phrase courte, max 10 mots.
+
+TIMER : "48H" par défaut. Pour un événement urgent : "12 MINUTES", "6H", "24H". Toujours en majuscules.
 
 COULEURS : blue, red, gold, green, muted, yellow
 DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20)
