@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 // ============================================================
-// REPUBLICA · PROTOTYPE — VERSION IA TEMPS RÉEL
-// Génération de dossiers par Claude à chaque session
+// REPUBLICA · PROTOTYPE — VERSION CINÉMATOGRAPHIQUE
+// Génération IA en temps réel · 5 décisions par session
 // ============================================================
 
 const COLORS = {
@@ -16,6 +16,7 @@ const COLORS = {
   navyLight: "#1e3a7a",
   gold: "#b8954a",
   goldDim: "#8a7037",
+  goldLight: "#d9b86b",
   text: "#1a1a1a",
   textBright: "#0a1a3a",
   textMuted: "#5a5a5a",
@@ -29,8 +30,18 @@ const COLORS = {
   yellow: "#a87a2a",
 };
 
-const SECTIONS = { intro: "intro", loading: "loading", dossier: "dossier", consequence: "consequence", profile: "profile" };
+// Image de fond : bureau en bois noble (libre de droits Unsplash)
+const BG_IMAGE = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80";
 
+const SECTIONS = {
+  welcome: "welcome",
+  intro: "intro",
+  loading: "loading",
+  dossier: "dossier",
+  scenarioDetail: "scenarioDetail",
+  consequence: "consequence",
+  profile: "profile",
+};
 const TOTAL_DECISIONS = 5;
 
 function resolveColor(name) {
@@ -49,7 +60,6 @@ function renderRich(text) {
   });
 }
 
-// Dossier de secours en cas d'échec total de l'API
 const FALLBACK_DOSSIER = {
   id: "fallback",
   day: "J+30",
@@ -68,14 +78,14 @@ const FALLBACK_DOSSIER = {
     { name: "Opinion publique", color: "muted", stance: "INQUIÈTE 84%", quote: "Le pouvoir d'achat redevient la 1re préoccupation." },
   ],
   scenarios: [
-    { code: "SCÉNARIO A", color: "blue", title: "Bouclier tarifaire prolongé", risk: "COÛTEUX", desc: "Prolongation 12 mois. Coût pour l'État : 8 Md€.", tags: [["+ Ménages", true], ["+ Opinion", true], ["− Bercy", false]], deltas: { debt: +0.6, confidence: +4, parliament: +2, tension: -0.4, spread: +3, social: 2 }, signature: "A" },
-    { code: "SCÉNARIO B", color: "gold", title: "Bouclier ciblé revenus modestes", risk: "ÉQUILIBRÉ", desc: "Aide concentrée sur les 6M de foyers les plus modestes. Coût : 2,5 Md€.", tags: [["+ Justice sociale", true], ["+ Bercy", true], ["± Opinion", null]], deltas: { debt: +0.2, confidence: +2, parliament: +1, tension: -0.1, spread: 0, social: 1, liberal: 1 }, signature: "B" },
-    { code: "SCÉNARIO C", color: "muted", title: "Laisser passer la hausse", risk: "LIBÉRAL", desc: "Pas d'intervention. Vérité des prix.", tags: [["+ Marchés", true], ["+ EDF", true], ["− Opinion massive", false]], deltas: { debt: -0.3, confidence: -7, parliament: -3, tension: +1.2, spread: -2, liberal: 2 }, signature: "C" },
+    { code: "SCÉNARIO A", color: "blue", title: "Bouclier tarifaire prolongé", risk: "COÛTEUX", desc: "Prolongation 12 mois. Coût pour l'État : 8 Md€.", tags: [["+ Ménages", true], ["+ Opinion", true], ["− Bercy", false]], deltas: { debt: 0.6, confidence: 4, parliament: 2, tension: -0.4, spread: 3, social: 2 }, signature: "A" },
+    { code: "SCÉNARIO B", color: "gold", title: "Bouclier ciblé revenus modestes", risk: "ÉQUILIBRÉ", desc: "Aide concentrée sur les 6M de foyers les plus modestes. Coût : 2,5 Md€.", tags: [["+ Justice sociale", true], ["+ Bercy", true], ["± Opinion", null]], deltas: { debt: 0.2, confidence: 2, parliament: 1, tension: -0.1, spread: 0, social: 1, liberal: 1 }, signature: "B" },
+    { code: "SCÉNARIO C", color: "muted", title: "Laisser passer la hausse", risk: "LIBÉRAL", desc: "Pas d'intervention. Vérité des prix.", tags: [["+ Marchés", true], ["+ EDF", true], ["− Opinion massive", false]], deltas: { debt: -0.3, confidence: -7, parliament: -3, tension: 1.2, spread: -2, liberal: 2 }, signature: "C" },
   ],
   consequences: {
     A: { title: "Bouclier prolongé", narrative: "Décision saluée par 76% des Français. Mais le déficit se creuse et les marchés s'inquiètent.", events: [{ day: "+5", label: "Décret de prolongation publié", color: "blue" }, { day: "+15", label: "76% d'opinion favorable", color: "green" }, { day: "+30", label: "Spread OAT s'écarte de 3 pb", color: "yellow" }, { day: "+60", label: "Bercy demande un plan d'extinction", color: "red" }] },
-    B: { title: "Bouclier ciblé engagé", narrative: "Mesure technique. Les classes moyennes protestent : « on paie pour les pauvres et pour les riches ».", events: [{ day: "+8", label: "Décret de ciblage publié", color: "blue" }, { day: "+22", label: "Manifestation des classes moyennes", color: "yellow" }, { day: "+45", label: "Économie réelle : 5,5 Md€", color: "green" }, { day: "+70", label: "Opposition lance « classes moyennes oubliées »", color: "red" }] },
-    C: { title: "Aucune intervention", narrative: "Décision libérale assumée. Vague de mobilisation sociale. Cote de confiance en chute.", events: [{ day: "+5", label: "Hausse effective de 18%", color: "red" }, { day: "+15", label: "1ère manifestation nationale", color: "red" }, { day: "+30", label: "Cote de confiance : −7 points", color: "red" }, { day: "+60", label: "Bercy salue la « rigueur budgétaire »", color: "green" }] },
+    B: { title: "Bouclier ciblé engagé", narrative: "Mesure technique. Les classes moyennes protestent.", events: [{ day: "+8", label: "Décret de ciblage publié", color: "blue" }, { day: "+22", label: "Manifestation des classes moyennes", color: "yellow" }, { day: "+45", label: "Économie réelle : 5,5 Md€", color: "green" }, { day: "+70", label: "Opposition lance « classes moyennes oubliées »", color: "red" }] },
+    C: { title: "Aucune intervention", narrative: "Décision libérale assumée. Vague de mobilisation sociale.", events: [{ day: "+5", label: "Hausse effective de 18%", color: "red" }, { day: "+15", label: "1ère manifestation nationale", color: "red" }, { day: "+30", label: "Cote de confiance : −7 points", color: "red" }, { day: "+60", label: "Bercy salue la « rigueur budgétaire »", color: "green" }] },
   },
 };
 
@@ -84,16 +94,16 @@ const FALLBACK_DOSSIER = {
 // ============================================================
 
 export default function Page() {
-  const [section, setSection] = useState(SECTIONS.intro);
+  const [section, setSection] = useState(SECTIONS.welcome);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [dossiers, setDossiers] = useState([]); // Dossiers chargés au fur et à mesure
+  const [dossiers, setDossiers] = useState([]);
   const [choices, setChoices] = useState({});
   const [indicators, setIndicators] = useState({ debt: 115.6, confidence: 52, parliament: 287, tension: 4.2, spread: 64 });
   const [scores, setScores] = useState({ liberal: 0, social: 0, autorite: 0, europe: 0 });
   const [loadingMessage, setLoadingMessage] = useState("");
   const [generationError, setGenerationError] = useState(null);
+  const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
 
-  // Génère un nouveau dossier en appelant l'API Claude
   async function generateDossier() {
     const previousTitles = dossiers.map(d => d.title);
     setLoadingMessage("Claude rédige votre prochain dossier...");
@@ -106,40 +116,40 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ previousTitles }),
       });
-
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || `Erreur ${response.status}`);
       }
-
       const data = await response.json();
       const newDossier = data.dossier;
-
-      // Validation minimale du JSON reçu
       if (!newDossier || !newDossier.title || !newDossier.scenarios || newDossier.scenarios.length < 2) {
         throw new Error("Format de dossier invalide");
       }
-
       setDossiers(prev => [...prev, newDossier]);
       setSection(SECTIONS.dossier);
     } catch (err) {
       console.error("Erreur génération:", err);
       setGenerationError(err.message);
-      // Utilisation du dossier de secours pour ne pas casser l'expérience
       const fallback = { ...FALLBACK_DOSSIER, id: `fallback-${currentIdx}` };
       setDossiers(prev => [...prev, fallback]);
       setSection(SECTIONS.dossier);
     }
   }
 
-  const startSession = () => {
-    setCurrentIdx(0);
-    generateDossier();
+  const goToIntro = () => setSection(SECTIONS.intro);
+  const startSession = () => { setCurrentIdx(0); generateDossier(); };
+
+  const selectScenario = (idx) => {
+    setSelectedScenarioIdx(idx);
+    setSection(SECTIONS.scenarioDetail);
   };
 
-  const recordChoice = (deltas, signature) => {
-    const idx = currentIdx;
-    setChoices((c) => ({ ...c, [idx]: signature }));
+  const confirmChoice = () => {
+    const dossier = dossiers[currentIdx];
+    const scenario = dossier.scenarios[selectedScenarioIdx];
+    const deltas = scenario.deltas || {};
+    const signature = scenario.signature;
+    setChoices((c) => ({ ...c, [currentIdx]: signature }));
     setIndicators((i) => ({
       debt: +(i.debt + (deltas.debt || 0)).toFixed(1),
       confidence: Math.max(0, Math.min(100, i.confidence + (deltas.confidence || 0))),
@@ -153,7 +163,13 @@ export default function Page() {
       autorite: s.autorite + (deltas.autorite || 0),
       europe: s.europe + (deltas.europe || 0),
     }));
+    setSelectedScenarioIdx(null);
     setSection(SECTIONS.consequence);
+  };
+
+  const cancelChoice = () => {
+    setSelectedScenarioIdx(null);
+    setSection(SECTIONS.dossier);
   };
 
   const goNext = () => {
@@ -171,35 +187,151 @@ export default function Page() {
   const currentChoice = choices[currentIdx];
 
   return (
-    <main style={{ minHeight: "100vh", background: COLORS.bg, color: COLORS.text, fontFamily: "system-ui, -apple-system, sans-serif", padding: 0, margin: 0 }}>
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "20px 16px 80px" }}>
-        <Header section={section} currentIdx={currentIdx} total={TOTAL_DECISIONS} />
+    <main style={{
+      minHeight: "100vh",
+      background: `linear-gradient(rgba(250,250,247,0.94), rgba(250,250,247,0.97)), url(${BG_IMAGE}) center / cover no-repeat fixed`,
+      color: COLORS.text,
+      fontFamily: "system-ui, -apple-system, sans-serif",
+      padding: 0,
+      margin: 0,
+      position: "relative",
+    }}>
+      <div style={{
+        position: "fixed",
+        inset: 0,
+        background: "radial-gradient(ellipse at center, transparent 40%, rgba(10,26,58,0.15) 100%)",
+        pointerEvents: "none",
+        zIndex: 0,
+      }} />
 
-        {section === SECTIONS.intro && <Intro onStart={startSession} />}
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "20px 16px 80px", position: "relative", zIndex: 1 }}>
+        {section !== SECTIONS.welcome && <Header section={section} currentIdx={currentIdx} total={TOTAL_DECISIONS} />}
 
-        {section === SECTIONS.loading && <Loading message={loadingMessage} />}
-
-        {section === SECTIONS.dossier && currentDossier && (
-          <DossierView dossier={currentDossier} indicators={indicators} onChoice={recordChoice} fallbackError={generationError} />
-        )}
-
-        {section === SECTIONS.consequence && currentDossier && (
-          <ConsequenceView dossier={currentDossier} choice={currentChoice} indicators={indicators} isLast={currentIdx + 1 >= TOTAL_DECISIONS} onContinue={goNext} />
-        )}
-
-        {section === SECTIONS.profile && (
-          <Profile choices={choices} dossiers={dossiers} indicators={indicators} scores={scores} onRestart={restart} />
-        )}
+        <FadeIn keyProp={section + "-" + currentIdx}>
+          {section === SECTIONS.welcome && <Welcome onContinue={goToIntro} />}
+          {section === SECTIONS.intro && <Intro onStart={startSession} />}
+          {section === SECTIONS.loading && <Loading message={loadingMessage} />}
+          {section === SECTIONS.dossier && currentDossier && (
+            <DossierView dossier={currentDossier} indicators={indicators} onSelectScenario={selectScenario} fallbackError={generationError} />
+          )}
+          {section === SECTIONS.scenarioDetail && currentDossier && selectedScenarioIdx !== null && (
+            <ScenarioDetail dossier={currentDossier} scenarioIdx={selectedScenarioIdx} onConfirm={confirmChoice} onCancel={cancelChoice} />
+          )}
+          {section === SECTIONS.consequence && currentDossier && (
+            <ConsequenceView dossier={currentDossier} choice={currentChoice} indicators={indicators} isLast={currentIdx + 1 >= TOTAL_DECISIONS} onContinue={goNext} />
+          )}
+          {section === SECTIONS.profile && (
+            <Profile choices={choices} dossiers={dossiers} indicators={indicators} scores={scores} onRestart={restart} />
+          )}
+        </FadeIn>
 
         <Footer />
       </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .republica-fade-in { animation: fadeInUp 0.5s ease-out; }
+      `}</style>
     </main>
   );
 }
 
+function FadeIn({ children, keyProp }) {
+  return <div key={keyProp} className="republica-fade-in">{children}</div>;
+}
+
 // ============================================================
-// HEADER + FOOTER
+// ÉCRAN DE BIENVENUE (Félicitations élection)
 // ============================================================
+
+function Welcome({ onContinue }) {
+  return (
+    <Section>
+      <div style={{ textAlign: "center", padding: "60px 20px 40px" }}>
+        <div style={{
+          display: "inline-block",
+          width: 90,
+          height: 90,
+          borderRadius: "50%",
+          background: `radial-gradient(circle, ${COLORS.gold} 0%, ${COLORS.goldDim} 100%)`,
+          marginBottom: 28,
+          position: "relative",
+          boxShadow: `0 6px 20px ${COLORS.navy}25`,
+        }}>
+          <div style={{
+            position: "absolute",
+            inset: 6,
+            borderRadius: "50%",
+            border: `2px solid ${COLORS.bg}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontFamily: "ui-serif, Georgia, serif",
+            fontSize: 32,
+            color: COLORS.bg,
+            fontWeight: 600,
+            fontStyle: "italic",
+          }}>R</div>
+        </div>
+
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.35em", marginBottom: 18, fontWeight: 600 }}>
+          — RÉPUBLIQUE FRANÇAISE —
+        </div>
+
+        <h1 style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 40,
+          fontWeight: 600,
+          color: COLORS.navy,
+          lineHeight: 1.1,
+          margin: "0 0 24px",
+          letterSpacing: "-0.015em",
+        }}>
+          Félicitations.<br/>
+          <em style={{ color: COLORS.gold }}>Vous venez d'être élu</em><br/>
+          Président de la République.
+        </h1>
+
+        <p style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 17,
+          color: COLORS.text,
+          lineHeight: 1.75,
+          fontStyle: "italic",
+          margin: "0 auto 36px",
+          maxWidth: 540,
+        }}>
+          Vous prendrez vos fonctions demain matin à l'Élysée.<br/>
+          Cent jours s'ouvrent devant vous pour imprimer votre marque sur la nation.<br/>
+          Chaque décision sera une trace dans l'Histoire.
+        </p>
+
+        <div style={{
+          display: "inline-block",
+          padding: "10px 24px",
+          background: `${COLORS.gold}10`,
+          border: `1px solid ${COLORS.gold}40`,
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 11,
+          color: COLORS.gold,
+          letterSpacing: "0.2em",
+          marginBottom: 36,
+        }}>
+          ◊ PROCLAMATION OFFICIELLE ◊
+        </div>
+
+        <div>
+          <BigButton onClick={onContinue}>Rejoindre l'Élysée ↗</BigButton>
+        </div>
+      </div>
+    </Section>
+  );
+}
 
 function Header({ section, currentIdx, total }) {
   const stepLabel = section === SECTIONS.intro ? "INVESTITURE"
@@ -235,28 +367,24 @@ function Footer() {
         REPUBLICA · SIMULATION PROSPECTIVE IA · RÉSULTATS NON PRÉDICTIFS
       </div>
       <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, marginTop: 4 }}>
-        Dossiers générés en temps réel par Claude — 2026
+        Personnages et données illustratifs · Dossiers générés par Claude
       </div>
     </div>
   );
 }
 
-// ============================================================
-// INTRO + LOADING
-// ============================================================
-
 function Intro({ onStart }) {
   return (
     <Section>
       <Tag>— Investiture présidentielle —</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 36, fontWeight: 600, color: COLORS.navy, lineHeight: 1.1, margin: "0 0 18px", letterSpacing: "-0.01em" }}>
-        Vous venez d'être élu Président de la République.
+      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 34, fontWeight: 600, color: COLORS.navy, lineHeight: 1.1, margin: "0 0 18px", letterSpacing: "-0.01em" }}>
+        Cent jours pour gouverner.
       </h1>
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 17, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", margin: "0 0 26px" }}>
-        Cent jours pour imprimer votre marque. Huit centres de pouvoir vous attendent : Bercy, les syndicats, Bruxelles, l'opinion, les médias, les marchés, le Conseil d'État, les collectivités. Chaque décision aura des conséquences. Aucune ne fera l'unanimité.
+      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.text, lineHeight: 1.75, fontStyle: "italic", margin: "0 0 26px" }}>
+        Huit centres de pouvoir vous attendent : Bercy, les syndicats, Bruxelles, l'opinion, les médias, les marchés, le Conseil d'État, les collectivités. Chaque décision aura des conséquences. Aucune ne fera l'unanimité.
       </p>
 
-      <div style={{ background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, padding: 16, margin: "0 0 22px" }}>
+      <div style={{ background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, padding: 16, margin: "0 0 22px", boxShadow: `0 1px 3px ${COLORS.navy}10` }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>◊ ÉTAT DE LA NATION · DONNÉES VÉRIFIÉES</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 1, background: COLORS.border }}>
           <Stat label="Dette / PIB" value="115,6%" note="INSEE 2025" />
@@ -267,7 +395,7 @@ function Intro({ onStart }) {
       </div>
 
       <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 28px" }}>
-        Ceci est une simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Chaque dossier est rédigé en temps réel par Claude (Anthropic). Aucune session n'est identique à une autre.</strong>
+        Simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.</strong>
       </p>
 
       <BigButton onClick={onStart}>Prendre mes fonctions ↗</BigButton>
@@ -279,20 +407,15 @@ function Loading({ message }) {
   return (
     <Section>
       <div style={{ textAlign: "center", padding: "80px 20px" }}>
-        <div style={{ display: "inline-block", width: 32, height: 32, border: `2px solid ${COLORS.border}`, borderTopColor: COLORS.gold, borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.navy, marginTop: 20, fontStyle: "italic" }}>{message}</div>
+        <div style={{ display: "inline-block", width: 36, height: 36, border: `2px solid ${COLORS.border}`, borderTopColor: COLORS.gold, borderRadius: "50%", animation: "spin 1s linear infinite" }} />
+        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.navy, marginTop: 22, fontStyle: "italic" }}>{message}</div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, marginTop: 10, letterSpacing: "0.15em" }}>GÉNÉRATION EN COURS · ~10 SECONDES</div>
       </div>
     </Section>
   );
 }
 
-// ============================================================
-// VUE DOSSIER
-// ============================================================
-
-function DossierView({ dossier, indicators, onChoice, fallbackError }) {
+function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
   const isUrgent = dossier.urgent;
   return (
     <Section>
@@ -307,7 +430,7 @@ function DossierView({ dossier, indicators, onChoice, fallbackError }) {
       {isUrgent && (
         <div style={{ background: `${COLORS.red}10`, border: `1px solid ${COLORS.red}40`, padding: 14, marginBottom: 18, borderLeft: `3px solid ${COLORS.red}` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <span style={{ display: "inline-block", width: 8, height: 8, background: COLORS.red, borderRadius: "50%" }}></span>
+            <span style={{ display: "inline-block", width: 8, height: 8, background: COLORS.red, borderRadius: "50%", animation: "pulse 1.5s infinite" }}></span>
             <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.red, letterSpacing: "0.2em", fontWeight: 600 }}>ÉVÉNEMENT IMPRÉVU · {dossier.day}</span>
           </div>
           <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 14.5, color: COLORS.navy, lineHeight: 1.55, fontWeight: 500 }}>{dossier.subtitle}</div>
@@ -341,19 +464,104 @@ function DossierView({ dossier, indicators, onChoice, fallbackError }) {
         ))}
       </AgentsGrid>
 
-      <SubTag>Votre arbitrage · {dossier.scenarios?.length || 0} voies</SubTag>
+      <SubTag>Votre arbitrage · cliquez pour découvrir chaque voie</SubTag>
       {dossier.scenarios?.map((s, i) => (
         <ScenarioButton key={i} code={s.code} color={resolveColor(s.color)} title={s.title} risk={s.risk}
           desc={s.desc} tags={(s.tags || []).map(t => Array.isArray(t) ? { label: t[0], positive: t[1] } : t)}
-          onClick={() => onChoice(s.deltas || {}, s.signature)} />
+          onClick={() => onSelectScenario(i)} />
       ))}
     </Section>
   );
 }
 
-// ============================================================
-// CONSÉQUENCES
-// ============================================================
+function ScenarioDetail({ dossier, scenarioIdx, onConfirm, onCancel }) {
+  const scenario = dossier.scenarios[scenarioIdx];
+  const color = resolveColor(scenario.color);
+  const deltas = scenario.deltas || {};
+
+  const impacts = [
+    { label: "Dette / PIB", value: deltas.debt, unit: " pts", inverse: true },
+    { label: "Confiance", value: deltas.confidence, unit: " pts" },
+    { label: "Soutien AN", value: deltas.parliament, unit: " sièges" },
+    { label: "Tension sociale", value: deltas.tension, unit: " pts", inverse: true },
+    { label: "Spread OAT", value: deltas.spread, unit: " pb", inverse: true },
+  ].filter(i => i.value !== undefined && i.value !== 0);
+
+  return (
+    <Section>
+      <Tag>Approfondissement du scénario</Tag>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color, letterSpacing: "0.15em", fontWeight: 700, padding: "4px 10px", border: `1px solid ${color}40`, background: `${color}10` }}>{scenario.code}</span>
+        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, fontWeight: 600, letterSpacing: "0.1em" }}>{scenario.risk}</span>
+      </div>
+      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 28, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, margin: "0 0 16px", letterSpacing: "-0.01em" }}>
+        {scenario.title}
+      </h1>
+
+      <div style={{ padding: 18, background: COLORS.bgPanel, border: `1px solid ${color}30`, borderLeft: `3px solid ${color}`, marginBottom: 20 }}>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>◊ DESCRIPTION DÉTAILLÉE</div>
+        <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, margin: 0 }}>
+          {scenario.desc}
+        </p>
+      </div>
+
+      {scenario.tags && scenario.tags.length > 0 && (
+        <>
+          <SubTag>Effets attendus sur les acteurs</SubTag>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 24 }}>
+            {(scenario.tags || []).map((t, i) => {
+              const tag = Array.isArray(t) ? { label: t[0], positive: t[1] } : t;
+              return (
+                <span key={i} style={{
+                  padding: "6px 12px",
+                  fontFamily: "ui-monospace, monospace",
+                  fontSize: 11,
+                  background: tag.positive === true ? `${COLORS.green}15` : tag.positive === false ? `${COLORS.red}12` : `${COLORS.yellow}15`,
+                  color: tag.positive === true ? COLORS.green : tag.positive === false ? COLORS.red : COLORS.yellow,
+                  fontWeight: 600,
+                  border: `1px solid ${tag.positive === true ? COLORS.green : tag.positive === false ? COLORS.red : COLORS.yellow}30`,
+                }}>{tag.label}</span>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {impacts.length > 0 && (
+        <>
+          <SubTag>Impact projeté sur les indicateurs</SubTag>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8, marginBottom: 26 }}>
+            {impacts.map((imp, i) => {
+              const sign = imp.value > 0 ? "+" : "";
+              const isGood = imp.inverse ? imp.value < 0 : imp.value > 0;
+              const isBad = imp.inverse ? imp.value > 0 : imp.value < 0;
+              const c = isGood ? COLORS.green : isBad ? COLORS.red : COLORS.textMuted;
+              return (
+                <div key={i} style={{ padding: "10px 12px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}` }}>
+                  <div style={{ fontSize: 10, color: COLORS.textDim, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, marginBottom: 4 }}>{imp.label}</div>
+                  <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 15, color: c, fontWeight: 700 }}>{sign}{imp.value}{imp.unit}</div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 10, marginBottom: 16 }}>
+        <button onClick={onCancel} style={{
+          padding: "14px 18px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, color: COLORS.textMuted,
+          fontFamily: "ui-monospace, monospace", fontSize: 12, letterSpacing: "0.15em", cursor: "pointer", textTransform: "uppercase", fontWeight: 600,
+          transition: "all 0.15s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = COLORS.navy; e.currentTarget.style.color = COLORS.navy; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = COLORS.border; e.currentTarget.style.color = COLORS.textMuted; }}>
+          ← Revenir
+        </button>
+        <BigButton onClick={onConfirm}>Valider ce choix ✓</BigButton>
+      </div>
+    </Section>
+  );
+}
 
 function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
   const data = dossier.consequences?.[choice];
@@ -378,20 +586,15 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
   );
 }
 
-// ============================================================
-// PROFIL POLITIQUE FINAL
-// ============================================================
-
 function Profile({ choices, dossiers, indicators, scores, onRestart }) {
   const family = useMemo(() => classifyFamily(scores), [scores]);
-
   return (
     <Section>
       <Tag>— Votre famille politique —</Tag>
-      <div style={{ textAlign: "center", padding: "22px 24px", border: `1px solid ${COLORS.navy}30`, background: COLORS.bgPanel, margin: "0 0 24px", position: "relative" }}>
+      <div style={{ textAlign: "center", padding: "26px 24px", border: `1px solid ${COLORS.navy}30`, background: COLORS.bgPanel, margin: "0 0 24px", position: "relative", boxShadow: `0 4px 12px ${COLORS.navy}10` }}>
         <div style={{ position: "absolute", top: 8, right: 10, fontFamily: "ui-monospace, monospace", fontSize: 9, color: COLORS.textDim, letterSpacing: "0.15em" }}>N° 048</div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 8, fontWeight: 600 }}>CLASSIFICATION</div>
-        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 30, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{family.label}</div>
+        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{family.label}</div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textMuted, letterSpacing: "0.15em", marginTop: 12 }}>PROCHE DE : {family.closeTo}</div>
       </div>
 
@@ -421,7 +624,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart }) {
       </div>
 
       <SubTag>Carte de partage · #MES100JOURS</SubTag>
-      <div style={{ background: `linear-gradient(140deg, ${COLORS.navy} 0%, ${COLORS.bgDarker} 100%)`, border: `1px solid ${COLORS.gold}40`, padding: "26px 22px", position: "relative", overflow: "hidden", marginBottom: 26, color: COLORS.textOnDark }}>
+      <div style={{ background: `linear-gradient(140deg, ${COLORS.navy} 0%, ${COLORS.bgDarker} 100%)`, border: `1px solid ${COLORS.gold}40`, padding: "26px 22px", position: "relative", overflow: "hidden", marginBottom: 26, color: COLORS.textOnDark, boxShadow: `0 8px 24px ${COLORS.navy}30` }}>
         <div style={{ position: "absolute", top: -20, right: -20, fontFamily: "ui-serif, Georgia, serif", fontSize: 150, color: `${COLORS.gold}12`, fontWeight: 600, lineHeight: 1 }}>R</div>
         <div style={{ position: "relative" }}>
           <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 14, fontWeight: 600 }}>REPUBLICA · MES 100 JOURS</div>
@@ -445,7 +648,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart }) {
       <div style={{ marginTop: 24, padding: 16, background: `${COLORS.gold}08`, border: `1px solid ${COLORS.gold}30`, borderLeft: `3px solid ${COLORS.gold}` }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.2em", marginBottom: 8, fontWeight: 600 }}>◊ PROTOTYPE — VERSION DE DÉMONSTRATION</div>
         <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.65, margin: 0 }}>
-          Chaque dossier de ce prototype est généré en temps réel par Claude. La version finale proposera un mandat complet de 100 jours, des indicateurs vivants entre les sessions, et un comparatif anonymisé entre joueurs.
+          Chaque dossier est généré en temps réel par Claude. La version finale proposera un mandat complet de 100 jours, des indicateurs vivants, et un comparatif anonymisé entre joueurs.
         </p>
       </div>
     </Section>
@@ -466,10 +669,6 @@ function classifyFamily(scores) {
   return { label: "Centre · pragmatique", shortLabel: "Centre pragmatique", closeTo: "Tradition modérée française", tagline: "Vous gouvernez sans étiquette idéologique fixe.", shareQuote: "J'ai pris chaque décision pour ce qu'elle valait.", pct: 14 };
 }
 
-// ============================================================
-// COMPOSANTS RÉUTILISABLES
-// ============================================================
-
 function Section({ children }) { return <div style={{ padding: "8px 0" }}>{children}</div>; }
 function Tag({ children }) { return <div style={{ fontSize: 11, color: COLORS.textDim, letterSpacing: "0.2em", textTransform: "uppercase", marginBottom: 10, fontWeight: 600 }}>{children}</div>; }
 function SubTag({ children }) { return <div style={{ fontSize: 11, color: COLORS.textDim, letterSpacing: "0.2em", textTransform: "uppercase", margin: "22px 0 14px", fontWeight: 600 }}>{children}</div>; }
@@ -480,7 +679,7 @@ function Sources({ children }) {
 
 function ExecutiveSummary({ children }) {
   return (
-    <div style={{ padding: 16, background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, marginBottom: 18 }}>
+    <div style={{ padding: 16, background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, marginBottom: 18, boxShadow: `0 1px 3px ${COLORS.navy}08` }}>
       <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>— EXECUTIVE SUMMARY —</div>
       <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 14, color: COLORS.text, lineHeight: 1.7 }}>{children}</div>
     </div>
@@ -489,7 +688,7 @@ function ExecutiveSummary({ children }) {
 
 function Dashboard({ indicators, highlight }) {
   return (
-    <div style={{ background: COLORS.bgPanel, padding: "14px 16px", marginBottom: 20, border: `1px solid ${highlight ? COLORS.gold : COLORS.border}` }}>
+    <div style={{ background: COLORS.bgPanel, padding: "14px 16px", marginBottom: 20, border: `1px solid ${highlight ? COLORS.gold : COLORS.border}`, boxShadow: `0 1px 3px ${COLORS.navy}08` }}>
       <Tag>État de la nation</Tag>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(80px, 1fr))", gap: 1, background: COLORS.border, marginTop: 4 }}>
         <Stat label="Dette" value={`${indicators.debt}%`} />
@@ -527,7 +726,7 @@ function AgentsGrid({ children }) {
 
 function Agent({ name, color, stance, quote }) {
   return (
-    <div style={{ padding: "12px 14px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${color}` }}>
+    <div style={{ padding: "12px 14px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${color}`, boxShadow: `0 1px 2px ${COLORS.navy}05` }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
         <span style={{ fontSize: 12, fontWeight: 600, color: COLORS.navy }}>{name}</span>
         <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 9, color, letterSpacing: "0.05em", fontWeight: 600 }}>{stance}</span>
@@ -540,9 +739,9 @@ function Agent({ name, color, stance, quote }) {
 function ScenarioButton({ code, color, title, risk, desc, tags, onClick }) {
   return (
     <button onClick={onClick}
-      style={{ width: "100%", textAlign: "left", padding: "16px 18px", background: COLORS.bgPanel, border: `1px solid ${color}50`, borderLeft: `3px solid ${color}`, color: COLORS.text, cursor: "pointer", marginBottom: 10, fontFamily: "inherit", transition: "all 0.15s" }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = `${color}06`; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${color}50`; e.currentTarget.style.borderLeftColor = color; e.currentTarget.style.background = COLORS.bgPanel; }}>
+      style={{ width: "100%", textAlign: "left", padding: "16px 18px", background: COLORS.bgPanel, border: `1px solid ${color}50`, borderLeft: `3px solid ${color}`, color: COLORS.text, cursor: "pointer", marginBottom: 10, fontFamily: "inherit", transition: "all 0.2s", boxShadow: `0 1px 3px ${COLORS.navy}08` }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = `${color}06`; e.currentTarget.style.transform = "translateX(2px)"; e.currentTarget.style.boxShadow = `0 4px 12px ${COLORS.navy}12`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${color}50`; e.currentTarget.style.borderLeftColor = color; e.currentTarget.style.background = COLORS.bgPanel; e.currentTarget.style.transform = "translateX(0)"; e.currentTarget.style.boxShadow = `0 1px 3px ${COLORS.navy}08`; }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 7, flexWrap: "wrap", gap: 6 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color, letterSpacing: "0.1em", fontWeight: 700 }}>{code}</span>
@@ -551,10 +750,13 @@ function ScenarioButton({ code, color, title, risk, desc, tags, onClick }) {
         <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 9.5, color: COLORS.textDim, fontWeight: 600 }}>{risk}</span>
       </div>
       <div style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.55, marginBottom: 8 }}>{desc}</div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, fontFamily: "ui-monospace, monospace", fontSize: 10 }}>
-        {tags.map((t, i) => (
-          <span key={i} style={{ padding: "3px 8px", background: t.positive === true ? `${COLORS.green}15` : t.positive === false ? `${COLORS.red}12` : `${COLORS.yellow}15`, color: t.positive === true ? COLORS.green : t.positive === false ? COLORS.red : COLORS.yellow, fontWeight: 600 }}>{t.label}</span>
-        ))}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 5, fontFamily: "ui-monospace, monospace", fontSize: 10 }}>
+          {tags.map((t, i) => (
+            <span key={i} style={{ padding: "3px 8px", background: t.positive === true ? `${COLORS.green}15` : t.positive === false ? `${COLORS.red}12` : `${COLORS.yellow}15`, color: t.positive === true ? COLORS.green : t.positive === false ? COLORS.red : COLORS.yellow, fontWeight: 600 }}>{t.label}</span>
+          ))}
+        </div>
+        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color, fontWeight: 600, letterSpacing: "0.1em" }}>EN SAVOIR + →</span>
       </div>
     </button>
   );
@@ -577,9 +779,9 @@ function Timeline({ events }) {
 function BigButton({ onClick, children }) {
   return (
     <button onClick={onClick}
-      style={{ width: "100%", padding: "16px 22px", background: COLORS.navy, border: "none", color: COLORS.textOnDark, fontFamily: "ui-monospace, monospace", fontSize: 13, letterSpacing: "0.2em", cursor: "pointer", textTransform: "uppercase", fontWeight: 600, transition: "all 0.15s" }}
-      onMouseEnter={(e) => { e.currentTarget.style.background = COLORS.navyLight; }}
-      onMouseLeave={(e) => { e.currentTarget.style.background = COLORS.navy; }}>
+      style={{ width: "100%", padding: "16px 22px", background: COLORS.navy, border: "none", color: COLORS.textOnDark, fontFamily: "ui-monospace, monospace", fontSize: 13, letterSpacing: "0.2em", cursor: "pointer", textTransform: "uppercase", fontWeight: 600, transition: "all 0.2s", boxShadow: `0 4px 12px ${COLORS.navy}30` }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = COLORS.navyLight; e.currentTarget.style.boxShadow = `0 6px 20px ${COLORS.navy}40`; e.currentTarget.style.transform = "translateY(-1px)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = COLORS.navy; e.currentTarget.style.boxShadow = `0 4px 12px ${COLORS.navy}30`; e.currentTarget.style.transform = "translateY(0)"; }}>
       {children}
     </button>
   );
