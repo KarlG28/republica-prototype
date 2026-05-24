@@ -103,10 +103,15 @@ export default function Page() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [generationError, setGenerationError] = useState(null);
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
+  // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
+  const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 2 : 3);
 
   async function generateDossier() {
     const previousTitles = dossiers.map(d => d.title);
-    setLoadingMessage("Claude rédige votre prochain dossier...");
+    const nextIdx = dossiers.length;
+    const forceUrgent = nextIdx === urgentDossierIdx;
+
+    setLoadingMessage(forceUrgent ? "Une crise survient à l'Élysée..." : "Claude rédige votre prochain dossier...");
     setSection(SECTIONS.loading);
     setGenerationError(null);
 
@@ -114,7 +119,7 @@ export default function Page() {
       const response = await fetch("/api/generate-dossier", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ previousTitles }),
+        body: JSON.stringify({ previousTitles, forceUrgent }),
       });
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
