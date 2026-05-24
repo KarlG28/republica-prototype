@@ -542,8 +542,8 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
       {/* ═══ LE RESTE : agents + scénarios, inchangé ═══ */}
       <SubTag>Centres de pouvoir · positions exprimées</SubTag>
       <AgentsGrid>
-        {dossier.agents?.map((a, i) => (
-          <Agent key={i} name={a.name} color={resolveColor(a.color)} stance={a.stance} quote={a.quote} />
+        {(dossier.agents || []).filter(Boolean).map((a, i) => (
+          <Agent key={i} name={a.name || "Acteur"} color={resolveColor(a.color || "muted")} stance={a.stance || ""} quote={a.quote || ""} />
         ))}
       </AgentsGrid>
 
