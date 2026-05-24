@@ -128,6 +128,10 @@ export default function Page() {
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
   const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 2 : 3);
+  // Synthèse Nouvelle Énergie (générée à la fin du mandat)
+  const [partnerSummary, setPartnerSummary] = useState(null);
+  const [partnerLoading, setPartnerLoading] = useState(false);
+  const [partnerError, setPartnerError] = useState(null);
 
   async function generateDossier() {
     const previousTitles = dossiers.map(d => d.title);
@@ -164,6 +168,40 @@ export default function Page() {
     }
   }
 
+  async function generatePartnerSummary() {
+    setPartnerLoading(true);
+    setPartnerError(null);
+    try {
+      const decisions = dossiers.map((d, i) => {
+        const sig = choices[i];
+        const sc = d.scenarios?.find(s => s.signature === sig);
+        return {
+          title: d.title,
+          urgent: !!d.urgent,
+          scenarioTitle: sc ? sc.title : "Aucun choix",
+        };
+      });
+
+      const response = await fetch("/api/generate-partner-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ decisions }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Erreur ${response.status}`);
+      }
+      const data = await response.json();
+      setPartnerSummary(data.summary);
+    } catch (err) {
+      console.error("Erreur synthèse partenaire:", err);
+      setPartnerError(err.message);
+      setPartnerSummary(FALLBACK_PARTNER_SUMMARY);
+    } finally {
+      setPartnerLoading(false);
+    }
+  }
+  
   const goToIntro = () => setSection(SECTIONS.intro);
   const startSession = () => { setCurrentIdx(0); generateDossier(); };
 
