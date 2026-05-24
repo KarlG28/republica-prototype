@@ -238,9 +238,10 @@ export default function Page() {
     setSection(SECTIONS.dossier);
   };
 
-  const goNext = () => {
+const goNext = () => {
     if (currentIdx + 1 >= TOTAL_DECISIONS) {
       setSection(SECTIONS.profile);
+      generatePartnerSummary();
     } else {
       setCurrentIdx(currentIdx + 1);
       generateDossier();
@@ -287,7 +288,8 @@ export default function Page() {
             <ConsequenceView dossier={currentDossier} choice={currentChoice} indicators={indicators} isLast={currentIdx + 1 >= TOTAL_DECISIONS} onContinue={goNext} />
           )}
           {section === SECTIONS.profile && (
-            <Profile choices={choices} dossiers={dossiers} indicators={indicators} scores={scores} onRestart={restart} />
+            <Profile choices={choices} dossiers={dossiers} indicators={indicators} scores={scores} onRestart={restart}
+              partnerSummary={partnerSummary} partnerLoading={partnerLoading} partnerError={partnerError} />
           )}
         </FadeIn>
 
@@ -845,7 +847,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
   );
 }
 
-function Profile({ choices, dossiers, indicators, scores, onRestart }) {
+function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError }) {
   const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
   return (
     <Section>
@@ -988,6 +990,102 @@ function Profile({ choices, dossiers, indicators, scores, onRestart }) {
         </div>
       </div>
 
+{/* ═══ BLOC PARTENAIRE NOUVELLE ÉNERGIE ═══ */}
+      <SubTag>Une autre manière de gouverner ?</SubTag>
+      <div style={{
+        background: COLORS.bgPanel,
+        border: `1px solid ${COLORS.border}`,
+        borderTop: `3px solid ${COLORS.gold}`,
+        padding: "24px 22px",
+        marginBottom: 26,
+        boxShadow: `0 2px 8px ${COLORS.navy}08`,
+      }}>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 18,
+          paddingBottom: 14,
+          borderBottom: `1px solid ${COLORS.border}`,
+        }}>
+          <span style={{
+            display: "inline-block",
+            width: 12,
+            height: 12,
+            borderRadius: "50%",
+            border: `2px solid ${COLORS.gold}`,
+            background: "transparent",
+          }} />
+          <span style={{
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 11,
+            color: COLORS.gold,
+            letterSpacing: "0.2em",
+            fontWeight: 700,
+          }}>
+            NOUVELLE ÉNERGIE
+          </span>
+        </div>
+
+        {partnerLoading && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 0" }}>
+            <div style={{
+              display: "inline-block",
+              width: 18,
+              height: 18,
+              border: `2px solid ${COLORS.border}`,
+              borderTopColor: COLORS.gold,
+              borderRadius: "50%",
+              animation: "spin 1s linear infinite",
+            }} />
+            <span style={{ fontSize: 13, color: COLORS.textMuted, fontStyle: "italic" }}>
+              Nouvelle Énergie analyse votre mandat...
+            </span>
+          </div>
+        )}
+
+        {!partnerLoading && partnerSummary && (
+          <>
+            {partnerError && (
+              <div style={{
+                padding: "8px 12px",
+                background: `${COLORS.yellow}15`,
+                border: `1px solid ${COLORS.yellow}40`,
+                fontSize: 10,
+                color: COLORS.yellow,
+                marginBottom: 14,
+                fontFamily: "ui-monospace, monospace",
+                letterSpacing: "0.1em",
+              }}>
+                ⚠ TEXTE DE SECOURS — GÉNÉRATION IA INDISPONIBLE
+              </div>
+            )}
+            <div style={{
+              fontFamily: "ui-serif, Georgia, serif",
+              fontSize: 14.5,
+              color: COLORS.text,
+              lineHeight: 1.7,
+              whiteSpace: "pre-line",
+            }}>
+              {partnerSummary}
+            </div>
+          </>
+        )}
+
+        <div style={{
+          marginTop: 22,
+          paddingTop: 18,
+          borderTop: `1px solid ${COLORS.border}`,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+        }}>
+          <PartnerCTA href="#" label="Rejoindre le groupe WhatsApp" primary />
+          <PartnerCTA href="#" label="Participer au prochain échange en ligne" />
+          <PartnerCTA href="#" label="Proposer votre idée pour les 100 jours" />
+        </div>
+      </div>
+            
       <BigButton onClick={onRestart}>Rejouer un autre mandat ↗</BigButton>
 
       <div style={{ marginTop: 24, padding: 16, background: `${COLORS.gold}08`, border: `1px solid ${COLORS.gold}30`, borderLeft: `3px solid ${COLORS.gold}` }}>
@@ -1222,4 +1320,34 @@ function delta(d) {
   if (Math.abs(d) < 0.05) return "— stable";
   const sign = d > 0 ? "▲" : "▼";
   return `${sign} ${d > 0 ? "+" : ""}${d.toFixed(1)}`;
+}
+function PartnerCTA({ href, label, primary }) {
+  return (
+    <a href={href} style={{
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "12px 16px",
+      border: `1px solid ${primary ? COLORS.gold : COLORS.border}`,
+      background: primary ? `${COLORS.gold}08` : "transparent",
+      color: primary ? COLORS.gold : COLORS.navy,
+      textDecoration: "none",
+      fontSize: 13.5,
+      fontWeight: 600,
+      transition: "all 0.15s",
+    }}
+    onMouseEnter={(e) => {
+      e.currentTarget.style.background = primary ? `${COLORS.gold}15` : `${COLORS.gold}06`;
+      e.currentTarget.style.borderColor = COLORS.gold;
+      e.currentTarget.style.color = COLORS.gold;
+    }}
+    onMouseLeave={(e) => {
+      e.currentTarget.style.background = primary ? `${COLORS.gold}08` : "transparent";
+      e.currentTarget.style.borderColor = primary ? COLORS.gold : COLORS.border;
+      e.currentTarget.style.color = primary ? COLORS.gold : COLORS.navy;
+    }}>
+      <span>{label}</span>
+      <span style={{ fontSize: 16 }}>→</span>
+    </a>
+  );
 }
