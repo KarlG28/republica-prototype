@@ -235,7 +235,47 @@ export default function Page() {
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes urgentStripes {
+          0% { background-position: 0 0; }
+          100% { background-position: 40px 0; }
+        }
+        @keyframes urgentGlow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(168, 50, 50, 0.45), 0 0 30px rgba(168, 50, 50, 0.15); }
+          50% { box-shadow: 0 0 0 6px rgba(168, 50, 50, 0), 0 0 60px rgba(168, 50, 50, 0.35); }
+        }
+        @keyframes urgentBlink {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.4; transform: scale(1.15); }
+        }
+        @keyframes urgentShake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-1px); }
+          75% { transform: translateX(1px); }
+        }
         .republica-fade-in { animation: fadeInUp 0.5s ease-out; }
+        .republica-urgent-glow { animation: urgentGlow 2s ease-in-out infinite; }
+        .republica-urgent-stripes-top, .republica-urgent-stripes-bottom {
+          height: 14px;
+          background-image: repeating-linear-gradient(
+            -45deg,
+            #a83232,
+            #a83232 10px,
+            #fafaf7 10px,
+            #fafaf7 20px
+          );
+          animation: urgentStripes 1s linear infinite;
+        }
+        .republica-urgent-blink {
+          display: inline-block;
+          width: 10px;
+          height: 10px;
+          background: #a83232;
+          border-radius: 50%;
+          animation: urgentBlink 1.2s ease-in-out infinite;
+        }
+        .republica-urgent-card {
+          animation: urgentShake 0.3s ease-in-out 3, urgentGlow 2s ease-in-out infinite 1s;
+        }
       `}</style>
     </main>
   );
@@ -430,71 +470,141 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
         </div>
       )}
 
-      {/* ═══ BANDEAU TIMER en haut ═══ */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 14px",
-        background: isUrgent ? `${COLORS.red}10` : "transparent",
-        border: `1px solid ${isUrgent ? COLORS.red : COLORS.border}`,
-        borderRadius: 4,
-        marginBottom: 18,
-        fontFamily: "ui-monospace, monospace",
-        fontSize: 11,
-        letterSpacing: "0.18em",
-      }}>
-        <span style={{ color: COLORS.textDim }}>
-          {isUrgent ? "⚠ URGENCE ÉLYSÉE" : `JOUR ${dossier.day || "?"}`} · MANDAT EN COURS
-        </span>
-        <span style={{
-          color: isUrgent ? COLORS.red : COLORS.navy,
-          fontWeight: 700,
+     {/* ═══ MODE URGENT : irruption visuelle ═══ */}
+      {isUrgent ? (
+        <div className="republica-urgent-card" style={{
+          marginBottom: 22,
+          border: `2px solid ${COLORS.red}`,
+          background: "#fff",
+          position: "relative",
+          overflow: "hidden",
         }}>
-          VOUS AVEZ {timer}
-        </span>
-      </div>
+          {/* Bandes rayées rouges qui défilent en haut */}
+          <div className="republica-urgent-stripes-top" />
 
-      {/* ═══ BLOC 1 : CE QUI SE PASSE ═══ */}
-      <div style={{
-        border: `1px solid ${COLORS.border}`,
-        borderLeft: `3px solid ${isUrgent ? COLORS.red : COLORS.navy}`,
-        padding: "16px 18px",
-        marginBottom: 14,
-        background: "#fff",
-      }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 10,
-          letterSpacing: "0.2em",
-          color: COLORS.textDim,
-          marginBottom: 10,
-          fontWeight: 600,
-        }}>
-          CE QUI SE PASSE
-        </div>
-        <div style={{
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 22,
-          fontWeight: 600,
-          color: COLORS.navy,
-          lineHeight: 1.25,
-          letterSpacing: "-0.01em",
-        }}>
-          {dossier.title}
-        </div>
-        {dossier.subtitle && (
-          <div style={{
-            fontSize: 14,
-            color: COLORS.textMuted,
-            marginTop: 8,
-            fontStyle: "italic",
-            lineHeight: 1.45,
-          }}>
-            {dossier.subtitle}
+          <div style={{ padding: "20px 22px" }}>
+            {/* Bandeau d'urgence avec sirène clignotante */}
+            <div style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 16,
+              fontFamily: "ui-monospace, monospace",
+              fontSize: 11,
+              letterSpacing: "0.2em",
+            }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 10, color: COLORS.red, fontWeight: 700 }}>
+                <span className="republica-urgent-blink" />
+                URGENCE ÉLYSÉE — INTERRUPTION DE MANDAT
+              </span>
+              <span style={{
+                color: COLORS.red,
+                fontWeight: 800,
+                background: `${COLORS.red}15`,
+                padding: "4px 10px",
+                border: `1px solid ${COLORS.red}50`,
+              }}>
+                {timer}
+              </span>
+            </div>
+
+            {/* Le titre choc */}
+            <div style={{
+              fontFamily: "ui-serif, Georgia, serif",
+              fontSize: 28,
+              fontWeight: 700,
+              color: COLORS.red,
+              lineHeight: 1.15,
+              letterSpacing: "-0.015em",
+              marginBottom: 10,
+            }}>
+              {dossier.title}
+            </div>
+
+            {/* Le subtitle direct, sans italique mou */}
+            {dossier.subtitle && (
+              <div style={{
+                fontSize: 15,
+                color: COLORS.text,
+                lineHeight: 1.5,
+                fontWeight: 500,
+              }}>
+                {renderRich(dossier.subtitle)}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+
+          {/* Bandes rayées rouges qui défilent en bas */}
+          <div className="republica-urgent-stripes-bottom" />
+        </div>
+      ) : (
+        <>
+          {/* ═══ MODE NORMAL : timer + bloc CE QUI SE PASSE ═══ */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "10px 14px",
+            background: "transparent",
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 4,
+            marginBottom: 18,
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 11,
+            letterSpacing: "0.18em",
+          }}>
+            <span style={{ color: COLORS.textDim }}>
+              JOUR {dossier.day || "?"} · MANDAT EN COURS
+            </span>
+            <span style={{
+              color: COLORS.navy,
+              fontWeight: 700,
+            }}>
+              VOUS AVEZ {timer}
+            </span>
+          </div>
+
+          <div style={{
+            border: `1px solid ${COLORS.border}`,
+            borderLeft: `3px solid ${COLORS.navy}`,
+            padding: "16px 18px",
+            marginBottom: 14,
+            background: "#fff",
+          }}>
+            <div style={{
+              fontFamily: "ui-monospace, monospace",
+              fontSize: 10,
+              letterSpacing: "0.2em",
+              color: COLORS.textDim,
+              marginBottom: 10,
+              fontWeight: 600,
+            }}>
+              CE QUI SE PASSE
+            </div>
+            <div style={{
+              fontFamily: "ui-serif, Georgia, serif",
+              fontSize: 22,
+              fontWeight: 600,
+              color: COLORS.navy,
+              lineHeight: 1.25,
+              letterSpacing: "-0.01em",
+            }}>
+              {dossier.title}
+            </div>
+            {dossier.subtitle && (
+              <div style={{
+                fontSize: 14,
+                color: COLORS.textMuted,
+                marginTop: 8,
+                fontStyle: "italic",
+                lineHeight: 1.45,
+              }}>
+                {dossier.subtitle}
+              </div>
+            )}
+          </div>
+        </>
+      )}
 
       {/* ═══ BLOC 2 : CE QUE VOUS RISQUEZ ═══ */}
       {risks.length > 0 && (
