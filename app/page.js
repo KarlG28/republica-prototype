@@ -60,6 +60,21 @@ function renderRich(text) {
   });
 }
 
+function renderTwist(text) {
+  if (!text) return null;
+  // Coupe la phrase au "mais" pour mettre la 2ème partie en rouge gras
+  const match = text.match(/^(.+?)(\.\.\.|…)\s*mais\s+(.+)$/i);
+  if (!match) return text;
+  return (
+    <>
+      {match[1]}{match[2]} mais{" "}
+      <strong style={{ color: COLORS.red, fontWeight: 700, fontStyle: "italic" }}>
+        {match[3]}
+      </strong>
+    </>
+  );
+}
+
 const FALLBACK_DOSSIER = {
   id: "fallback",
   day: "J+30",
@@ -785,7 +800,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
 }
 
 function Profile({ choices, dossiers, indicators, scores, onRestart }) {
-  const family = useMemo(() => classifyFamily(scores), [scores]);
+  const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
   return (
     <Section>
       <Tag>— Votre famille politique —</Tag>
@@ -821,22 +836,108 @@ function Profile({ choices, dossiers, indicators, scores, onRestart }) {
         })}
       </div>
 
-      <SubTag>Carte de partage · #MES100JOURS</SubTag>
-      <div style={{ background: `linear-gradient(140deg, ${COLORS.navy} 0%, ${COLORS.bgDarker} 100%)`, border: `1px solid ${COLORS.gold}40`, padding: "26px 22px", position: "relative", overflow: "hidden", marginBottom: 26, color: COLORS.textOnDark, boxShadow: `0 8px 24px ${COLORS.navy}30` }}>
-        <div style={{ position: "absolute", top: -20, right: -20, fontFamily: "ui-serif, Georgia, serif", fontSize: 150, color: `${COLORS.gold}12`, fontWeight: 600, lineHeight: 1 }}>R</div>
+      <SubTag>Carte de partage · screenshot-able</SubTag>
+      <div style={{
+        background: "#fafaf7",
+        border: `1px solid ${COLORS.border}`,
+        padding: "28px 26px",
+        position: "relative",
+        overflow: "hidden",
+        marginBottom: 26,
+        color: COLORS.text,
+        boxShadow: `0 8px 24px ${COLORS.navy}15`,
+      }}>
+        {/* Filigrane R en arrière-plan */}
+        <div style={{
+          position: "absolute",
+          top: -30,
+          right: -20,
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 200,
+          color: `${COLORS.gold}10`,
+          fontWeight: 600,
+          lineHeight: 1,
+          fontStyle: "italic",
+        }}>R</div>
+
         <div style={{ position: "relative" }}>
-          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 14, fontWeight: 600 }}>REPUBLICA · MES 100 JOURS</div>
-          <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 20, fontWeight: 500, color: COLORS.textOnDark, lineHeight: 1.2 }}>J'ai gouverné en</div>
-          <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 26, fontWeight: 600, color: COLORS.gold, lineHeight: 1.1, fontStyle: "italic", marginBottom: 16 }}>{family.shortLabel}</div>
-          <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 13.5, color: "#e0dcd3", lineHeight: 1.6, fontStyle: "italic", padding: "12px 0", borderTop: `1px solid ${COLORS.gold}30`, borderBottom: `1px solid ${COLORS.gold}30`, marginBottom: 14 }}>« {family.shareQuote} »</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-            <ShareStat label="CONFIANCE" value={`${indicators.confidence}%`} />
-            <ShareStat label="DETTE" value={`${indicators.debt}%`} />
-            <ShareStat label="FAMILLE" value={`${family.pct}%`} />
+          {/* En-tête type "Mandat terminé · X ans · Y crises" */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingBottom: 14,
+            marginBottom: 20,
+            borderBottom: `1px solid ${COLORS.border}`,
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 10,
+            color: COLORS.textDim,
+            letterSpacing: "0.2em",
+            fontWeight: 600,
+          }}>
+            <span>MANDAT TERMINÉ</span>
+            <span>5 DÉCISIONS · {dossiers.filter(d => d.urgent).length} CRISE{dossiers.filter(d => d.urgent).length > 1 ? "S" : ""}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 14, paddingTop: 12, borderTop: `1px solid #ffffff15`, fontFamily: "ui-monospace, monospace", fontSize: 10, color: "#a8a8a0", letterSpacing: "0.15em" }}>
-            <span>REPUBLICA.FR · ET TOI ?</span>
-            <span style={{ color: COLORS.gold }}>#MES100JOURS</span>
+
+          {/* "Vous avez gouverné en..." */}
+          <div style={{
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 11,
+            color: COLORS.gold,
+            letterSpacing: "0.25em",
+            fontWeight: 600,
+            marginBottom: 10,
+          }}>
+            VOUS AVEZ GOUVERNÉ EN
+          </div>
+
+          {/* La famille en serif gros + adjectif en gold italique */}
+          <div style={{
+            fontFamily: "ui-serif, Georgia, serif",
+            fontSize: 36,
+            fontWeight: 600,
+            color: COLORS.navy,
+            lineHeight: 1.05,
+            letterSpacing: "-0.02em",
+            marginBottom: 24,
+          }}>
+            {family.shortLabel}{" "}
+            <em style={{ color: COLORS.gold, fontWeight: 600 }}>{family.adjective}.</em>
+          </div>
+
+          {/* LE TWIST en gros — la phrase qui pique */}
+          <div style={{
+            paddingLeft: 14,
+            borderLeft: `3px solid ${COLORS.red}`,
+            marginBottom: 22,
+          }}>
+            <div style={{
+              fontFamily: "ui-serif, Georgia, serif",
+              fontSize: 19,
+              fontStyle: "italic",
+              color: COLORS.navy,
+              lineHeight: 1.4,
+              fontWeight: 500,
+            }}>
+              « {renderTwist(family.shareQuote)} »
+            </div>
+          </div>
+
+          {/* Footer signature */}
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            paddingTop: 16,
+            borderTop: `1px solid ${COLORS.border}`,
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 10,
+            color: COLORS.textDim,
+            letterSpacing: "0.2em",
+            fontWeight: 600,
+          }}>
+            <span>REPUBLICA.FR</span>
+            <span style={{ color: COLORS.gold }}>#JOUEZ_LE_VÔTRE</span>
           </div>
         </div>
       </div>
@@ -853,18 +954,104 @@ function Profile({ choices, dossiers, indicators, scores, onRestart }) {
   );
 }
 
-function classifyFamily(scores) {
+function classifyFamily(scores, indicators) {
   const { liberal = 0, social = 0, autorite = 0, europe = 0 } = scores;
-  const max = Math.max(liberal, social, autorite, europe);
-  if (max === 0) return { label: "Centre · indéterminé", shortLabel: "Centriste", closeTo: "Tradition modérée", tagline: "Vous gouvernez par équilibre. Ni rupture, ni constance idéologique.", shareQuote: "J'ai cherché le compromis. Toujours.", pct: 11 };
-  if (autorite === max && autorite >= 3) return { label: "Droite conservatrice", shortLabel: "Droite conservatrice", closeTo: "Tradition gaulliste régalienne", tagline: "Vous gouvernez par la fermeté. Votre boussole : l'autorité, la responsabilité, le refus du compromis perçu comme faiblesse.", shareQuote: "J'ai tranché, j'ai assumé. Le pays plie, il ne se rompt pas.", pct: 22 };
-  if (social === max && social >= 4) return { label: "Gauche radicale · contestataire", shortLabel: "Gauche radicale", closeTo: "Tradition contestataire", tagline: "Vous refusez les cadres imposés. La justice avant tout.", shareQuote: "J'ai refusé les cadres. J'ai gouverné à contre-courant.", pct: 9 };
-  if (social === max && social >= 2) return { label: "Centre-gauche · réformiste social", shortLabel: "Centre-gauche social", closeTo: "Tradition rocardienne", tagline: "Vous croyez à la justice sociale comme moteur du progrès.", shareQuote: "J'ai investi dans le pays. La dette monte, mais la France se reconstruit.", pct: 14 };
-  if (europe === max && europe >= 3) return { label: "Centre · social-européen", shortLabel: "Centre social-européen", closeTo: "Sociale-démocratie réformiste", tagline: "Vous croyez à la négociation comme méthode et à l'Europe comme cadre.", shareQuote: "J'ai négocié, j'ai européanisé. Le pays avance sans se déchirer.", pct: 16 };
-  if (liberal === max && liberal >= 4) return { label: "Droite libérale décomplexée", shortLabel: "Droite libérale", closeTo: "Tradition libérale-conservatrice", tagline: "Vous croyez au marché, à la concurrence, à la responsabilité individuelle.", shareQuote: "J'ai libéré ce qui devait l'être. Tant pis pour les rentes.", pct: 13 };
-  if (liberal === max && liberal >= 2) return { label: "Centre-droit · libéral européen", shortLabel: "Centre-droit libéral", closeTo: "Macronisme première manière", tagline: "Vous croyez à la rigueur budgétaire et à l'ouverture économique.", shareQuote: "Réforme structurelle et discipline. J'ai assumé les deux.", pct: 19 };
-  if (europe >= 2 && liberal >= 1) return { label: "Centre · technocratique", shortLabel: "Centre technocratique", closeTo: "Tradition giscardienne", tagline: "Vous croyez à la méthode plus qu'à la rupture.", shareQuote: "Pas de feuilleton, juste des résultats.", pct: 12 };
-  return { label: "Centre · pragmatique", shortLabel: "Centre pragmatique", closeTo: "Tradition modérée française", tagline: "Vous gouvernez sans étiquette idéologique fixe.", shareQuote: "J'ai pris chaque décision pour ce qu'elle valait.", pct: 14 };
+  const { debt = 115.6, confidence = 52, parliament = 287, tension = 4.2, spread = 64 } = indicators || {};
+
+  // ═══ Étape A : déterminer la famille politique principale (7 catégories nettes) ═══
+  const scoreList = [
+    { key: "social_radical", value: social >= 4 ? social + 1 : 0, family: "Gauche radicale" },
+    { key: "social_dem", value: social >= 2 ? social : 0, family: "Social-démocrate" },
+    { key: "ecologiste", value: 0, family: "Écologiste" }, // pas de score "écologie" dans la matrice actuelle
+    { key: "autorite", value: autorite >= 3 ? autorite : 0, family: "Conservateur" },
+    { key: "national", value: autorite >= 5 ? autorite + 1 : 0, family: "National-populaire" },
+    { key: "liberal", value: liberal >= 2 ? liberal : 0, family: "Libéral" },
+    { key: "europe", value: europe >= 3 ? europe : 0, family: "Centriste" },
+  ];
+  scoreList.sort((a, b) => b.value - a.value);
+  const top = scoreList[0];
+  const family = top.value > 0 ? top.family : "Centriste";
+
+  // ═══ Étape B : déterminer l'adjectif qui pique selon le BILAN réel ═══
+  // L'adjectif révèle COMMENT le mandat s'est passé, pas juste l'orientation idéologique.
+  let adjective = "";
+  if (confidence < 35) adjective = "isolé";
+  else if (debt > 119) adjective = "endetté";
+  else if (tension > 6) adjective = "contesté";
+  else if (parliament < 270) adjective = "fragilisé";
+  else if (spread > 80) adjective = "sous pression";
+  else if (confidence > 65 && debt > 117) adjective = "généreux";
+  else if (confidence > 65) adjective = "rassembleur";
+  else if (debt < 114 && confidence < 50) adjective = "rigoureux";
+  else adjective = "réformateur";
+
+  // ═══ Étape C : pourcentage (pour effet de rareté / partage) ═══
+  const pctMap = {
+    "Gauche radicale": 8,
+    "Social-démocrate": 17,
+    "Écologiste": 11,
+    "Centriste": 19,
+    "Libéral": 14,
+    "Conservateur": 18,
+    "National-populaire": 13,
+  };
+  const pct = pctMap[family] || 14;
+
+  // ═══ Étape D : construire le twist « Vous avez X… mais Y » ═══
+  // On choisit le verbe positif selon l'orientation, et la conséquence négative selon l'indicateur le plus dégradé.
+  const positives = {
+    "Gauche radicale": "refusé les cadres imposés",
+    "Social-démocrate": "apaisé le pays",
+    "Écologiste": "préparé la transition",
+    "Centriste": "tenu votre ligne",
+    "Libéral": "libéré l'économie",
+    "Conservateur": "rétabli l'autorité",
+    "National-populaire": "parlé fort à la nation",
+  };
+
+  // Trouver la conséquence négative la plus marquante
+  const negatives = [];
+  if (debt > 118) negatives.push({ score: debt - 118, label: "fait exploser la dette" });
+  if (confidence < 40) negatives.push({ score: 40 - confidence, label: "perdu la confiance du pays" });
+  if (parliament < 275) negatives.push({ score: 275 - parliament, label: "perdu votre majorité" });
+  if (tension > 5.5) negatives.push({ score: tension * 10, label: "embrasé la rue" });
+  if (spread > 80) negatives.push({ score: spread - 80, label: "fait fuir les marchés" });
+  if (europe < -2) negatives.push({ score: -europe, label: "isolé la France à Bruxelles" });
+
+  let negative;
+  if (negatives.length > 0) {
+    negatives.sort((a, b) => b.score - a.score);
+    negative = negatives[0].label;
+  } else {
+    // Si rien n'est dramatiquement négatif, on fait quand même un twist nuancé
+    if (liberal > social) negative = "déçu les classes populaires";
+    else if (social > liberal) negative = "alarmé Bercy";
+    else negative = "laissé le pays sans cap clair";
+  }
+
+  const positiveVerb = positives[family] || "tenu le cap";
+  const shareQuote = `Vous avez ${positiveVerb}… mais ${negative}.`;
+
+  // ═══ Étape E : tagline plus longue pour la page de profil ═══
+  const taglines = {
+    "Gauche radicale": "Vous avez refusé les cadres. Vous avez gouverné à contre-courant.",
+    "Social-démocrate": "Vous croyez à la justice sociale et au compromis comme méthode.",
+    "Écologiste": "Vous avez fait passer la transition avant tout le reste.",
+    "Centriste": "Vous gouvernez par l'équilibre. Ni rupture, ni dogme.",
+    "Libéral": "Vous croyez au marché, à la concurrence, à la responsabilité individuelle.",
+    "Conservateur": "Vous gouvernez par la fermeté. L'autorité avant le débat.",
+    "National-populaire": "Vous avez parlé au pays réel, au-dessus des élites.",
+  };
+
+  return {
+    label: `${family} ${adjective}`,
+    shortLabel: family,
+    adjective,
+    closeTo: "", // plus utilisé, on garde vide pour compatibilité
+    tagline: taglines[family] || "Vous avez gouverné sans étiquette idéologique fixe.",
+    shareQuote,
+    pct,
+  };
 }
 
 function Section({ children }) { return <div style={{ padding: "8px 0" }}>{children}</div>; }
