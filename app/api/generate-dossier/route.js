@@ -72,11 +72,16 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
     {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2},"signature":"C"}
   ],
   "consequences":{
-    "A":{"title":"Titre 4 mots","narrative":"2 phrases max","events":[{"day":"+5","label":"Evt 4 mots","color":"blue"},{"day":"+20","label":"...","color":"yellow"},{"day":"+45","label":"...","color":"red"},{"day":"+70","label":"...","color":"green"}]},
+    "A":{"title":"Titre 4 mots","narrative":"3 phrases qui racontent vraiment ce qui se passe","events":[
+      {"day":"+0","label":"Annonce de la décision · effet immédiat","color":"blue"},
+      {"day":"+12","label":"Conséquence chiffrée (CAC, sondage, chômage)","color":"yellow"},
+      {"day":"+25","label":"Réaction internationale ou diplomatique inattendue","color":"red"},
+      {"day":"+45","label":"Événement viral/inattendu (memes, figure improbable, sondage surprenant)","color":"green"},
+      {"day":"+70","label":"Conséquence politique long-terme qui change la suite","color":"gold"}
+    ]},
     "B":{"title":"...","narrative":"...","events":[...]},
     "C":{"title":"...","narrative":"...","events":[...]}
   }
-}
 
 ═══════════════════════════════════════════
 RISQUES — 3 conséquences immédiates si rien n'est décidé
@@ -87,6 +92,44 @@ RISQUES — 3 conséquences immédiates si rien n'est décidé
 - Chaque risque tient en UNE phrase courte, max 10 mots.
 
 TIMER : "48H" par défaut. Pour un événement urgent : "12 MINUTES", "6H", "24H". Toujours en majuscules.
+
+═══════════════════════════════════════════
+NARRATIVE — la phrase qui ouvre les conséquences
+═══════════════════════════════════════════
+Le champ "narrative" doit raconter en 3 phrases ce qui se passe, comme un journaliste qui résume la séquence. Ton vivant, presque romanesque. JAMAIS technocratique. Premier mot fort.
+Ex: "Le pays gronde. Les marchés vacillent. Mais vous tenez."
+Ex: "Bruxelles s'inquiète, l'opinion applaudit, l'opposition vous tend un piège."
+
+═══════════════════════════════════════════
+CONSÉQUENCES — RÈGLE D'OR : ce sont elles qui font raconter sa partie
+═══════════════════════════════════════════
+Chaque scénario doit générer EXACTEMENT 5 events qui racontent une histoire, avec ces 5 saveurs OBLIGATOIRES :
+
+1. **EFFET IMMÉDIAT** (day +0 à +5) : la décision est annoncée, première réaction concrète. Couleur "blue".
+   Ex: "Décret publié · effet immédiat", "Discours fort à l'Assemblée", "Annonce surprise au JT de 20h"
+
+2. **CHIFFRE QUI FRAPPE** (day +10 à +20) : un chiffre dramatique et palpable, pas une statistique molle. Couleur "yellow".
+   Ex: "CAC 40 –3,2%", "Cote chute de 7 points", "+ 120 000 manifestants à Paris", "Spread OAT s'écarte de 18 pb"
+
+3. **RÉACTION INATTENDUE D'UN ACTEUR EXTERNE** (day +20 à +35) : un pays, une organisation, un acteur surprenant prend position. Couleur "red".
+   Ex: "L'Italie vous soutient publiquement", "La Pologne bloque un texte en représailles", "Le Vatican s'invite dans le débat", "Bruxelles ouvre une procédure"
+
+4. **MOMENT VIRAL OU DRÔLE** (day +35 à +55) : un événement absurde, viral, ou inattendu qui fait sourire ou raconter. Couleur "green".
+   Ex: "TikTok français explose de memes · cote +8 points chez les 18-25 ans", "Un humoriste vous imite, sketch à 8M de vues", "Sondage surprise : 62% des agriculteurs vous soutiennent", "Un ministre démissionne en direct sur X"
+
+5. **CONSÉQUENCE LONG-TERME** (day +60 à +80) : un effet politique structurant qui change la suite du mandat. Couleur "gold".
+   Ex: "Votre majorité se recompose autour de ce vote", "Vous gagnez 4 points dans les Hauts-de-France", "Une nouvelle ligne politique émerge dans l'opposition"
+
+INTERDITS ABSOLUS :
+- "Bercy demande un plan d'extinction" → trop ENA, mort.
+- "Réunion interministérielle" → mort.
+- "Communiqué de presse" → mort.
+- Tout vocabulaire technocratique doux.
+
+À LA PLACE :
+- Chiffres précis, noms d'acteurs, conséquences palpables.
+- Si tu hésites entre "réunion technique" et "explosion sur TikTok", choisis TikTok.
+- L'objectif : que le joueur ait envie de screenshoter et de raconter à un pote.
 
 COULEURS : blue, red, gold, green, muted, yellow
 DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20)
