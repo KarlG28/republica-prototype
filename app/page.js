@@ -532,7 +532,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
                 alignItems: "flex-start",
               }}>
                 <span style={{ color: COLORS.gold, fontWeight: 700, flexShrink: 0 }}>—</span>
-                <span>{renderRich(r)}</span>
+                <span dangerouslySetInnerHTML={{ __html: String(r).replace(/\*\*(.+?)\*\*/g, '<strong style="color: ' + COLORS.navy + '; font-weight: 600">$1</strong>') }} />
               </li>
             ))}
           </ul>
