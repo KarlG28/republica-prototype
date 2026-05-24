@@ -551,7 +551,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
       {(dossier.scenarios || []).filter(Boolean).map((s, i) => (
         <ScenarioButton key={i} code={s.code || `SCÉNARIO ${i+1}`} color={resolveColor(s.color || "blue")} title={s.title || "Sans titre"} risk={s.risk || ""}
           desc={s.desc || ""} tags={(s.tags || []).filter(Boolean).map(t => Array.isArray(t) ? t : [t, true])}
-          onClick={() => onSelectScenario(s)} />
+         onClick={() => onSelectScenario(i)} />
       ))}
     </Section>
   );
