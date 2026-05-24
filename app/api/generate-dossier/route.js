@@ -1,6 +1,5 @@
 // ============================================================
 // ENDPOINT API · GÉNÉRATION DE DOSSIER PAR CLAUDE
-// Version ultra-optimisée pour rester sous 25s sur Vercel Hobby
 // ============================================================
 
 export const runtime = "edge";
@@ -16,7 +15,7 @@ CONTRAINTES :
 
 EXEMPLES de sujets (à ne PAS reprendre, juste pour l'esprit) : statut juridique d'une langue régionale, pédiatres dans le Massif central, aidants familiaux, encadrement du lobbying, friches industrielles, pompiers volontaires, tension Mayotte, quotas d'IA dans le service public.
 
-FORMAT : JSON STRICT uniquement, aucun texte ni markdown autour.
+FORMAT : JSON STRICT uniquement, aucun texte ni markdown autour. Sois CONCIS dans toutes les chaînes de texte.
 
 STRUCTURE EXACTE :
 {
@@ -26,21 +25,21 @@ STRUCTURE EXACTE :
   "title":"Titre 5-8 mots",
   "subtitle":"Sous-titre 10-15 mots",
   "urgent":false,
-  "summary":{"contexte":"Contexte avec **données en gras** (2 phrases)","enjeu":"Enjeu en 1 phrase"},
+  "summary":{"contexte":"Contexte avec **données en gras** (2 phrases max)","enjeu":"Enjeu en 1 phrase"},
   "sources":["[1] Source · date"],
   "agents":[
-    {"name":"Acteur 1","color":"blue","stance":"POSITION","quote":"Citation courte"},
+    {"name":"Acteur 1","color":"blue","stance":"POSITION","quote":"Citation 10 mots max"},
     {"name":"Acteur 2","color":"red","stance":"POSITION","quote":"..."},
     {"name":"Acteur 3","color":"gold","stance":"POSITION","quote":"..."},
     {"name":"Acteur 4","color":"muted","stance":"POSITION","quote":"..."}
   ],
   "scenarios":[
-    {"code":"SCÉNARIO A","color":"blue","title":"Titre","risk":"QUALIF","desc":"Description 1-2 phrases","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
+    {"code":"SCÉNARIO A","color":"blue","title":"Titre 4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
     {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2},"signature":"B"},
     {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2},"signature":"C"}
   ],
   "consequences":{
-    "A":{"title":"...","narrative":"3 phrases","events":[{"day":"+5","label":"Evt 1","color":"blue"},{"day":"+20","label":"Evt 2","color":"yellow"},{"day":"+45","label":"Evt 3","color":"red"},{"day":"+70","label":"Evt 4","color":"green"}]},
+    "A":{"title":"Titre 4 mots","narrative":"2 phrases max","events":[{"day":"+5","label":"Evt 4 mots","color":"blue"},{"day":"+20","label":"...","color":"yellow"},{"day":"+45","label":"...","color":"red"},{"day":"+70","label":"...","color":"green"}]},
     "B":{"title":"...","narrative":"...","events":[...]},
     "C":{"title":"...","narrative":"...","events":[...]}
   }
@@ -60,13 +59,12 @@ export async function POST(request) {
       return jsonResponse({ error: "Clé API manquante" }, 500);
     }
 
-    // On ne garde que les 3 derniers titres pour rester court
     const recentTitles = previousTitles.slice(-3);
     const exclusion = recentTitles.length > 0
       ? ` Évite ces sujets : ${recentTitles.join(", ")}.`
       : "";
 
-    const userMessage = `Génère un dossier politique inédit.${exclusion} JSON uniquement.`;
+    const userMessage = `Génère un dossier politique inédit.${exclusion} JSON uniquement, concis.`;
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -77,7 +75,7 @@ export async function POST(request) {
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5",
-        max_tokens: 2200,
+        max_tokens: 3500,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
       }),
@@ -90,6 +88,15 @@ export async function POST(request) {
 
     const data = await response.json();
     const text = data.content?.[0]?.text || "";
+    const stopReason = data.stop_reason || "";
+
+    // Si Claude a été coupé par max_tokens, on signale clairement
+    if (stopReason === "max_tokens") {
+      return jsonResponse({
+        error: "Réponse Claude tronquée (max_tokens atteint)",
+        details: `stop_reason: ${stopReason}, longueur: ${text.length}`,
+      }, 500);
+    }
 
     let cleaned = text.trim();
     if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
@@ -110,7 +117,9 @@ export async function POST(request) {
       return jsonResponse({
         error: "JSON invalide",
         details: parseError.message,
-        rawPreview: cleaned.slice(0, 300),
+        stopReason,
+        rawPreview: cleaned.slice(0, 500),
+        rawEnd: cleaned.slice(-200),
       }, 500);
     }
 
