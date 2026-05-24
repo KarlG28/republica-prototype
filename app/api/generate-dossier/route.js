@@ -149,6 +149,7 @@ export async function POST(request) {
   try {
     const body = await request.json().catch(() => ({}));
     const previousTitles = body.previousTitles || [];
+    const forceUrgent = body.forceUrgent === true;
 
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
@@ -160,8 +161,12 @@ export async function POST(request) {
       ? ` Évite ces sujets : ${recentTitles.join(", ")}.`
       : "";
 
-    const userMessage = `Génère un dossier politique inédit.${exclusion} JSON uniquement, concis.`;
+  const urgentDirective = forceUrgent
+      ? ` ATTENTION : ce dossier doit OBLIGATOIREMENT avoir urgent: true. C'est une CRISE qui interrompt le mandat. Titre court et choc (attentat déjoué, ministre qui démissionne en direct, crise diplomatique, panne nationale, fuite explosive dans la presse, mouvement social surprise). Timer court (12 MINUTES, 2H ou 6H). Subtitle qui pose une urgence palpable. NE PIOCHE PAS dans la liste des 9 sujets, invente une vraie crise.`
+      : ` Ce dossier a urgent: false. C'est un arbitrage normal piochant dans la liste des 9 sujets autorisés.`;
 
+    const userMessage = `Génère un dossier politique inédit.${exclusion}${urgentDirective} JSON uniquement, concis.`;
+    
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
