@@ -1,40 +1,71 @@
-// ============================================================
-// ENDPOINT API · GÉNÉRATION DE DOSSIER PAR CLAUDE
-// ============================================================
-
-export const runtime = "edge";
-export const maxDuration = 25;
-
 const SYSTEM_PROMPT = `Tu génères un dossier politique français inédit pour une simulation présidentielle (2026).
 
-CONTRAINTES :
-- Sujet original, ancré dans le réel français. Pas de cliché.
-- Ton institutionnel, sobre, sérieux.
-- Données chiffrées plausibles.
-- Ne cite jamais de personne réelle vivante par son nom.
+OBJECTIF DU PRODUIT :
+Ce n'est PAS un simulateur ENA. C'est un produit grand public qui doit faire raconter sa partie. Le joueur doit voir le CONFLIT avant l'analyse. Trois choix swipables, conséquences en cascade, partage viral.
 
-EXEMPLES de sujets (à ne PAS reprendre, juste pour l'esprit) : statut juridique d'une langue régionale, pédiatres dans le Massif central, aidants familiaux, encadrement du lobbying, friches industrielles, pompiers volontaires, tension Mayotte, quotas d'IA dans le service public.
+═══════════════════════════════════════════
+SUJETS AUTORISÉS — pioche UN sujet dans cette liste, ou un sujet TRÈS proche
+═══════════════════════════════════════════
+1. TikTok interdit aux moins de 15 ans
+2. Rétablir le service militaire obligatoire
+3. Plafonner le télétravail à 3 jours par semaine
+4. Supprimer les préfets
+5. Autoriser les universités à sélectionner les étudiants
+6. Expulser un influenceur étranger condamné
+7. Surtaxer Shein et l'ultra fast-fashion
+8. Privatiser l'audiovisuel public
+9. Interdire les écrans à l'école primaire
 
-FORMAT : JSON STRICT uniquement, aucun texte ni markdown autour. Sois CONCIS dans toutes les chaînes de texte.
+TEST DE VALIDATION : si le sujet peut être débattu dans un café à 11h le dimanche, c'est bon. Si c'est un colloque Sciences Po à 16h le mardi, c'est mauvais.
 
-STRUCTURE EXACTE :
+INTERDITS ABSOLUS :
+- Régulation des matelas connectés, quotas d'IA dans le service public, statut juridique d'une langue régionale, encadrement du lobbying : ces sujets sont MORTS.
+- Aucun nom de personne réelle vivante.
+- Aucun jargon technocratique.
+
+═══════════════════════════════════════════
+TON
+═══════════════════════════════════════════
+- Direct, incarné, conflictuel.
+- Langue parlée par un Français normal, pas un haut fonctionnaire.
+- Chiffres impactants et plausibles.
+- Le subtitle doit créer une tension immédiate ("Bruxelles veut imposer...", "Les syndicats menacent de...", etc.)
+
+═══════════════════════════════════════════
+CATÉGORIES POLITIQUES AUTORISÉES (pour agents.stance)
+═══════════════════════════════════════════
+Utilise EXACTEMENT ces 7 labels, jamais d'autres :
+- Gauche radicale
+- Social-démocrate
+- Écologiste
+- Centriste
+- Libéral
+- Conservateur
+- National-populaire
+
+Tu peux ajouter un suffixe court : "proche de [organisation]" ou "tendance [un mot]".
+JAMAIS : "gauche radicale contestataire", "écologiste décroissant", "libéral-conservateur modéré", "social-démocrate de tradition". Ces formulations sont INTERDITES.
+
+═══════════════════════════════════════════
+FORMAT : JSON STRICT, aucun texte ni markdown autour.
+═══════════════════════════════════════════
 {
   "id":"slug-court",
   "day":"J+XX",
   "tag":"Note d'arbitrage présidentiel",
-  "title":"Titre 5-8 mots",
-  "subtitle":"Sous-titre 10-15 mots",
+  "title":"Titre 5-8 mots, direct, incarné",
+  "subtitle":"Phrase qui pose le conflit en 10-15 mots",
   "urgent":false,
-  "summary":{"contexte":"Contexte avec **données en gras** (2 phrases max)","enjeu":"Enjeu en 1 phrase"},
+  "summary":{"contexte":"Contexte avec **chiffres en gras** (2 phrases max, langage normal)","enjeu":"Enjeu en 1 phrase percutante"},
   "sources":["[1] Source · date"],
   "agents":[
-    {"name":"Acteur 1","color":"blue","stance":"POSITION","quote":"Citation 10 mots max"},
-    {"name":"Acteur 2","color":"red","stance":"POSITION","quote":"..."},
-    {"name":"Acteur 3","color":"gold","stance":"POSITION","quote":"..."},
-    {"name":"Acteur 4","color":"muted","stance":"POSITION","quote":"..."}
+    {"name":"Acteur 1","color":"blue","stance":"Centriste","quote":"Citation 10 mots max"},
+    {"name":"Acteur 2","color":"red","stance":"Gauche radicale","quote":"..."},
+    {"name":"Acteur 3","color":"gold","stance":"Libéral","quote":"..."},
+    {"name":"Acteur 4","color":"muted","stance":"Conservateur","quote":"..."}
   ],
   "scenarios":[
-    {"code":"SCÉNARIO A","color":"blue","title":"Titre 4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
+    {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
     {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2},"signature":"B"},
     {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2},"signature":"C"}
   ],
