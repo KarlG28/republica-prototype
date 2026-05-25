@@ -14,24 +14,27 @@ Le champ "urgent" peut être true ou false.
 - Ces sujets de crise s'ajoutent à la liste des sujets autorisés — ils n'ont pas besoin de venir des 9 sujets pré-cadrés.
 
 ═══════════════════════════════════════════
-SUJETS AUTORISÉS — pioche UN sujet dans cette liste, ou un sujet TRÈS proche
+LE SUJET — invente, ne pioche pas
 ═══════════════════════════════════════════
-1. TikTok interdit aux moins de 15 ans
-2. Rétablir le service militaire obligatoire
-3. Plafonner le télétravail à 3 jours par semaine
-4. Supprimer les préfets
-5. Autoriser les universités à sélectionner les étudiants
-6. Expulser un influenceur étranger condamné
-7. Surtaxer Shein et l'ultra fast-fashion
-8. Privatiser l'audiovisuel public
-9. Interdire les écrans à l'école primaire
+Tu inventes un sujet INÉDIT, ancré dans le réel français de 2026. Ce n'est pas un dossier de cours d'ENA. C'est un truc dont les Français parlent vraiment.
 
-TEST DE VALIDATION : si le sujet peut être débattu dans un café à 11h le dimanche, c'est bon. Si c'est un colloque Sciences Po à 16h le mardi, c'est mauvais.
+CRITÈRES D'UN BON SUJET :
+- Concret : on peut décrire le problème en une phrase à un ami au téléphone.
+- Conflictuel : au moins deux camps clairs s'affrontent. Pas de "tout le monde est d'accord pour".
+- Familier : le sujet a déjà été évoqué dans la presse, à la télé, ou dans une conversation de famille en 2025-2026.
+- Tranchant : la décision aura des perdants ET des gagnants identifiables.
+
+TEST DU CAFÉ : si tu peux imaginer le sujet débattu dans un café à 11h le dimanche, c'est bon. Si c'est un colloque Sciences Po à 16h le mardi, c'est mauvais.
+
+EXEMPLES DE BONS SUJETS (à ne PAS reprendre tels quels, juste pour l'esprit) :
+TikTok et les ados, service militaire, télétravail, sélection à l'université, Shein et l'ultra fast-fashion, audiovisuel public, écrans à l'école, expulsion d'influenceurs, plafonnement des loyers, retour de l'uniforme, dépénalisation du cannabis, voiture électrique obligatoire, surtaxe des SUV, Schengen, salaire minimum européen, port d'arme pour la police municipale, gestation pour autrui, sortie du nucléaire, fin du diesel, contrôle parental obligatoire sur les smartphones, taxe sur les billets d'avion...
 
 INTERDITS ABSOLUS :
-- Régulation des matelas connectés, quotas d'IA dans le service public, statut juridique d'une langue régionale, encadrement du lobbying : ces sujets sont MORTS.
-- Aucun nom de personne réelle vivante.
-- Aucun jargon technocratique.
+- Inventer des noms de personnes, d'entreprises, d'entités
+- Aucun jargon technocratique (matelas connectés, quotas d'IA dans le service public, statut juridique d'une langue régionale, encadrement du lobbying : MORTS).
+- Aucun sujet abstrait ("la réforme de l'État", "le modèle social français" : trop vague).
+
+VARIÉTÉ : Tu DOIS varier les domaines d'un dossier à l'autre dans une même session. Si on t'a déjà donné un sujet sur l'école, ne reprends pas l'école. Domaines à couvrir progressivement : économie, société, sécurité, international/Europe, écologie, numérique, culture, santé, justice, territoires.
 
 ═══════════════════════════════════════════
 TON
@@ -131,10 +134,16 @@ Chaque scénario doit générer EXACTEMENT 5 events qui racontent une histoire, 
    Ex: "Votre majorité se recompose autour de ce vote", "Vous gagnez 4 points dans les Hauts-de-France", "Une nouvelle ligne politique émerge dans l'opposition"
 
 INTERDITS ABSOLUS :
-- "Bercy demande un plan d'extinction" → trop ENA, mort.
-- "Réunion interministérielle" → mort.
-- "Communiqué de presse" → mort.
-- Tout vocabulaire technocratique doux.
+- Aucun jargon technocratique (matelas connectés, quotas d'IA dans le service public, statut juridique d'une langue régionale, encadrement du lobbying : MORTS).
+- Aucun sujet abstrait ("la réforme de l'État", "le modèle social français" : trop vague).
+- JAMAIS le nom propre d'une personne réelle vivante (politiques, chefs d'État, célébrités, dirigeants, journalistes nommés). Préfère toujours la FONCTION : "le ministre de l'Intérieur", "la présidente du RN", "le patron du Medef", "le secrétaire général de la CGT".
+- N'invente pas non plus de personnes fictives. Reste sur des fonctions, institutions, organisations, mouvements.
+
+AUTORISÉS et même ENCOURAGÉS :
+- Institutions réelles : Bercy, Élysée, Matignon, Conseil constitutionnel, Conseil d'État, ARCOM, AMF...
+- Fonctions et titres : "le ministre de X", "la présidente de Y", "le porte-parole de Z"
+- Organisations : partis (RN, LFI, LR, PS, EELV, Renaissance, Horizons...), syndicats (CGT, CFDT, FO, Medef, CPME...), médias (Le Monde, BFM, France Inter...), fédérations professionnelles, grandes entreprises (TotalEnergies, EDF, Carrefour, LVMH, Stellantis...)
+- Lieux et territoires précis (Marseille, Hauts-de-France, Loire-Atlantique...)
 
 À LA PLACE :
 - Chiffres précis, noms d'acteurs, conséquences palpables.
@@ -156,16 +165,44 @@ export async function POST(request) {
       return jsonResponse({ error: "Clé API manquante" }, 500);
     }
 
-    const recentTitles = previousTitles.slice(-3);
+const recentTitles = previousTitles.slice(-5);
     const exclusion = recentTitles.length > 0
-      ? ` Évite ces sujets : ${recentTitles.join(", ")}.`
+      ? ` Sujets DÉJÀ joués cette session, à exclure absolument : ${recentTitles.join(" / ")}.`
       : "";
+
+    // Prismes aléatoires qui orientent l'inspiration sans contraindre le sujet
+    const prismes = [
+      "Un sujet qui divise les générations (jeunes vs anciens).",
+      "Un sujet ancré dans un territoire précis (région, département, ville).",
+      "Un sujet où l'argent est au cœur du conflit.",
+      "Un sujet qui oppose la liberté individuelle à l'intérêt collectif.",
+      "Un sujet où la France est perçue différemment à l'étranger.",
+      "Un sujet qui touche au quotidien des classes populaires.",
+      "Un sujet qui crée du clivage entre ruraux et urbains.",
+      "Un sujet où l'Europe et la France sont en désaccord.",
+      "Un sujet technologique avec un enjeu de société.",
+      "Un sujet où la science et l'opinion publique se contredisent.",
+      "Un sujet qui réveille une vieille fracture française.",
+      "Un sujet qui mêle écologie et économie.",
+      "Un sujet qui interroge l'autorité de l'État.",
+      "Un sujet qui touche à l'identité ou à la culture.",
+      "Un sujet qui implique un groupe professionnel mobilisé (agriculteurs, profs, soignants, transporteurs...).",
+      "Un sujet où une décision rapide est techniquement impossible mais politiquement exigée.",
+      "Un sujet qui pose une question morale (santé, vie privée, fin de vie...).",
+      "Un sujet qui oppose un secteur économique français à une concurrence étrangère.",
+    ];
+    const prisme = prismes[Math.floor(Math.random() * prismes.length)];
 
   const urgentDirective = forceUrgent
       ? ` ATTENTION : ce dossier doit OBLIGATOIREMENT avoir urgent: true. C'est une CRISE qui interrompt le mandat. Titre court et choc (attentat déjoué, ministre qui démissionne en direct, crise diplomatique, panne nationale, fuite explosive dans la presse, mouvement social surprise). Timer court (12 MINUTES, 2H ou 6H). Subtitle qui pose une urgence palpable. NE PIOCHE PAS dans la liste des 9 sujets, invente une vraie crise.`
       : ` Ce dossier a urgent: false. C'est un arbitrage normal piochant dans la liste des 9 sujets autorisés.`;
 
-    const userMessage = `Génère un dossier politique inédit.${exclusion}${urgentDirective} JSON uniquement, concis.`;
+    const userMessage = `Génère un dossier politique inédit. ${exclusion}
+
+PRISME D'INSPIRATION POUR CE DOSSIER (oriente le sujet sans le déterminer) : ${prisme}
+${urgentDirective}
+
+JSON uniquement, concis.`;
     
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
