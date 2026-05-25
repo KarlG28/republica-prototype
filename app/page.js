@@ -139,6 +139,12 @@ export default function Page() {
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
   const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 2 : 3);
+
+  // ID unique de session (pour relier l'opt-in à la session anonyme)
+  const [sessionId] = useState(() => {
+    return `s_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+  });
+  
   // Synthèse Nouvelle Énergie (générée à la fin du mandat)
   const [partnerSummary, setPartnerSummary] = useState(null);
   const [partnerLoading, setPartnerLoading] = useState(false);
@@ -210,6 +216,38 @@ export default function Page() {
       setPartnerSummary(FALLBACK_PARTNER_SUMMARY);
     } finally {
       setPartnerLoading(false);
+    }
+  }
+
+async function saveSessionAnonymous(familyData) {
+    try {
+      const decisionsBrief = dossiers.map((d, i) => {
+        const sig = choices[i];
+        const sc = d.scenarios?.find(s => s.signature === sig);
+        return {
+          title: d.title,
+          urgent: !!d.urgent,
+          choice: sig,
+          choiceTitle: sc ? sc.title : null,
+        };
+      });
+
+      await fetch("/api/save-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sessionId,
+          family: familyData.shortLabel,
+          adjective: familyData.adjective,
+          decisions: decisionsBrief,
+          urgentIdx: urgentDossierIdx,
+          indicators,
+          scores,
+        }),
+      });
+    } catch (err) {
+      console.error("Erreur sauvegarde session anonyme:", err);
+      // silencieux : on ne casse pas l'expérience si Airtable échoue
     }
   }
   
@@ -304,9 +342,10 @@ const goNext = () => {
           {section === SECTIONS.consequence && currentDossier && (
             <ConsequenceView dossier={currentDossier} choice={currentChoice} indicators={indicators} isLast={currentIdx + 1 >= TOTAL_DECISIONS} onContinue={goNext} />
           )}
-          {section === SECTIONS.profile && (
+         {section === SECTIONS.profile && (
             <Profile choices={choices} dossiers={dossiers} indicators={indicators} scores={scores} onRestart={restart}
-              partnerSummary={partnerSummary} partnerLoading={partnerLoading} partnerError={partnerError} />
+              partnerSummary={partnerSummary} partnerLoading={partnerLoading} partnerError={partnerError}
+              sessionId={sessionId} onSaveAnonymous={saveSessionAnonymous} />
           )}
         </FadeIn>
 
@@ -864,14 +903,16 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
   );
 }
 
-function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError }) {
+function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
   const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
 
- useEffect(() => {
+  useEffect(() => {
     track("share_card_viewed", {
       family: family.shortLabel,
       adjective: family.adjective,
     });
+    // Sauvegarde anonyme dans Airtable, une seule fois à l'arrivée du bilan
+    if (onSaveAnonymous) onSaveAnonymous(family);
   }, []);
 
   return (
@@ -1015,6 +1056,10 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         </div>
       </div>
 
+{/* ═══ BLOC OPT-IN EMAIL ═══ */}
+      <SubTag>◊ Mes 100 jours à l'Élysée</SubTag>
+      <OptInForm sessionId={sessionId} family={family} />
+
 {/* ═══ BLOC PARTENAIRE NOUVELLE ÉNERGIE ═══ */}
       <SubTag>Une autre manière de gouverner ?</SubTag>
       <div style={{
@@ -1110,7 +1155,11 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
           <PartnerCTA href="#" label="Proposer votre idée pour les 100 jours" />
         </div>
       </div>
-            
+
+    {/* ═══ BLOC QR CODE NOUVELLE ÉNERGIE ═══ */}
+      <SubTag>Découvrir Nouvelle Énergie</SubTag>
+      <NouvelleEnergieQRBlock />
+          
       <BigButton onClick={onRestart}>Rejouer un autre mandat ↗</BigButton>
 
       <div style={{ marginTop: 24, padding: 16, background: `${COLORS.gold}08`, border: `1px solid ${COLORS.gold}30`, borderLeft: `3px solid ${COLORS.gold}` }}>
@@ -1377,5 +1426,257 @@ function PartnerCTA({ href, label, primary }) {
       <span>{label}</span>
       <span style={{ fontSize: 16 }}>→</span>
     </a>
+  );
+}
+
+// ============================================================
+// COMPOSANT OPT-IN EMAIL
+// ============================================================
+function OptInForm({ sessionId, family }) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (status === "loading" || status === "success") return;
+
+    const trimmed = email.trim();
+    if (!trimmed || !/^\S+@\S+\.\S+$/.test(trimmed)) {
+      setStatus("error");
+      setErrorMsg("Adresse email invalide.");
+      return;
+    }
+
+    setStatus("loading");
+    setErrorMsg("");
+    try {
+      const response = await fetch("/api/save-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId, email: trimmed }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `Erreur ${response.status}`);
+      }
+      track("email_submitted", { family: family.shortLabel });
+      setStatus("success");
+    } catch (err) {
+      console.error("Opt-in error:", err);
+      setStatus("error");
+      setErrorMsg("Impossible d'enregistrer. Réessayez dans un instant.");
+    }
+  };
+
+  if (status === "success") {
+    return (
+      <div style={{
+        background: `${COLORS.green}08`,
+        border: `1px solid ${COLORS.green}40`,
+        borderLeft: `3px solid ${COLORS.green}`,
+        padding: "20px 22px",
+        marginBottom: 26,
+      }}>
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: COLORS.green,
+          letterSpacing: "0.2em",
+          fontWeight: 700,
+          marginBottom: 10,
+        }}>
+          ◊ ENREGISTRÉ
+        </div>
+        <div style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 16,
+          color: COLORS.navy,
+          lineHeight: 1.55,
+          marginBottom: 6,
+          fontWeight: 600,
+        }}>
+          Votre bilan vous attendra dans votre boîte mail.
+        </div>
+        <div style={{
+          fontSize: 13,
+          color: COLORS.textMuted,
+          lineHeight: 1.55,
+        }}>
+          Vous recevrez votre profil de président et l'analyse détaillée de votre mandat. Vos données restent confidentielles.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{
+      background: COLORS.bgPanel,
+      border: `1px solid ${COLORS.border}`,
+      borderLeft: `3px solid ${COLORS.gold}`,
+      padding: "20px 22px",
+      marginBottom: 26,
+      boxShadow: `0 2px 6px ${COLORS.navy}06`,
+    }}>
+      <div style={{
+        fontFamily: "ui-serif, Georgia, serif",
+        fontSize: 16,
+        color: COLORS.navy,
+        lineHeight: 1.5,
+        marginBottom: 14,
+        fontWeight: 600,
+      }}>
+        Recevez votre profil de président par email.
+      </div>
+      <div style={{
+        fontSize: 13,
+        color: COLORS.textMuted,
+        lineHeight: 1.55,
+        marginBottom: 18,
+      }}>
+        Votre famille politique, vos décisions, vos indicateurs finaux et une analyse de votre mandat.
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            type="email"
+            placeholder="votre@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={status === "loading"}
+            style={{
+              width: "100%",
+              padding: "14px 16px",
+              background: "#fff",
+              border: `1px solid ${status === "error" ? COLORS.red : COLORS.border}`,
+              fontFamily: "system-ui, -apple-system, sans-serif",
+              fontSize: 14,
+              color: COLORS.navy,
+              outline: "none",
+              transition: "border-color 0.15s",
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = COLORS.navy; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = status === "error" ? COLORS.red : COLORS.border; }}
+          />
+          <button
+            type="submit"
+            disabled={status === "loading"}
+            style={{
+              width: "100%",
+              padding: "14px 18px",
+              background: COLORS.navy,
+              border: "none",
+              color: COLORS.textOnDark,
+              fontFamily: "ui-monospace, monospace",
+              fontSize: 12,
+              letterSpacing: "0.2em",
+              cursor: status === "loading" ? "wait" : "pointer",
+              textTransform: "uppercase",
+              fontWeight: 600,
+              opacity: status === "loading" ? 0.6 : 1,
+              transition: "all 0.2s",
+            }}
+          >
+            {status === "loading" ? "Enregistrement..." : "Mes 100 jours à l'Élysée →"}
+          </button>
+        </div>
+      </form>
+
+      {status === "error" && errorMsg && (
+        <div style={{
+          marginTop: 10,
+          fontSize: 12,
+          color: COLORS.red,
+          fontStyle: "italic",
+        }}>
+          {errorMsg}
+        </div>
+      )}
+
+      <div style={{
+        marginTop: 12,
+        fontSize: 11,
+        color: COLORS.textDim,
+        fontStyle: "italic",
+      }}>
+        Vos données restent confidentielles. Pas de spam, jamais.
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// COMPOSANT QR CODE NOUVELLE ÉNERGIE
+// ============================================================
+function NouvelleEnergieQRBlock() {
+  const url = "https://www.unenouvelleenergie.fr/";
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=0a1a3a&bgcolor=ffffff&margin=10`;
+
+  return (
+    <div style={{
+      background: COLORS.bgPanel,
+      border: `1px solid ${COLORS.border}`,
+      borderTop: `3px solid ${COLORS.gold}`,
+      padding: "22px 22px",
+      marginBottom: 26,
+      display: "flex",
+      gap: 20,
+      alignItems: "center",
+      boxShadow: `0 2px 8px ${COLORS.navy}08`,
+    }}>
+      <div style={{
+        flexShrink: 0,
+        width: 110,
+        height: 110,
+        background: "#fff",
+        padding: 4,
+        border: `1px solid ${COLORS.border}`,
+      }}>
+        <img
+          src={qrUrl}
+          alt="QR code vers le site Nouvelle Énergie"
+          width="100%"
+          height="100%"
+          style={{ display: "block" }}
+        />
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: COLORS.gold,
+          letterSpacing: "0.2em",
+          fontWeight: 700,
+          marginBottom: 6,
+        }}>
+          NOUVELLE ÉNERGIE
+        </div>
+        <div style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 16,
+          color: COLORS.navy,
+          lineHeight: 1.4,
+          marginBottom: 8,
+          fontWeight: 600,
+        }}>
+          Scannez pour découvrir notre vision.
+        </div>
+        
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => track("cta_clicked", { label: "QR site Nouvelle Énergie" })}
+          style={{
+            fontSize: 12,
+            color: COLORS.gold,
+            textDecoration: "underline",
+            fontWeight: 600,
+          }}
+        >
+          unenouvelleenergie.fr ↗
+        </a>
+      </div>
+    </div>
   );
 }
