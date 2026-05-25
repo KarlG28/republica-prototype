@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 // ============================================================
 // REPUBLICA · PROTOTYPE — VERSION CINÉMATOGRAPHIQUE
@@ -47,6 +47,17 @@ const TOTAL_DECISIONS = 5;
 function resolveColor(name) {
   const map = { blue: COLORS.blue, red: COLORS.red, redLight: COLORS.redLight, green: COLORS.green, gold: COLORS.gold, yellow: COLORS.yellow, muted: COLORS.textMuted, navy: COLORS.navy };
   return map[name] || COLORS.textMuted;
+}
+
+// Tracker Plausible : ne fait rien si Plausible bloqué/indisponible
+function track(eventName, props) {
+  try {
+    if (typeof window !== "undefined" && typeof window.plausible === "function") {
+      window.plausible(eventName, props ? { props } : undefined);
+    }
+  } catch (e) {
+    // silencieux
+  }
 }
 
 function renderRich(text) {
@@ -203,16 +214,21 @@ export default function Page() {
   }
   
   const goToIntro = () => setSection(SECTIONS.intro);
-  const startSession = () => { setCurrentIdx(0); generateDossier(); };
+  const startSession = () => {
+    track("start_session");
+    setCurrentIdx(0);
+    generateDossier();
+  };
 
   const selectScenario = (idx) => {
     setSelectedScenarioIdx(idx);
     setSection(SECTIONS.scenarioDetail);
   };
 
-  const confirmChoice = () => {
+const confirmChoice = () => {
     const dossier = dossiers[currentIdx];
     const scenario = dossier.scenarios[selectedScenarioIdx];
+    track("decision_made", { idx: String(currentIdx + 1), urgent: dossier.urgent ? "yes" : "no" });
     const deltas = scenario.deltas || {};
     const signature = scenario.signature;
     setChoices((c) => ({ ...c, [currentIdx]: signature }));
@@ -240,13 +256,10 @@ export default function Page() {
 
 const goNext = () => {
     if (currentIdx + 1 >= TOTAL_DECISIONS) {
+      track("mandate_completed");
       setSection(SECTIONS.profile);
       generatePartnerSummary();
     } else {
-      setCurrentIdx(currentIdx + 1);
-      generateDossier();
-    }
-  };
 
   const restart = () => window.location.reload();
 
@@ -849,6 +862,14 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
 
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError }) {
   const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
+
+  useEffect(() => {
+    track("share_card_viewed", {
+      family: family.shortLabel,
+      adjective: family.adjective,
+    });
+  }, []);
+
   return (
     <Section>
       <Tag>— Votre famille politique —</Tag>
@@ -1322,8 +1343,11 @@ function delta(d) {
   return `${sign} ${d > 0 ? "+" : ""}${d.toFixed(1)}`;
 }
 function PartnerCTA({ href, label, primary }) {
+  const handleClick = () => {
+    track("cta_clicked", { label });
+  };
   return (
-    <a href={href} style={{
+    <a href={href} onClick={handleClick} style={{
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
