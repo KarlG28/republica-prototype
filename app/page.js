@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 
 // ============================================================
 // REPUBLICA · PROTOTYPE — VERSION CINÉMATOGRAPHIQUE
@@ -69,6 +69,24 @@ function renderRich(text) {
     }
     return <span key={i}>{p}</span>;
   });
+}
+
+// Convertit une phrase à la 2ème personne en 1ère personne (pour la carte téléchargée)
+function toFirstPerson(text) {
+  if (!text) return text;
+  let t = text;
+  // Substitutions ordonnées : du plus spécifique au plus général
+  t = t.replace(/Vous avez/gi, "J'ai");
+  t = t.replace(/vous avez/gi, "j'ai");
+  t = t.replace(/Vous êtes/gi, "Je suis");
+  t = t.replace(/vous êtes/gi, "je suis");
+  t = t.replace(/Vous /g, "Je ");
+  t = t.replace(/ vous /g, " je ");
+  t = t.replace(/Votre /g, "Ma ");
+  t = t.replace(/ votre /g, " ma ");
+  t = t.replace(/Vos /g, "Mes ");
+  t = t.replace(/ vos /g, " mes ");
+  return t;
 }
 
 function renderTwist(text) {
@@ -905,6 +923,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
 
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
   const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
+  const shareCardRef = useRef(null);
 
   useEffect(() => {
     track("share_card_viewed", {
@@ -1055,6 +1074,12 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
           </div>
         </div>
       </div>
+
+{/* Bouton de partage intelligent (mobile = Web Share / desktop = download) */}
+      <ShareButton shareCardRef={shareCardRef} family={family} />
+
+      {/* Carte 1080x1080 cachée pour la capture html2canvas */}
+      <ShareCardImage family={family} dossiers={dossiers} shareCardRef={shareCardRef} />
 
 {/* ═══ BLOC OPT-IN EMAIL ═══ */}
       <SubTag>◊ Mes 100 jours à l'Élysée</SubTag>
@@ -1680,4 +1705,245 @@ function NouvelleEnergieQRBlock() {
       </div>
     </div>
   );
+}
+
+// ============================================================
+// CARTE DE PARTAGE 1080x1080 — version téléchargeable
+// ============================================================
+function ShareCardImage({ family, dossiers, shareCardRef }) {
+  const url = "https://www.unenouvelleenergie.fr/";
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(url)}&color=0a1a3a&bgcolor=ffffff&margin=0`;
+  const nbCrises = dossiers.filter(d => d.urgent).length;
+  const quote = toFirstPerson(family.shareQuote);
+  // Découpe pour mettre la partie après "mais" en rouge
+  const match = quote.match(/^(.+?)(\.\.\.|…)\s*mais\s+(.+)$/i);
+
+  return (
+    <div ref={shareCardRef} style={{
+      position: "absolute",
+      left: "-9999px",
+      top: 0,
+      width: 1080,
+      height: 1080,
+      background: "#fafaf7",
+      overflow: "hidden",
+      fontFamily: "system-ui, -apple-system, sans-serif",
+    }}>
+      {/* Filigrane R rouge en arrière-plan */}
+      <div style={{
+        position: "absolute",
+        top: -80,
+        right: -60,
+        fontFamily: "Georgia, serif",
+        fontSize: 760,
+        color: "rgba(230, 70, 50, 0.06)",
+        fontWeight: 600,
+        lineHeight: 1,
+        fontStyle: "italic",
+        pointerEvents: "none",
+      }}>R</div>
+
+      {/* Top : logo + QR */}
+      <div style={{ position: "absolute", top: 56, left: 64, right: 64, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: "50%",
+            background: "#e63946",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "Georgia, serif", fontSize: 40, color: "#fafaf7",
+            fontWeight: 600, fontStyle: "italic",
+          }}>R</div>
+          <div>
+            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, color: "#0a1a3a", letterSpacing: "0.2em", fontWeight: 700, lineHeight: 1 }}>REPUBLICA</div>
+            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, color: "rgba(10,26,58,0.5)", letterSpacing: "0.15em", marginTop: 8 }}>MES 100 JOURS</div>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+          <div style={{ width: 120, height: 120, background: "#fff", padding: 8, border: "1px solid rgba(10,26,58,0.1)" }}>
+            <img src={qrUrl} alt="" width="100%" height="100%" style={{ display: "block" }} crossOrigin="anonymous" />
+          </div>
+          <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 13, color: "#e63946", letterSpacing: "0.15em", fontWeight: 700 }}>NOUVELLE ÉNERGIE</div>
+        </div>
+      </div>
+
+      {/* Bloc principal : famille politique */}
+      <div style={{ position: "absolute", top: 290, left: 96, right: 96 }}>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#e6b94f", letterSpacing: "0.28em", fontWeight: 700, marginBottom: 24 }}>
+          J'AI GOUVERNÉ EN
+        </div>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 128, fontWeight: 600, color: "#0a1a3a", lineHeight: 0.95, letterSpacing: "-0.025em", marginBottom: 8 }}>
+          {family.shortLabel}
+        </div>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 112, fontWeight: 600, color: "#e63946", lineHeight: 0.95, fontStyle: "italic", letterSpacing: "-0.02em" }}>
+          {family.adjective}.
+        </div>
+      </div>
+
+      {/* Twist en gros avec bordure rouge */}
+      <div style={{ position: "absolute", top: 730, left: 96, right: 96, paddingLeft: 32, borderLeft: "8px solid #e63946" }}>
+        <div style={{ fontFamily: "Georgia, serif", fontSize: 44, color: "#0a1a3a", lineHeight: 1.35, fontStyle: "italic", fontWeight: 500 }}>
+          {match ? (
+            <>
+              « {match[1]}{match[2]} mais{" "}
+              <span style={{ color: "#e63946", fontWeight: 700 }}>{match[3].replace(/\.$/, "")}</span>. »
+            </>
+          ) : (
+            <>« {quote} »</>
+          )}
+        </div>
+      </div>
+
+      {/* Séparateur */}
+      <div style={{ position: "absolute", bottom: 180, left: 96, right: 96, height: 1, background: "rgba(10,26,58,0.15)" }} />
+
+      {/* Stats + signature */}
+      <div style={{ position: "absolute", bottom: 100, left: 96, right: 96, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#0a1a3a", letterSpacing: "0.18em", fontWeight: 700 }}>
+          5 DÉCISIONS · {nbCrises} CRISE{nbCrises > 1 ? "S" : ""}
+        </div>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#e6b94f", letterSpacing: "0.18em", fontWeight: 700 }}>
+          REPUBLICA.FR
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", bottom: 44, left: 96, right: 96, textAlign: "center", fontFamily: "ui-monospace, monospace", fontSize: 18, color: "rgba(10,26,58,0.4)", letterSpacing: "0.3em", fontWeight: 600 }}>
+        #JOUEZ_LE_VÔTRE
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
+// BOUTON DE PARTAGE INTELLIGENT (mobile = Web Share, desktop = download)
+// ============================================================
+function ShareButton({ shareCardRef, family }) {
+  const [status, setStatus] = useState("idle"); // idle | generating | success | error
+  const [errorMsg, setErrorMsg] = useState("");
+
+  // Détection mobile pour décider Web Share vs download
+  const isMobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  const handleClick = async () => {
+    if (status === "generating") return;
+    setStatus("generating");
+    setErrorMsg("");
+
+    try {
+      // Charger html2canvas dynamiquement (depuis CDN)
+      if (typeof window.html2canvas === "undefined") {
+        await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+      }
+
+      if (!shareCardRef.current) {
+        throw new Error("Carte introuvable");
+      }
+
+      const canvas = await window.html2canvas(shareCardRef.current, {
+        backgroundColor: "#fafaf7",
+        scale: 1, // déjà en 1080px natif
+        useCORS: true,
+        allowTaint: false,
+        logging: false,
+      });
+
+      // Convertir en blob
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
+      if (!blob) throw new Error("Impossible de générer l'image");
+
+      const fileName = `republica-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
+
+      // Sur mobile : tenter Web Share API
+      if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
+        const file = new File([blob], fileName, { type: "image/png" });
+        await navigator.share({
+          files: [file],
+          title: "Mon mandat sur Republica",
+          text: `J'ai gouverné en ${family.shortLabel} ${family.adjective}. Et toi ?`,
+        });
+        track("share_card_shared", { mode: "native", family: family.shortLabel });
+      } else {
+        // Sur desktop ou si Web Share indisponible : download direct
+        const dataUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = dataUrl;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(dataUrl);
+        track("share_card_shared", { mode: "download", family: family.shortLabel });
+      }
+
+      setStatus("success");
+      setTimeout(() => setStatus("idle"), 2500);
+    } catch (err) {
+      // Web Share annulé par l'utilisateur ≠ erreur
+      if (err && err.name === "AbortError") {
+        setStatus("idle");
+        return;
+      }
+      console.error("Share error:", err);
+      setStatus("error");
+      setErrorMsg("Impossible de générer l'image. Réessayez.");
+    }
+  };
+
+  const label =
+    status === "generating" ? "Création de l'image…" :
+    status === "success" ? (isMobile ? "Partagé ✓" : "Téléchargé ✓") :
+    isMobile ? "Partager ma carte" : "Télécharger ma carte";
+
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <button
+        onClick={handleClick}
+        disabled={status === "generating"}
+        style={{
+          width: "100%",
+          padding: "16px 22px",
+          background: status === "success" ? "#3a7a4a" : "#e63946",
+          border: "none",
+          color: "#fafaf7",
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 13,
+          letterSpacing: "0.2em",
+          cursor: status === "generating" ? "wait" : "pointer",
+          textTransform: "uppercase",
+          fontWeight: 700,
+          opacity: status === "generating" ? 0.7 : 1,
+          transition: "all 0.2s",
+          boxShadow: `0 4px 12px rgba(230,57,70,0.3)`,
+        }}
+      >
+        {label} {status === "idle" && "↗"}
+      </button>
+      {status === "error" && errorMsg && (
+        <div style={{ marginTop: 8, fontSize: 12, color: "#a83232", fontStyle: "italic", textAlign: "center" }}>
+          {errorMsg}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Loader de script externe en promise
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      existing.addEventListener("load", resolve);
+      existing.addEventListener("error", reject);
+      if (existing.dataset.loaded === "true") resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = "true";
+      resolve();
+    };
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
 }
