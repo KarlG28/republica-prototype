@@ -260,6 +260,10 @@ const goNext = () => {
       setSection(SECTIONS.profile);
       generatePartnerSummary();
     } else {
+      setCurrentIdx(currentIdx + 1);
+      generateDossier();
+    }
+  };
 
   const restart = () => window.location.reload();
 
@@ -863,7 +867,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError }) {
   const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
 
-  useEffect(() => {
+ useEffect(() => {
     track("share_card_viewed", {
       family: family.shortLabel,
       adjective: family.adjective,
