@@ -1674,7 +1674,7 @@ function NouvelleEnergieQRBlock() {
             fontWeight: 600,
           }}
         >
-          unenouvelleenergie.fr ↗
+          unenouvelleenergie.fr →
         </a>
       </div>
     </div>
