@@ -418,6 +418,16 @@ const goNext = () => {
         .republica-urgent-card {
           animation: urgentShake 0.3s ease-in-out 3, urgentGlow 2s ease-in-out infinite 1s;
         }
+        @keyframes cursorBlink {
+          0%, 50% { opacity: 1; }
+          51%, 100% { opacity: 0; }
+        }
+        .republica-cursor {
+          display: inline-block;
+          margin-left: 2px;
+          color: #e6b94f;
+          animation: cursorBlink 0.9s steps(2) infinite;
+        }
       `}</style>
     </main>
   );
@@ -584,14 +594,98 @@ function Intro({ onStart }) {
     </Section>
   );
 }
-
 function Loading({ message }) {
+  // Étapes qui défilent pour donner l'impression que Claude travaille
+  const steps = [
+    "RÉDACTION EN COURS",
+    "NOTE D'ARBITRAGE PRÉSIDENTIEL",
+    "CONSULTATION DES CENTRES DE POUVOIR",
+    "ÉVALUATION DES SCÉNARIOS",
+    "FINALISATION DU DOSSIER",
+  ];
+
+  const [stepIdx, setStepIdx] = useState(0);
+  const [typed, setTyped] = useState("");
+  const [phase, setPhase] = useState("typing"); // typing | hold | erasing
+
+  const currentText = steps[stepIdx];
+
+  useEffect(() => {
+    let timer;
+
+    if (phase === "typing") {
+      if (typed.length < currentText.length) {
+        timer = setTimeout(() => {
+          setTyped(currentText.slice(0, typed.length + 1));
+        }, 45); // vitesse de frappe
+      } else {
+        timer = setTimeout(() => setPhase("hold"), 1400);
+      }
+    } else if (phase === "hold") {
+      timer = setTimeout(() => setPhase("erasing"), 200);
+    } else if (phase === "erasing") {
+      if (typed.length > 0) {
+        timer = setTimeout(() => {
+          setTyped(typed.slice(0, -1));
+        }, 25); // effacement plus rapide
+      } else {
+        // Passer à l'étape suivante
+        setStepIdx((idx) => (idx + 1) % steps.length);
+        setPhase("typing");
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [typed, phase, currentText, steps.length]);
+
   return (
     <Section>
-      <div style={{ textAlign: "center", padding: "80px 20px" }}>
-        <div style={{ display: "inline-block", width: 36, height: 36, border: `2px solid ${COLORS.border}`, borderTopColor: COLORS.gold, borderRadius: "50%", animation: "spin 1s linear infinite" }} />
-        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.navy, marginTop: 22, fontStyle: "italic" }}>{message}</div>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, marginTop: 10, letterSpacing: "0.15em" }}>GÉNÉRATION EN COURS · ~10 SECONDES</div>
+      <div style={{ textAlign: "center", padding: "100px 20px 80px" }}>
+        {/* Bloc machine à écrire */}
+        <div style={{
+          display: "inline-block",
+          padding: "26px 30px",
+          background: "#000",
+          border: "1px solid #000",
+          minWidth: 280,
+          maxWidth: 480,
+          textAlign: "left",
+          boxShadow: `0 6px 20px ${COLORS.navy}30`,
+        }}>
+          <div style={{
+            fontFamily: "ui-monospace, 'Courier New', monospace",
+            fontSize: 13,
+            color: "#fafaf7",
+            letterSpacing: "0.12em",
+            fontWeight: 600,
+            lineHeight: 1.5,
+            minHeight: "1.5em",
+            wordBreak: "break-word",
+          }}>
+            {typed}<span className="republica-cursor">▮</span>
+          </div>
+        </div>
+
+        {/* Message contextuel discret en dessous */}
+        <div style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 14,
+          color: COLORS.textMuted,
+          marginTop: 28,
+          fontStyle: "italic",
+        }}>
+          {message}
+        </div>
+
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: COLORS.textDim,
+          marginTop: 14,
+          letterSpacing: "0.2em",
+        }}>
+          ~ 15 SECONDES
+        </div>
       </div>
     </Section>
   );
