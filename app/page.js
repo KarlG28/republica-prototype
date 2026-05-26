@@ -428,6 +428,16 @@ const goNext = () => {
           color: #e6b94f;
           animation: cursorBlink 0.9s steps(2) infinite;
         }
+        .republica-carousel::-webkit-scrollbar {
+          display: none;
+        }
+        .republica-carousel {
+          /* Indication tactile : on suggère le swipe */
+          cursor: grab;
+        }
+        .republica-carousel:active {
+          cursor: grabbing;
+        }
       `}</style>
     </main>
   );
@@ -937,12 +947,11 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
         ))}
       </AgentsGrid>
 
-  <SubTag>Votre arbitrage · {(dossier.scenarios || []).filter(Boolean).length} voies</SubTag>
-      {(dossier.scenarios || []).filter(Boolean).map((s, i) => (
-        <ScenarioButton key={i} code={s.code || `SCÉNARIO ${i+1}`} color={resolveColor(s.color || "blue")} title={s.title || "Sans titre"} risk={s.risk || ""}
-          desc={s.desc || ""} tags={(s.tags || []).filter(Boolean).map(t => Array.isArray(t) ? t : [t, true])}
-         onClick={() => onSelectScenario(i)} />
-      ))}
+<SubTag>Votre arbitrage · {(dossier.scenarios || []).filter(Boolean).length} voies</SubTag>
+      <ScenariosCarousel
+        scenarios={(dossier.scenarios || []).filter(Boolean)}
+        onSelectScenario={onSelectScenario}
+      />
     </Section>
   );
 }
@@ -1026,8 +1035,8 @@ function ScenarioDetail({ dossier, scenarioIdx, onConfirm, onCancel }) {
           fontFamily: "ui-monospace, monospace", fontSize: 12, letterSpacing: "0.15em", cursor: "pointer", textTransform: "uppercase", fontWeight: 600,
           transition: "all 0.15s",
         }}
-        onMouseEnter={(e) => { e.currentTarget.style.borderColor = COLORS.navy; e.currentTarget.style.color = COLORS.navy; }}
-        onMouseLeave={(e) => { e.currentTarget.style.borderColor = COLORS.border; e.currentTarget.style.color = COLORS.textMuted; }}>
+       onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = `${color}06`; e.currentTarget.style.boxShadow = `0 4px 12px ${COLORS.navy}12`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${color}50`; e.currentTarget.style.borderLeftColor = color; e.currentTarget.style.background = COLORS.bgPanel; e.currentTarget.style.boxShadow = `0 1px 3px ${COLORS.navy}08`; }}>
           ← Revenir
         </button>
         <BigButton onClick={onConfirm}>Valider ce choix ✓</BigButton>
@@ -1491,7 +1500,60 @@ function ShareStat({ label, value }) {
 }
 
 function AgentsGrid({ children }) {
-  return <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 10, marginBottom: 16 }}>{children}</div>;
+  const childArray = Array.isArray(children) ? children : [children].filter(Boolean);
+  const total = childArray.length;
+  return (
+    <div style={{ position: "relative", marginBottom: 16 }}>
+      <div
+        className="republica-carousel"
+        style={{
+          display: "flex",
+          gap: 10,
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          paddingBottom: 8,
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {childArray.map((child, i) => (
+          <div
+            key={i}
+            style={{
+              flex: "0 0 85%",
+              maxWidth: 280,
+              scrollSnapAlign: "start",
+              scrollSnapStop: "always",
+            }}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
+      {/* Indicateur de pagination en pointillé */}
+      {total > 1 && (
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 6,
+          marginTop: 4,
+        }}>
+          {Array.from({ length: total }).map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: 24,
+                height: 2,
+                background: COLORS.border,
+                borderRadius: 1,
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Agent({ name, color, stance, quote }) {
@@ -2088,4 +2150,72 @@ function loadScript(src) {
     script.onerror = reject;
     document.body.appendChild(script);
   });
+}
+
+// ============================================================
+// CAROUSEL DES SCÉNARIOS (swipe mobile + glisser desktop)
+// ============================================================
+function ScenariosCarousel({ scenarios, onSelectScenario }) {
+  const total = scenarios.length;
+
+  return (
+    <div style={{ position: "relative", marginBottom: 16 }}>
+      <div
+        className="republica-carousel"
+        style={{
+          display: "flex",
+          gap: 10,
+          overflowX: "auto",
+          scrollSnapType: "x mandatory",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+          paddingBottom: 8,
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        {scenarios.map((s, i) => (
+          <div
+            key={i}
+            style={{
+              flex: "0 0 88%",
+              maxWidth: 360,
+              scrollSnapAlign: "start",
+              scrollSnapStop: "always",
+            }}
+          >
+            <ScenarioButton
+              code={s.code || `SCÉNARIO ${i + 1}`}
+              color={resolveColor(s.color || "blue")}
+              title={s.title || "Sans titre"}
+              risk={s.risk || ""}
+              desc={s.desc || ""}
+              tags={(s.tags || []).filter(Boolean).map((t) => (Array.isArray(t) ? t : [t, true]))}
+              onClick={() => onSelectScenario(i)}
+            />
+          </div>
+        ))}
+      </div>
+      {/* Indicateur de pagination */}
+      {total > 1 && (
+        <div style={{
+          display: "flex",
+          justifyContent: "center",
+          gap: 6,
+          marginTop: 6,
+        }}>
+          {Array.from({ length: total }).map((_, i) => (
+            <span
+              key={i}
+              style={{
+                width: 24,
+                height: 2,
+                background: COLORS.border,
+                borderRadius: 1,
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
