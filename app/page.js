@@ -926,6 +926,10 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   const shareCardRef = useRef(null);
 
   useEffect(() => {
+    // Scroll en haut de la page quand le bilan apparait
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
     track("share_card_viewed", {
       family: family.shortLabel,
       adjective: family.adjective,
@@ -1081,10 +1085,6 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       {/* Carte 1080x1080 cachée pour la capture html2canvas */}
       <ShareCardImage family={family} dossiers={dossiers} shareCardRef={shareCardRef} />
 
-{/* ═══ BLOC OPT-IN EMAIL ═══ */}
-      <SubTag>◊ Mes 100 jours à l'Élysée</SubTag>
-      <OptInForm sessionId={sessionId} family={family} />
-
 {/* ═══ BLOC PARTENAIRE NOUVELLE ÉNERGIE ═══ */}
       <SubTag>Une autre manière de gouverner ?</SubTag>
       <div style={{
@@ -1180,6 +1180,10 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
           <PartnerCTA href="#" label="Proposer votre idée pour les 100 jours" />
         </div>
       </div>
+
+    {/* ═══ BLOC OPT-IN EMAIL ═══ */}
+      <SubTag>◊ Mes 100 jours à l'Élysée</SubTag>
+      <OptInForm sessionId={sessionId} family={family} />
 
     {/* ═══ BLOC QR CODE NOUVELLE ÉNERGIE ═══ */}
       <SubTag>Découvrir Nouvelle Énergie</SubTag>
