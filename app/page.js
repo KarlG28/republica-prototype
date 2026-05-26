@@ -554,12 +554,28 @@ function Header({ section, currentIdx, total }) {
 
 function Footer() {
   return (
-    <div style={{ marginTop: 44, padding: "18px 4px", borderTop: `1px solid ${COLORS.border}`, textAlign: "center" }}>
-      <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, letterSpacing: "0.1em" }}>
-        REPUBLICA · SIMULATION PROSPECTIVE IA · RÉSULTATS NON PRÉDICTIFS
+    <div style={{ marginTop: 44, padding: "20px 8px 24px", borderTop: `1px solid ${COLORS.border}`, textAlign: "center" }}>
+      <div style={{
+        fontFamily: "ui-monospace, monospace",
+        fontSize: 10,
+        color: COLORS.textDim,
+        letterSpacing: "0.1em",
+        lineHeight: 1.7,
+      }}>
+        REPUBLICA · SIMULATION PROSPECTIVE IA
       </div>
-      <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, marginTop: 4 }}>
-        Personnages et données illustratifs · Dossiers générés par Claude
+      <div style={{
+        fontFamily: "ui-serif, Georgia, serif",
+        fontSize: 11,
+        color: COLORS.textMuted,
+        marginTop: 10,
+        lineHeight: 1.6,
+        fontStyle: "italic",
+        maxWidth: 540,
+        margin: "10px auto 0",
+        padding: "0 12px",
+      }}>
+        Situations et propositions librement simulées par IA : Republica décline toute responsabilité dans l'occurence de ces événements. Sujets, chiffres et personnalités indiqués à titre illustratif.
       </div>
     </div>
   );
@@ -586,9 +602,37 @@ function Intro({ onStart }) {
         </div>
       </div>
 
-      <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 28px" }}>
+      <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 20px" }}>
         Simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.</strong>
       </p>
+
+      {/* ═══ ENCART AVERTISSEMENT ═══ */}
+      <div style={{
+        background: `${COLORS.yellow}10`,
+        border: `1px solid ${COLORS.yellow}40`,
+        borderLeft: `3px solid ${COLORS.yellow}`,
+        padding: "14px 16px",
+        marginBottom: 28,
+      }}>
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: COLORS.yellow,
+          letterSpacing: "0.18em",
+          fontWeight: 700,
+          marginBottom: 8,
+        }}>
+          ⚠ AVERTISSEMENT
+        </div>
+        <p style={{
+          fontSize: 12.5,
+          color: COLORS.textMuted,
+          lineHeight: 1.6,
+          margin: 0,
+        }}>
+          Republica est une simulation expérimentale lancée par <strong style={{ color: COLORS.navy }}>Nouvelle Energie, parti de la liberté en France</strong>. Les dossiers, indicateurs et conséquences sont générés en temps réel par une IA (Claude, Anthropic). Les chiffres, les organisations et les positions exprimées sont illustratifs.
+        </p>
+      </div>
 
       <BigButton onClick={onStart}>Prendre mes fonctions ↗</BigButton>
     </Section>
