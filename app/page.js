@@ -1629,7 +1629,7 @@ function PartnerCTA({ href, label, primary }) {
     track("cta_clicked", { label });
   };
   return (
-    <a href={href} onClick={handleClick} style={{
+    <a href={href} onClick={handleClick} target="_blank" rel="noopener noreferrer" style={{
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
