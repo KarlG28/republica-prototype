@@ -587,6 +587,21 @@ function Footer() {
       }}>
         Situations et propositions librement simulées par IA : Republica décline toute responsabilité dans l'occurence de ces événements. Sujets, chiffres et personnalités indiqués à titre illustratif.
       </div>
+      <div style={{
+        marginTop: 16,
+        display: "flex",
+        justifyContent: "center",
+        gap: 20,
+        flexWrap: "wrap",
+        fontFamily: "ui-monospace, monospace",
+        fontSize: 10,
+        letterSpacing: "0.15em",
+        fontWeight: 600,
+      }}>
+        <a href="/a-propos" style={{ color: COLORS.textDim, textDecoration: "none" }}>À PROPOS</a>
+        <a href="/mentions-legales" style={{ color: COLORS.textDim, textDecoration: "none" }}>MENTIONS LÉGALES</a>
+        <a href="/confidentialite" style={{ color: COLORS.textDim, textDecoration: "none" }}>CONFIDENTIALITÉ</a>
+      </div>
     </div>
   );
 }
