@@ -2380,3 +2380,137 @@ function SocialButton({ label, icon, bg, onClick }) {
     </button>
   );
 }
+
+// ============================================================
+// COMPOSANT STATS COMMUNAUTAIRES
+// Affiche le % de joueurs partageant la même famille politique
+// ============================================================
+function CommunityStats({ family }) {
+  const [status, setStatus] = useState("loading"); // loading | ready | not_enough | error
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchStats() {
+      try {
+        const response = await fetch("/api/get-stats");
+        if (!response.ok) throw new Error("Erreur " + response.status);
+        const data = await response.json();
+        if (cancelled) return;
+
+        if (!data.ready) {
+          setStats({ total: data.total });
+          setStatus("not_enough");
+        } else {
+          const familyCount = (data.distribution || {})[family.shortLabel] || 0;
+          const pct = data.total > 0 ? Math.round((familyCount / data.total) * 100) : 0;
+          setStats({
+            total: data.total,
+            familyCount,
+            pct,
+            distribution: data.distribution,
+          });
+          setStatus("ready");
+        }
+      } catch (err) {
+        console.error("Stats error:", err);
+        if (!cancelled) setStatus("error");
+      }
+    }
+
+    fetchStats();
+    return () => { cancelled = true; };
+  }, [family.shortLabel]);
+
+  // Pendant le chargement, on n'affiche rien (évite un flicker)
+  if (status === "loading") return null;
+  // En cas d'erreur silencieuse (on ne casse pas l'expérience)
+  if (status === "error") return null;
+
+  // Pas assez de sessions : message d'invitation
+  if (status === "not_enough") {
+    return (
+      <div style={{
+        background: `${COLORS.gold}08`,
+        border: `1px solid ${COLORS.gold}30`,
+        borderLeft: `3px solid ${COLORS.gold}`,
+        padding: "16px 20px",
+        marginBottom: 26,
+      }}>
+        <div style={{
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: COLORS.gold,
+          letterSpacing: "0.2em",
+          fontWeight: 700,
+          marginBottom: 6,
+        }}>
+          ◊ COMMUNAUTÉ
+        </div>
+        <div style={{
+          fontFamily: "ui-serif, Georgia, serif",
+          fontSize: 14,
+          color: COLORS.navy,
+          lineHeight: 1.55,
+          fontStyle: "italic",
+        }}>
+          Pas encore assez de joueurs pour comparer ({stats.total} session{stats.total > 1 ? "s" : ""} jouée{stats.total > 1 ? "s" : ""}). <strong style={{ fontStyle: "normal" }}>Partagez Republica</strong> pour faire grandir la communauté.
+        </div>
+      </div>
+    );
+  }
+
+  // Stats prêtes
+  const { pct, total, familyCount } = stats;
+
+  // Adjectif accordé selon la rareté
+  let rarity = "";
+  if (pct >= 30) rarity = "C'est l'un des profils les plus fréquents.";
+  else if (pct >= 15) rarity = "Un profil courant.";
+  else if (pct >= 7) rarity = "Un profil minoritaire.";
+  else rarity = "Vous faites partie d'une minorité rare.";
+
+  return (
+    <div style={{
+      background: `${COLORS.navy}05`,
+      border: `1px solid ${COLORS.navy}20`,
+      borderLeft: `3px solid ${COLORS.navy}`,
+      padding: "18px 20px",
+      marginBottom: 26,
+    }}>
+      <div style={{
+        fontFamily: "ui-monospace, monospace",
+        fontSize: 10,
+        color: COLORS.navy,
+        letterSpacing: "0.2em",
+        fontWeight: 700,
+        marginBottom: 10,
+      }}>
+        ◊ VOTRE PROFIL DANS LA COMMUNAUTÉ
+      </div>
+      <div style={{
+        fontFamily: "ui-serif, Georgia, serif",
+        fontSize: 17,
+        color: COLORS.navy,
+        lineHeight: 1.5,
+        marginBottom: 8,
+        fontWeight: 600,
+      }}>
+        Vous êtes <span style={{ color: COLORS.gold }}>{family.shortLabel} {family.adjective}</span>, comme <span style={{
+          color: COLORS.red,
+          fontWeight: 700,
+          fontSize: 22,
+        }}>{pct}%</span> des joueurs.
+      </div>
+      <div style={{
+        fontSize: 13,
+        color: COLORS.textMuted,
+        lineHeight: 1.55,
+        fontStyle: "italic",
+      }}>
+        {rarity} Calcul sur {total} mandats joués.
+      </div>
+    </div>
+  );
+}
