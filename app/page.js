@@ -170,7 +170,7 @@ export default function Page() {
   const [dossiers, setDossiers] = useState([]);
   const [choices, setChoices] = useState({});
   const [indicators, setIndicators] = useState({ debt: 115.6, confidence: 52, parliament: 287, tension: 4.2, spread: 64 });
-  const [scores, setScores] = useState({ liberal: 0, social: 0, autorite: 0, europe: 0 });
+  const [scores, setScores] = useState({ liberal: 0, social: 0, autorite: 0, europe: 0, progressisme: 0 });
   const [loadingMessage, setLoadingMessage] = useState("");
   const [generationError, setGenerationError] = useState(null);
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
@@ -1430,25 +1430,68 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
 }
 
 function classifyFamily(scores, indicators) {
-  const { liberal = 0, social = 0, autorite = 0, europe = 0 } = scores;
+function classifyFamily(scores, indicators) {
+  const { liberal = 0, social = 0, autorite = 0, europe = 0, progressisme = 0 } = scores;
   const { debt = 115.6, confidence = 52, parliament = 287, tension = 4.2, spread = 64 } = indicators || {};
 
-  // ═══ Étape A : déterminer la famille politique principale (7 catégories nettes) ═══
-  const scoreList = [
-    { key: "social_radical", value: social >= 4 ? social + 1 : 0, family: "Gauche radicale" },
-    { key: "social_dem", value: social >= 2 ? social : 0, family: "Social-démocrate" },
-    { key: "ecologiste", value: 0, family: "Écologiste" }, // pas de score "écologie" dans la matrice actuelle
-    { key: "autorite", value: autorite >= 3 ? autorite : 0, family: "Conservateur" },
-    { key: "national", value: autorite >= 5 ? autorite + 1 : 0, family: "National-populaire" },
-    { key: "liberal", value: liberal >= 2 ? liberal : 0, family: "Libéral" },
-    { key: "europe", value: europe >= 3 ? europe : 0, family: "Centriste" },
+  // ═══ Étape A : on liste les 12 familles avec un score de "match" calculé
+  // selon la grille des dimensions et un signal distinctif fort.
+  const families = [
+    {
+      family: "Communiste",
+      match: (social >= 8 && liberal <= 2) ? social * 1.3 - liberal : 0,
+    },
+    {
+      family: "Anarchiste",
+      match: (autorite <= 2 && liberal <= 4 && progressisme >= 5) ? progressisme + (5 - autorite) : 0,
+    },
+    {
+      family: "Gauche radicale",
+      match: (social >= 6 && liberal <= 4 && progressisme >= 6 && autorite <= 4) ? social + progressisme * 0.5 : 0,
+    },
+    {
+      family: "Social-démocrate",
+      match: (social >= 5 && liberal >= 3 && liberal <= 6 && progressisme >= 4) ? social + 2 : 0,
+    },
+    {
+      family: "Progressiste",
+      match: (progressisme >= 7 && europe >= 6 && social <= 6) ? progressisme + europe * 0.6 : 0,
+    },
+    {
+      family: "Écologiste",
+      match: (progressisme >= 5 && social >= 5 && autorite <= 4 && europe >= 4) ? progressisme + social * 0.5 : 0,
+    },
+    {
+      family: "Centriste",
+      match: (Math.abs(liberal - 5) <= 2 && Math.abs(social - 5) <= 2 && Math.abs(autorite - 5) <= 2 && europe >= 4) ? 6 : 0,
+    },
+    {
+      family: "Libéral",
+      match: (liberal >= 6 && social <= 4 && europe >= 5) ? liberal + europe * 0.4 : 0,
+    },
+    {
+      family: "Conservateur",
+      match: (autorite >= 5 && progressisme <= 3 && social >= 3 && social <= 6 && europe >= 3) ? autorite + (5 - progressisme) : 0,
+    },
+    {
+      family: "Souverainiste",
+      match: (europe <= 3 && autorite >= 4 && autorite <= 7 && social >= 3) ? (10 - europe) + autorite * 0.5 : 0,
+    },
+    {
+      family: "National-populaire",
+      match: (autorite >= 5 && europe <= 3 && social >= 5 && progressisme <= 4) ? autorite + social + (5 - europe) : 0,
+    },
+    {
+      family: "Identitaire",
+      match: (autorite >= 7 && progressisme <= 2 && europe <= 4) ? autorite + (3 - progressisme) * 1.5 : 0,
+    },
   ];
-  scoreList.sort((a, b) => b.value - a.value);
-  const top = scoreList[0];
-  const family = top.value > 0 ? top.family : "Centriste";
 
-  // ═══ Étape B : déterminer l'adjectif qui pique selon le BILAN réel ═══
-  // L'adjectif révèle COMMENT le mandat s'est passé, pas juste l'orientation idéologique.
+  families.sort((a, b) => b.match - a.match);
+  const top = families[0];
+  const family = top.match > 0 ? top.family : "Centriste";
+
+  // ═══ Étape B : déterminer l'adjectif qui pique selon le BILAN réel
   let adjective = "";
   if (confidence < 35) adjective = "isolé";
   else if (debt > 119) adjective = "endetté";
@@ -1460,72 +1503,59 @@ function classifyFamily(scores, indicators) {
   else if (debt < 114 && confidence < 50) adjective = "rigoureux";
   else adjective = "réformateur";
 
-  // ═══ Étape C : pourcentage (pour effet de rareté / partage) ═══
+  // ═══ Étape C : pourcentage indicatif (effet de rareté pour le partage)
   const pctMap = {
-    "Gauche radicale": 8,
-    "Social-démocrate": 17,
-    "Écologiste": 11,
-    "Centriste": 19,
-    "Libéral": 14,
-    "Conservateur": 18,
-    "National-populaire": 13,
+    "Communiste": 4,
+    "Anarchiste": 3,
+    "Gauche radicale": 7,
+    "Social-démocrate": 13,
+    "Progressiste": 11,
+    "Écologiste": 9,
+    "Centriste": 15,
+    "Libéral": 12,
+    "Conservateur": 11,
+    "Souverainiste": 6,
+    "National-populaire": 6,
+    "Identitaire": 3,
   };
-  const pct = pctMap[family] || 14;
+  const pct = pctMap[family] || 10;
 
-  // ═══ Étape D : construire le twist « Vous avez X… mais Y » ═══
-  // On choisit le verbe positif selon l'orientation, et la conséquence négative selon l'indicateur le plus dégradé.
+  // ═══ Étape D : construire le twist « Vous avez X… mais Y »
   const positives = {
+    "Communiste": "renversé l'ordre économique",
+    "Anarchiste": "tordu le cou aux institutions",
     "Gauche radicale": "refusé les cadres imposés",
     "Social-démocrate": "apaisé le pays",
+    "Progressiste": "ouvert la société",
     "Écologiste": "préparé la transition",
     "Centriste": "tenu votre ligne",
     "Libéral": "libéré l'économie",
-    "Conservateur": "rétabli l'autorité",
+    "Conservateur": "rétabli l'ordre",
+    "Souverainiste": "repris en main la souveraineté",
     "National-populaire": "parlé fort à la nation",
+    "Identitaire": "réaffirmé l'identité nationale",
+  };
+  const negatives = {
+    "endetté": "creusé la dette",
+    "isolé": "isolé la France à Bruxelles",
+    "contesté": "déclenché la rue",
+    "fragilisé": "perdu votre majorité",
+    "sous pression": "fait grimper le spread",
+    "généreux": "creusé les comptes publics",
+    "rassembleur": "déçu vos alliés",
+    "rigoureux": "tendu le pays",
+    "réformateur": "déçu vos électeurs",
   };
 
-  // Trouver la conséquence négative la plus marquante
-  const negatives = [];
-  if (debt > 118) negatives.push({ score: debt - 118, label: "fait exploser la dette" });
-  if (confidence < 40) negatives.push({ score: 40 - confidence, label: "perdu la confiance du pays" });
-  if (parliament < 275) negatives.push({ score: 275 - parliament, label: "perdu votre majorité" });
-  if (tension > 5.5) negatives.push({ score: tension * 10, label: "embrasé la rue" });
-  if (spread > 80) negatives.push({ score: spread - 80, label: "fait fuir les marchés" });
-  if (europe < -2) negatives.push({ score: -europe, label: "isolé la France à Bruxelles" });
-
-  let negative;
-  if (negatives.length > 0) {
-    negatives.sort((a, b) => b.score - a.score);
-    negative = negatives[0].label;
-  } else {
-    // Si rien n'est dramatiquement négatif, on fait quand même un twist nuancé
-    if (liberal > social) negative = "déçu les classes populaires";
-    else if (social > liberal) negative = "alarmé Bercy";
-    else negative = "laissé le pays sans cap clair";
-  }
-
-  const positiveVerb = positives[family] || "tenu le cap";
-  const shareQuote = `Vous avez ${positiveVerb}… mais ${negative}.`;
-
-  // ═══ Étape E : tagline plus longue pour la page de profil ═══
-  const taglines = {
-    "Gauche radicale": "Vous avez refusé les cadres. Vous avez gouverné à contre-courant.",
-    "Social-démocrate": "Vous croyez à la justice sociale et au compromis comme méthode.",
-    "Écologiste": "Vous avez fait passer la transition avant tout le reste.",
-    "Centriste": "Vous gouvernez par l'équilibre. Ni rupture, ni dogme.",
-    "Libéral": "Vous croyez au marché, à la concurrence, à la responsabilité individuelle.",
-    "Conservateur": "Vous gouvernez par la fermeté. L'autorité avant le débat.",
-    "National-populaire": "Vous avez parlé au pays réel, au-dessus des élites.",
-  };
+  const positive = positives[family] || "tenu votre cap";
+  const negative = negatives[adjective] || "déçu vos électeurs";
+  const shareQuote = `Vous avez ${positive}… mais ${negative}.`;
 
   return {
-    label: `${family} ${adjective}`,
     shortLabel: family,
     adjective,
-    closeTo: "", // plus utilisé, on garde vide pour compatibilité
-    tagline: taglines[family] || "Vous avez gouverné sans étiquette idéologique fixe.",
-    shareQuote,
     pct,
+    shareQuote,
   };
 }
 
