@@ -154,6 +154,7 @@ DELTAS — RÈGLE DE RÉALISME : utilise des chiffres NON-RONDS qui collent à l
 - spread : variation en points de base de l'OAT (−14 à +18 pb). Un dérapage budgétaire = +6 à +14. Une réforme structurelle = −5 à −10.
 PROSCRIRE les chiffres en .0 et .5 ronds. Privilégier les valeurs comme 0.34, 2.7, 6.8, -4, +12. Éviter aussi les chiffres ronds (10, 20, 50). UN seul indicateur peut être 0 par scénario maximum.
 AXES POLITIQUES — RÈGLE DE NUANCE : valeurs de -3 à +3, mais utilise toute la plage avec des décimales si l'effet est modéré (ex: liberal: 1.6, progressisme: -0.8). Un scénario peut activer 1 à 3 axes.
+`;
 
 export async function POST(request) {
   try {
