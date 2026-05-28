@@ -211,6 +211,9 @@ export default function Page() {
       if (!newDossier || !newDossier.title || !newDossier.scenarios || newDossier.scenarios.length < 2) {
         throw new Error("Format de dossier invalide");
       }
+      // Forcer la chronologie : tous les dossiers tiennent dans les 100 premiers jours
+      const dayMapping = ["J+15", "J+40", "J+70", "J+95", "J+98"];
+      newDossier.day = dayMapping[nextIdx] || `J+${20 + nextIdx * 20}`;
       setDossiers(prev => [...prev, newDossier]);
       setSection(SECTIONS.dossier);
     } catch (err) {
