@@ -2138,8 +2138,7 @@ function ShareButton({ shareCardRef, family }) {
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
       if (!blob) throw new Error("Impossible de générer l'image");
 
-     const fileName = `moi-president-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`; const fileName = `Moi Président(e)-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
-
+      const fileName = `moi-president-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
       // Sur mobile : tenter Web Share API
       if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
         const file = new File([blob], fileName, { type: "image/png" });
