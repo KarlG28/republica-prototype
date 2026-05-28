@@ -30,8 +30,8 @@ const COLORS = {
   yellow: "#a87a2a",
 };
 
-// Image de fond : bureau en bois noble (libre de droits Unsplash)
-const BG_IMAGE = "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80";
+// Image de fond : Élysée stylisé (uploadé dans public/elysee.png)
+const BG_IMAGE = "/elysee.png";
 
 const SECTIONS = {
   welcome: "welcome",
@@ -349,7 +349,7 @@ const goNext = () => {
   return (
     <main style={{
       minHeight: "100vh",
-      background: `linear-gradient(rgba(250,250,247,0.94), rgba(250,250,247,0.97)), url(${BG_IMAGE}) center / cover no-repeat fixed`,
+      background: `linear-gradient(rgba(250,250,247,0.82), rgba(250,250,247,0.88)), url(${BG_IMAGE}) center / cover no-repeat fixed`,
       color: COLORS.text,
       fontFamily: "system-ui, -apple-system, sans-serif",
       padding: 0,
@@ -517,7 +517,7 @@ function FadeIn({ children, keyProp }) {
 
 function Welcome({ onContinue }) {
   return (
-    <>
+    <Section>
       {/* Image Élysée — accueil */}
       <div style={{
         width: "100%",
@@ -617,7 +617,6 @@ function Welcome({ onContinue }) {
         </div>
       </div>
     </Section>
-    </>
   );
 }
 
