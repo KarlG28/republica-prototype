@@ -14,11 +14,6 @@ const COLORS = {
   border: "#e0dcd3",
 };
 
-export const metadata = {
-  title: "À propos · Republica",
-  description: "Republica est une simulation politique lancée par Nouvelle Énergie.",
-};
-
 export default function APropos() {
   return (
     <main style={{
