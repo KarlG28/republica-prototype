@@ -1131,6 +1131,9 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
 
       <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", textAlign: "center", margin: "0 0 28px" }}>« {family.tagline} »</p>
 
+  {/* ═══ COMMUNAUTÉ ═══ */}
+      <CommunityStats family={family} />
+        
       <SubTag>État final de votre mandat</SubTag>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
         <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
