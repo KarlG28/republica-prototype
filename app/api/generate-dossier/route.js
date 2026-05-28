@@ -47,17 +47,12 @@ TON
 ═══════════════════════════════════════════
 CATÉGORIES POLITIQUES AUTORISÉES (pour agents.stance)
 ═══════════════════════════════════════════
-Utilise EXACTEMENT ces 7 labels, jamais d'autres :
-- Gauche radicale
-- Social-démocrate
-- Écologiste
-- Centriste
-- Libéral
-- Conservateur
-- National-populaire
-
-Tu peux ajouter un suffixe court : "proche de [organisation]" ou "tendance [un mot]".
-JAMAIS : "gauche radicale contestataire", "écologiste décroissant", "libéral-conservateur modéré", "social-démocrate de tradition". Ces formulations sont INTERDITES.
+Utilise EXACTEMENT ces labels, jamais d'autres :
+liberal : favorise le marché, la dérégulation, la propriété privée (−5 à +5)
+social : protection sociale, redistribution, État-providence (−5 à +5)
+autorite : ordre, sécurité, fermeté de l'État (−5 à +5)
+europe : pro-UE, mondialisation, ouverture économique (−5 à +5)
+progressisme : ouverture culturelle, droits individuels, valeurs modernes (vs continuité culturelle, traditions) (−5 à +5)
 
 ═══════════════════════════════════════════
 FORMAT : JSON STRICT, aucun texte ni markdown autour.
@@ -80,9 +75,9 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
     {"name":"Acteur 4","color":"muted","stance":"Conservateur","quote":"..."}
   ],
   "scenarios":[
-    {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2},"signature":"A"},
-    {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2},"signature":"B"},
-    {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2},"signature":"C"}
+    {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2,"progressisme":1},"signature":"A"},
+    {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2,"progressisme":2},"signature":"B"},
+    {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2,"progressisme":-1},"signature":"C"}
   ],
   "consequences":{
     "A":{"title":"Titre 4 mots","narrative":"3 phrases qui racontent vraiment ce qui se passe","events":[
@@ -151,8 +146,8 @@ AUTORISÉS et même ENCOURAGÉS :
 - L'objectif : que le joueur ait envie de screenshoter et de raconter à un pote.
 
 COULEURS : blue, red, gold, green, muted, yellow
-DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20)
-AXES politiques (1 par scénario, valeur 1-3) : liberal, social, autorite, europe`;
+DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20), liberal(-3 à 3), social(-3 à 3), autorite(-3 à 3), europe(-3 à 3), progressisme(-3 à 3)
+AXES politiques (1-2 par scénario, valeur -3 à 3) : liberal, social, autorite, europe, progressisme`;
 
 export async function POST(request) {
   try {
