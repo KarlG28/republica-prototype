@@ -516,6 +516,27 @@ function FadeIn({ children, keyProp }) {
 
 function Welcome({ onContinue }) {
   return (
+    {/* Image Élysée — accueil */}
+      <div style={{
+        width: "100%",
+        marginBottom: 32,
+        overflow: "hidden",
+        borderRadius: 4,
+        boxShadow: `0 4px 24px ${COLORS.navy}25`,
+        aspectRatio: "16 / 9",
+        background: "#0a0a0a",
+      }}>
+        <img
+          src="/elysee.png"
+          alt="Palais de l'Élysée"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
+      </div>
     <Section>
       <div style={{ textAlign: "center", padding: "60px 20px 40px" }}>
         <div style={{
