@@ -1164,45 +1164,10 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   }, []);
 
   return (
-    <Section>
+   <Section>
       <Tag>— Votre famille politique —</Tag>
-      <div style={{ textAlign: "center", padding: "26px 24px", border: `1px solid ${COLORS.navy}30`, background: COLORS.bgPanel, margin: "0 0 24px", position: "relative", boxShadow: `0 4px 12px ${COLORS.navy}10` }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 8, fontWeight: 600 }}>CLASSIFICATION</div>
-        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>
-          {family.shortLabel}{" "}
-          <em style={{ color: COLORS.gold, fontWeight: 600 }}>{family.adjective}</em>
-        </div>
-      </div>
 
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", textAlign: "center", margin: "0 0 28px" }}>« {family.shareQuote} »</p>
-
-  {/* ═══ COMMUNAUTÉ ═══ */}
-      <CommunityStats family={family} />
-        
-      <SubTag>La situation à la fin de vos 100 premiers jours</SubTag>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
-        <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
-        <Stat label="Confiance" value={`${indicators.confidence}%`} note={delta(indicators.confidence - 52)} />
-        <Stat label="Soutien AN" value={`${indicators.parliament}`} note={delta(indicators.parliament - 287)} />
-        <Stat label="Tension" value={`${indicators.tension}/10`} note={delta(indicators.tension - 4.2)} />
-      </div>
-
-      <SubTag>Vos décisions du mandat</SubTag>
-      <div style={{ marginBottom: 24 }}>
-        {dossiers.map((d, i) => {
-          const c = choices[i];
-          const sc = d.scenarios?.find(s => s.signature === c);
-          return (
-            <div key={i} style={{ padding: "10px 14px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${d.urgent ? COLORS.red : COLORS.gold}`, marginBottom: 6 }}>
-              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 9, color: COLORS.textDim, letterSpacing: "0.1em", marginBottom: 3 }}>{d.day} · {d.urgent ? "CRISE" : "DOSSIER"}</div>
-              <div style={{ fontSize: 13, color: COLORS.navy, fontWeight: 600, marginBottom: 2 }}>{d.title}</div>
-              <div style={{ fontSize: 12, color: COLORS.textMuted, fontStyle: "italic" }}>→ {sc ? sc.title : "—"}</div>
-            </div>
-          );
-        })}
-      </div>
-
-      <SubTag>Partagez vos 100 jours</SubTag>
+  <SubTag>Partagez vos 100 jours</SubTag>
       <div style={{
         background: "#fafaf7",
         border: `1px solid ${COLORS.border}`,
@@ -1316,6 +1281,32 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
 
       {/* Carte 1080x1080 cachée pour la capture html2canvas */}
       <ShareCardImage family={family} dossiers={dossiers} shareCardRef={shareCardRef} />
+
+  {/* ═══ COMMUNAUTÉ ═══ */}
+      <CommunityStats family={family} />
+        
+      <SubTag>La situation à la fin de vos 100 premiers jours</SubTag>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
+        <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
+        <Stat label="Confiance" value={`${indicators.confidence}%`} note={delta(indicators.confidence - 52)} />
+        <Stat label="Soutien AN" value={`${indicators.parliament}`} note={delta(indicators.parliament - 287)} />
+        <Stat label="Tension" value={`${indicators.tension}/10`} note={delta(indicators.tension - 4.2)} />
+      </div>
+
+      <SubTag>Vos décisions du mandat</SubTag>
+      <div style={{ marginBottom: 24 }}>
+        {dossiers.map((d, i) => {
+          const c = choices[i];
+          const sc = d.scenarios?.find(s => s.signature === c);
+          return (
+            <div key={i} style={{ padding: "10px 14px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${d.urgent ? COLORS.red : COLORS.gold}`, marginBottom: 6 }}>
+              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 9, color: COLORS.textDim, letterSpacing: "0.1em", marginBottom: 3 }}>{d.day} · {d.urgent ? "CRISE" : "DOSSIER"}</div>
+              <div style={{ fontSize: 13, color: COLORS.navy, fontWeight: 600, marginBottom: 2 }}>{d.title}</div>
+              <div style={{ fontSize: 12, color: COLORS.textMuted, fontStyle: "italic" }}>→ {sc ? sc.title : "—"}</div>
+            </div>
+          );
+        })}
+      </div>
 
 {/* ═══ BLOC PARTENAIRE NOUVELLE ÉNERGIE ═══ */}
       <SubTag>Une autre manière de gouverner ?</SubTag>
