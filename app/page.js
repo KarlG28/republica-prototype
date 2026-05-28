@@ -636,7 +636,7 @@ function Footer() {
         letterSpacing: "0.1em",
         lineHeight: 1.7,
       }}>
-       MOI PRÉSIDENT(E) - SIMULATION PROSPECTIVE IA
+       MOI PRÉSIDENT(E) - SIMULATION PROSPECTIVE IA CONÇUE PAR NOUVELLE ENERGIE
       </div>
       <div style={{
         fontFamily: "ui-serif, Georgia, serif",
@@ -692,7 +692,7 @@ function Intro({ onStart }) {
       </div>
 
       <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 20px" }}>
-Simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Les conséquences chiffrées de vos choix sont générées par IA et doivent être appréhendées avec recul et esprit critique.</strong> Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.      </p>
+Simulation prospective IA produite par Nouvelle Energie. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Les conséquences chiffrées de vos choix sont générées par IA et doivent être appréhendées avec recul et esprit critique.</strong> Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.      </p>
 
       {/* ═══ ENCART AVERTISSEMENT ═══ */}
       <div style={{
@@ -1179,7 +1179,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   {/* ═══ COMMUNAUTÉ ═══ */}
       <CommunityStats family={family} />
         
-      <SubTag>État final de votre mandat</SubTag>
+      <SubTag>La situation à la fin de vos 100 premiers jours</SubTag>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
         <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
         <Stat label="Confiance" value={`${indicators.confidence}%`} note={delta(indicators.confidence - 52)} />
@@ -1202,7 +1202,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         })}
       </div>
 
-      <SubTag>Partagez votre mandat</SubTag>
+      <SubTag>Partagez vos 100 jours</SubTag>
       <div style={{
         background: "#fafaf7",
         border: `1px solid ${COLORS.border}`,
@@ -1227,7 +1227,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         }}>R</div>
 
         <div style={{ position: "relative" }}>
-          {/* En-tête type "Mandat terminé · X ans · Y crises" */}
+          {/* En-tête type "Vos 100 jours · X ans · Y crises" */}
           <div style={{
             display: "flex",
             justifyContent: "space-between",
@@ -1303,7 +1303,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             fontWeight: 600,
           }}>
             <span>Moi Président(e).FR</span>
-            <span style={{ color: COLORS.gold }}>#JOUEZ_LE_VÔTRE</span>
+            <span style={{ color: COLORS.gold }}>#MOIPRESIDENT #MOIPRESIDENTE</span>
           </div>
         </div>
       </div>
