@@ -146,8 +146,14 @@ AUTORISÉS et même ENCOURAGÉS :
 - L'objectif : que le joueur ait envie de screenshoter et de raconter à un pote.
 
 COULEURS : blue, red, gold, green, muted, yellow
-DELTAS : debt(-2 à 2), confidence(-10 à 10), parliament(-10 à 10), tension(-2 à 2), spread(-20 à 20), liberal(-3 à 3), social(-3 à 3), autorite(-3 à 3), europe(-3 à 3), progressisme(-3 à 3)
-AXES politiques (1-2 par scénario, valeur -3 à 3) : liberal, social, autorite, europe, progressisme`;
+DELTAS — RÈGLE DE RÉALISME : utilise des chiffres NON-RONDS qui collent à la nature de l'événement.
+- debt : variation en points de PIB sur 12 mois (−1.5 à +1.7). Une réforme coûteuse = +0.4 à +0.8. Une coupe budgétaire = -0.3 à -0.6.
+- confidence : variation en points dans les sondages (−9 à +7). Une crise majeure = −5 à −8. Une victoire diplomatique = +3 à +6.
+- parliament : variation du nombre de soutiens à l'Assemblée (−12 à +8). Un vote raté = −6 à −10. Un ralliement = +2 à +5.
+- tension : variation sur 10 de l'agitation sociale (−1.4 à +1.8). Une grève majeure = +0.8 à +1.5. Un dialogue social qui aboutit = −0.6 à −1.0.
+- spread : variation en points de base de l'OAT (−14 à +18 pb). Un dérapage budgétaire = +6 à +14. Une réforme structurelle = −5 à −10.
+PROSCRIRE les chiffres en .0 et .5 ronds. Privilégier les valeurs comme 0.34, 2.7, 6.8, -4, +12. Éviter aussi les chiffres ronds (10, 20, 50). UN seul indicateur peut être 0 par scénario maximum.
+AXES POLITIQUES — RÈGLE DE NUANCE : valeurs de -3 à +3, mais utilise toute la plage avec des décimales si l'effet est modéré (ex: liberal: 1.6, progressisme: -0.8). Un scénario peut activer 1 à 3 axes.
 
 export async function POST(request) {
   try {
