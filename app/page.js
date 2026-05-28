@@ -71,6 +71,25 @@ function renderRich(text) {
   });
 }
 
+// Conjugue un mot au genre inclusif (forme "réformateur(rice)", "libéral(e)", etc.)
+function genderInclusive(word) {
+  if (!word) return word;
+  const w = word.trim();
+  const lower = w.toLowerCase();
+  // Terminaisons déjà épicènes (pas de modification)
+  if (/(iste|aire|able|ible|ique|isme|esse|euse|trice|enne|ette)$/i.test(lower)) return w;
+  // Mots déjà finissant par "e" (la plupart sont épicènes)
+  if (/e$/i.test(lower)) return w;
+  // "-eur" → ajoute "(rice)"
+  if (/eur$/i.test(lower)) return w + "(rice)";
+  // "-if" → ajoute "(ve)"
+  if (/if$/i.test(lower)) return w + "(ve)";
+  // "-l" → ajoute "(le)" (libéral → libéral(e), national → national(e))
+  if (/al$/i.test(lower)) return w + "(e)";
+  // Cas général : ajoute "(e)"
+  return w + "(e)";
+}
+
 // Convertit une phrase à la 2ème personne en 1ère personne (pour la carte téléchargée)
 function toFirstPerson(text) {
   if (!text) return text;
@@ -1244,6 +1263,9 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
 {/* Bouton de partage intelligent (mobile = Web Share / desktop = download) */}
       <ShareButton shareCardRef={shareCardRef} family={family} />
 
+      {/* Boutons de partage direct sur réseaux sociaux */}
+      <SocialShareButtons family={family} />
+
       {/* Carte 1080x1080 cachée pour la capture html2canvas */}
       <ShareCardImage family={family} dossiers={dossiers} shareCardRef={shareCardRef} />
 
@@ -2232,5 +2254,129 @@ function ScenariosCarousel({ scenarios, onSelectScenario }) {
         </div>
       )}
     </div>
+  );
+}
+
+// ============================================================
+// BOUTONS DE PARTAGE SUR RÉSEAUX SOCIAUX
+// ============================================================
+function SocialShareButtons({ family }) {
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://republica-prototype.vercel.app";
+
+  // Construire le message
+  const familyInclusive = genderInclusive(family.shortLabel);
+  const adjectiveInclusive = genderInclusive(family.adjective);
+  const message = `Moi Président(e), j'ai gouverné en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
+
+  // URLs des partages
+  const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${siteUrl}`)}`;
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(siteUrl)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}&quote=${encodeURIComponent(message)}`;
+  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(siteUrl)}&summary=${encodeURIComponent(message)}`;
+
+  const handleClick = (platform, url) => {
+    track("share_card_shared", { mode: platform, family: family.shortLabel });
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  return (
+    <div style={{ marginBottom: 26 }}>
+      <div style={{
+        fontFamily: "ui-monospace, monospace",
+        fontSize: 10,
+        color: COLORS.textMuted,
+        letterSpacing: "0.2em",
+        fontWeight: 600,
+        marginBottom: 10,
+        textAlign: "center",
+      }}>
+        ◊ PARTAGER DIRECTEMENT
+      </div>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(2, 1fr)",
+        gap: 8,
+      }}>
+        <SocialButton
+          label="WhatsApp"
+          icon="W"
+          bg="#25D366"
+          onClick={() => handleClick("whatsapp", whatsappUrl)}
+        />
+        <SocialButton
+          label="X / Twitter"
+          icon="X"
+          bg="#000"
+          onClick={() => handleClick("twitter", twitterUrl)}
+        />
+        <SocialButton
+          label="Facebook"
+          icon="f"
+          bg="#1877F2"
+          onClick={() => handleClick("facebook", facebookUrl)}
+        />
+        <SocialButton
+          label="LinkedIn"
+          icon="in"
+          bg="#0A66C2"
+          onClick={() => handleClick("linkedin", linkedinUrl)}
+        />
+      </div>
+      <div style={{
+        marginTop: 10,
+        fontSize: 11,
+        color: COLORS.textDim,
+        fontStyle: "italic",
+        textAlign: "center",
+      }}>
+        Le message est pré-rempli. Vous validez avant l'envoi.
+      </div>
+    </div>
+  );
+}
+
+function SocialButton({ label, icon, bg, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        padding: "12px 14px",
+        background: bg,
+        border: "none",
+        color: "#fff",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+        fontSize: 13,
+        fontWeight: 600,
+        cursor: "pointer",
+        transition: "transform 0.15s, box-shadow 0.15s",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-1px)";
+        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "none";
+      }}
+    >
+      <span style={{
+        width: 22,
+        height: 22,
+        borderRadius: "50%",
+        background: "rgba(255,255,255,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 12,
+        fontWeight: 800,
+      }}>
+        {icon}
+      </span>
+      {label}
+    </button>
   );
 }
