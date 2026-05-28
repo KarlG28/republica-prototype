@@ -3,8 +3,8 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 
 // ============================================================
-// REPUBLICA · PROTOTYPE — VERSION CINÉMATOGRAPHIQUE
-// Génération IA en temps réel · 5 décisions par session
+// MOI PRÉSIDENT(E) - PROTOTYPE
+// Génération IA en temps réel : 5 décisions par session
 // ============================================================
 
 const COLORS = {
@@ -175,7 +175,7 @@ export default function Page() {
   const [generationError, setGenerationError] = useState(null);
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
-  const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 2 : 3);
+  const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 1 : 2);
 
   // ID unique de session (pour relier l'opt-in à la session anonyme)
   const [sessionId] = useState(() => {
@@ -192,7 +192,7 @@ export default function Page() {
     const nextIdx = dossiers.length;
     const forceUrgent = nextIdx === urgentDossierIdx;
 
-    setLoadingMessage(forceUrgent ? "Une crise survient à l'Élysée..." : "Claude rédige votre prochain dossier...");
+    setLoadingMessage(forceUrgent ? "Une crise survient à l'Élysée..." : "L'actu ne dort jamais. Vous non plus d'ailleurs.");
     setSection(SECTIONS.loading);
     setGenerationError(null);
 
@@ -413,9 +413,9 @@ const goNext = () => {
           25% { transform: translateX(-1px); }
           75% { transform: translateX(1px); }
         }
-        .republica-fade-in { animation: fadeInUp 0.5s ease-out; }
-        .republica-urgent-glow { animation: urgentGlow 2s ease-in-out infinite; }
-        .republica-urgent-stripes-top, .republica-urgent-stripes-bottom {
+        .Moi Président(e)-fade-in { animation: fadeInUp 0.5s ease-out; }
+        .Moi Président(e)-urgent-glow { animation: urgentGlow 2s ease-in-out infinite; }
+        .Moi Président(e)-urgent-stripes-top, .Moi Président(e)-urgent-stripes-bottom {
           height: 14px;
           background-image: repeating-linear-gradient(
             -45deg,
@@ -426,7 +426,7 @@ const goNext = () => {
           );
           animation: urgentStripes 1s linear infinite;
         }
-        .republica-urgent-blink {
+        .Moi Président(e)-urgent-blink {
           display: inline-block;
           width: 10px;
           height: 10px;
@@ -434,28 +434,72 @@ const goNext = () => {
           border-radius: 50%;
           animation: urgentBlink 1.2s ease-in-out infinite;
         }
-        .republica-urgent-card {
+        .Moi Président(e)-urgent-card {
           animation: urgentShake 0.3s ease-in-out 3, urgentGlow 2s ease-in-out infinite 1s;
         }
         @keyframes cursorBlink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
         }
-        .republica-cursor {
+        .Moi Président(e)-cursor {
           display: inline-block;
           margin-left: 2px;
           color: #e6b94f;
           animation: cursorBlink 0.9s steps(2) infinite;
         }
-        .republica-carousel::-webkit-scrollbar {
+        .Moi Président(e)-carousel::-webkit-scrollbar {
           display: none;
         }
-        .republica-carousel {
+        .Moi Président(e)-carousel {
           /* Indication tactile : on suggère le swipe */
           cursor: grab;
         }
         .republica-carousel:active {
           cursor: grabbing;
+        }
+
+        .republica-carousel-arrow {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 5;
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          border: 1px solid ${COLORS.border};
+          background: rgba(255,255,255,0.95);
+          color: ${COLORS.navy};
+          font-size: 22px;
+          font-weight: 600;
+          cursor: pointer;
+          display: none;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 2px 8px rgba(10,26,58,0.12);
+          transition: all 0.2s;
+          padding: 0;
+          line-height: 1;
+        }
+
+        .republica-carousel-arrow:hover {
+          background: ${COLORS.navy};
+          color: ${COLORS.bg};
+          border-color: ${COLORS.navy};
+        }
+
+        .republica-carousel-arrow-left {
+          left: -12px;
+        }
+
+        .republica-carousel-arrow-right {
+          right: -12px;
+        }
+
+        /* Afficher les flèches uniquement sur écrans larges (desktop) */
+        @media (min-width: 768px) {
+          .republica-carousel-arrow {
+            display: flex;
+          }
         }
       `}</style>
     </main>
@@ -463,7 +507,7 @@ const goNext = () => {
 }
 
 function FadeIn({ children, keyProp }) {
-  return <div key={keyProp} className="republica-fade-in">{children}</div>;
+  return <div key={keyProp} className="Moi Président(e)-fade-in">{children}</div>;
 }
 
 // ============================================================
@@ -514,8 +558,8 @@ function Welcome({ onContinue }) {
           letterSpacing: "-0.015em",
         }}>
           Félicitations.<br/>
-          <em style={{ color: COLORS.gold }}>Vous venez d'être élu</em><br/>
-          Président de la République.
+        <em style={{ color: COLORS.gold, fontWeight: 700 }}>Vous venez d'être élu(e)</em><br/>
+        Président(e) de la République.
         </h1>
 
         <p style={{
@@ -529,7 +573,6 @@ function Welcome({ onContinue }) {
         }}>
           Vous prendrez vos fonctions demain matin à l'Élysée.<br/>
           Cent jours s'ouvrent devant vous pour imprimer votre marque sur la nation.<br/>
-          Chaque décision sera une trace dans l'Histoire.
         </p>
 
         <div style={{
@@ -564,7 +607,7 @@ function Header({ section, currentIdx, total }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ display: "inline-block", width: 7, height: 7, background: COLORS.gold, borderRadius: "50%" }}></span>
-          <span style={{ color: COLORS.navy, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>Republica · Prototype</span>
+          <span style={{ color: COLORS.navy, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>Moi Président(e) · Prototype</span>
         </div>
         <span style={{ color: COLORS.textDim, fontFamily: "ui-monospace, monospace", fontSize: 10, letterSpacing: "0.1em" }}>{stepLabel}</span>
       </div>
@@ -591,7 +634,7 @@ function Footer() {
         letterSpacing: "0.1em",
         lineHeight: 1.7,
       }}>
-        REPUBLICA · SIMULATION PROSPECTIVE IA
+       MOI PRÉSIDENT(E) - SIMULATION PROSPECTIVE IA
       </div>
       <div style={{
         fontFamily: "ui-serif, Georgia, serif",
@@ -604,7 +647,7 @@ function Footer() {
         margin: "10px auto 0",
         padding: "0 12px",
       }}>
-        Situations et propositions librement simulées par IA : Republica décline toute responsabilité dans l'occurence de ces événements. Sujets, chiffres et personnalités indiqués à titre illustratif.
+        Situations et propositions librement simulées par IA : Moi Président(e) décline toute responsabilité dans l'occurence de ces événements. Sujets, chiffres et personnalités indiqués à titre illustratif.
       </div>
       <div style={{
         marginTop: 16,
@@ -633,7 +676,7 @@ function Intro({ onStart }) {
         Cent jours pour gouverner.
       </h1>
       <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.text, lineHeight: 1.75, fontStyle: "italic", margin: "0 0 26px" }}>
-        Huit centres de pouvoir vous attendent : Bercy, les syndicats, Bruxelles, l'opinion, les médias, les marchés, le Conseil d'État, les collectivités. Chaque décision aura des conséquences. Aucune ne fera l'unanimité.
+        Tout le monde vous attend au tournant : Bercy, les syndicats, Bruxelles, l'opinion, les médias, les marchés, le Conseil d'État, les collectivités... Chaque décision a des conséquences sur la vie du pays et sur votre capacité à gouverner. Serez-vous à la hauteur ?
       </p>
 
       <div style={{ background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, padding: 16, margin: "0 0 22px", boxShadow: `0 1px 3px ${COLORS.navy}10` }}>
@@ -641,14 +684,13 @@ function Intro({ onStart }) {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 1, background: COLORS.border }}>
           <Stat label="Dette / PIB" value="115,6%" note="INSEE 2025" />
           <Stat label="Déficit" value="5,1%" note="du PIB" />
-          <Stat label="Croissance" value="1,1%" note="annuelle" />
+          <Stat label="Croissance" value="0,9%" note="annuelle" />
           <Stat label="Chômage" value="7,3%" note="BIT" />
         </div>
       </div>
 
       <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 20px" }}>
-        Simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.</strong>
-      </p>
+Simulation prospective IA. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Les conséquences chiffrées de vos choix sont générées par IA et doivent être appréhendées avec recul et esprit critique.</strong> Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.      </p>
 
       {/* ═══ ENCART AVERTISSEMENT ═══ */}
       <div style={{
@@ -674,7 +716,7 @@ function Intro({ onStart }) {
           lineHeight: 1.6,
           margin: 0,
         }}>
-          Republica est une simulation expérimentale lancée par <strong style={{ color: COLORS.navy }}>Nouvelle Energie, parti de la liberté en France</strong>. Les dossiers, indicateurs et conséquences sont générés en temps réel par une IA (Claude, Anthropic). Les chiffres, les organisations et les positions exprimées sont illustratifs.
+          Moi Président(e) est une simulation expérimentale lancée par <strong style={{ color: COLORS.navy }}>Nouvelle Energie, parti de la liberté en France</strong>. Les dossiers, indicateurs et conséquences sont générés en temps réel par une IA (Claude, Anthropic). Les chiffres, les organisations et les positions exprimées sont illustratifs.
         </p>
       </div>
 
@@ -750,7 +792,7 @@ function Loading({ message }) {
             minHeight: "1.5em",
             wordBreak: "break-word",
           }}>
-            {typed}<span className="republica-cursor">▮</span>
+            {typed}<span className="Moi Président(e)-cursor">▮</span>
           </div>
         </div>
 
@@ -796,7 +838,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
 
      {/* ═══ MODE URGENT : irruption visuelle ═══ */}
       {isUrgent ? (
-        <div className="republica-urgent-card" style={{
+        <div className="Moi Président(e)-urgent-card" style={{
           marginBottom: 22,
           border: `2px solid ${COLORS.red}`,
           background: "#fff",
@@ -804,7 +846,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
           overflow: "hidden",
         }}>
           {/* Bandes rayées rouges qui défilent en haut */}
-          <div className="republica-urgent-stripes-top" />
+          <div className="Moi Président(e)-urgent-stripes-top" />
 
           <div style={{ padding: "20px 22px" }}>
             {/* Bandeau d'urgence avec sirène clignotante */}
@@ -818,7 +860,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
               letterSpacing: "0.2em",
             }}>
               <span style={{ display: "flex", alignItems: "center", gap: 10, color: COLORS.red, fontWeight: 700 }}>
-                <span className="republica-urgent-blink" />
+                <span className="Moi Président(e)-urgent-blink" />
                 URGENCE ÉLYSÉE — INTERRUPTION DE MANDAT
               </span>
               <span style={{
@@ -859,7 +901,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
           </div>
 
           {/* Bandes rayées rouges qui défilent en bas */}
-          <div className="republica-urgent-stripes-bottom" />
+          <div className="Moi Président(e)-urgent-stripes-bottom" />
         </div>
       ) : (
         <>
@@ -974,7 +1016,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
       )}
 
       {/* ═══ LE RESTE : agents + scénarios, inchangé ═══ */}
-      <SubTag>Centres de pouvoir · positions exprimées</SubTag>
+      <SubTag>Ils ont deux mots à vous dire...</SubTag>
       <AgentsGrid>
         {(dossier.agents || []).filter(Boolean).map((a, i) => (
           <Agent key={i} name={a.name || "Acteur"} color={resolveColor(a.color || "muted")} stance={a.stance || ""} quote={a.quote || ""} />
@@ -1045,7 +1087,7 @@ function ScenarioDetail({ dossier, scenarioIdx, onConfirm, onCancel }) {
 
       {impacts.length > 0 && (
         <>
-          <SubTag>Impact projeté sur les indicateurs</SubTag>
+          <SubTag>Impact projeté sur les indicateurs. Ces impacts sont générés à l'aide de l'intelligence artificielle.</SubTag>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8, marginBottom: 26 }}>
             {impacts.map((imp, i) => {
               const sign = imp.value > 0 ? "+" : "";
@@ -1123,7 +1165,6 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
     <Section>
       <Tag>— Votre famille politique —</Tag>
       <div style={{ textAlign: "center", padding: "26px 24px", border: `1px solid ${COLORS.navy}30`, background: COLORS.bgPanel, margin: "0 0 24px", position: "relative", boxShadow: `0 4px 12px ${COLORS.navy}10` }}>
-        <div style={{ position: "absolute", top: 8, right: 10, fontFamily: "ui-monospace, monospace", fontSize: 9, color: COLORS.textDim, letterSpacing: "0.15em" }}>N° 048</div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 8, fontWeight: 600 }}>CLASSIFICATION</div>
         <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{family.label}</div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textMuted, letterSpacing: "0.15em", marginTop: 12 }}>PROCHE DE : {family.closeTo}</div>
@@ -1157,7 +1198,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         })}
       </div>
 
-      <SubTag>Carte de partage · screenshot-able</SubTag>
+      <SubTag>Partagez votre mandat</SubTag>
       <div style={{
         background: "#fafaf7",
         border: `1px solid ${COLORS.border}`,
@@ -1257,7 +1298,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             letterSpacing: "0.2em",
             fontWeight: 600,
           }}>
-            <span>REPUBLICA.FR</span>
+            <span>Moi Président(e).FR</span>
             <span style={{ color: COLORS.gold }}>#JOUEZ_LE_VÔTRE</span>
           </div>
         </div>
@@ -1541,59 +1582,7 @@ function ShareStat({ label, value }) {
 
 function AgentsGrid({ children }) {
   const childArray = Array.isArray(children) ? children : [children].filter(Boolean);
-  const total = childArray.length;
-  return (
-    <div style={{ position: "relative", marginBottom: 16 }}>
-      <div
-        className="republica-carousel"
-        style={{
-          display: "flex",
-          gap: 10,
-          overflowX: "auto",
-          scrollSnapType: "x mandatory",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-          paddingBottom: 8,
-          WebkitOverflowScrolling: "touch",
-        }}
-      >
-        {childArray.map((child, i) => (
-          <div
-            key={i}
-            style={{
-              flex: "0 0 85%",
-              maxWidth: 280,
-              scrollSnapAlign: "start",
-              scrollSnapStop: "always",
-            }}
-          >
-            {child}
-          </div>
-        ))}
-      </div>
-      {/* Indicateur de pagination en pointillé */}
-      {total > 1 && (
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: 6,
-          marginTop: 4,
-        }}>
-          {Array.from({ length: total }).map((_, i) => (
-            <span
-              key={i}
-              style={{
-                width: 24,
-                height: 2,
-                background: COLORS.border,
-                borderRadius: 1,
-              }}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  return <Carousel cardWidthPct={85} cardMaxWidth={280}>{childArray}</Carousel>;
 }
 
 function Agent({ name, color, stance, quote }) {
@@ -1998,7 +1987,7 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
             fontWeight: 600, fontStyle: "italic",
           }}>R</div>
           <div>
-            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, color: "#0a1a3a", letterSpacing: "0.2em", fontWeight: 700, lineHeight: 1 }}>REPUBLICA</div>
+            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, color: "#0a1a3a", letterSpacing: "0.2em", fontWeight: 700, lineHeight: 1 }}>Moi Président(e)</div>
             <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, color: "rgba(10,26,58,0.5)", letterSpacing: "0.15em", marginTop: 8 }}>MES 100 JOURS</div>
           </div>
         </div>
@@ -2043,10 +2032,10 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
       {/* Stats + signature */}
       <div style={{ position: "absolute", bottom: 100, left: 96, right: 96, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#0a1a3a", letterSpacing: "0.18em", fontWeight: 700 }}>
-          5 DÉCISIONS · {nbCrises} CRISE{nbCrises > 1 ? "S" : ""}
+          4 DÉCISIONS · {nbCrises} CRISE{nbCrises > 1 ? "S" : ""}
         </div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#e6b94f", letterSpacing: "0.18em", fontWeight: 700 }}>
-          REPUBLICA.FR
+          Moi Président(e).FR
         </div>
       </div>
 
@@ -2094,14 +2083,14 @@ function ShareButton({ shareCardRef, family }) {
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
       if (!blob) throw new Error("Impossible de générer l'image");
 
-      const fileName = `republica-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
+      const fileName = `Moi Président(e)-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
 
       // Sur mobile : tenter Web Share API
       if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
         const file = new File([blob], fileName, { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: "Mon mandat sur Republica",
+          title: "Mon mandat sur Moi Président(e)",
           text: `J'ai gouverné en ${family.shortLabel} ${family.adjective}. Et toi ?`,
         });
         track("share_card_shared", { mode: "native", family: family.shortLabel });
@@ -2196,11 +2185,70 @@ function loadScript(src) {
 // CAROUSEL DES SCÉNARIOS (swipe mobile + glisser desktop)
 // ============================================================
 function ScenariosCarousel({ scenarios, onSelectScenario }) {
-  const total = scenarios.length;
+  return (
+    <Carousel cardWidthPct={88} cardMaxWidth={360}>
+      {scenarios.map((s, i) => (
+        <ScenarioButton
+          key={i}
+          code={s.code || `SCÉNARIO ${i + 1}`}
+          color={resolveColor(s.color || "blue")}
+          title={s.title || "Sans titre"}
+          risk={s.risk || ""}
+          desc={s.desc || ""}
+          tags={(s.tags || []).filter(Boolean).map((t) => (Array.isArray(t) ? t : [t, true]))}
+          onClick={() => onSelectScenario(i)}
+        />
+      ))}
+    </Carousel>
+  );
+}
+
+// ============================================================
+// CAROUSEL GÉNÉRIQUE (mobile swipe + desktop flèches)
+// ============================================================
+function Carousel({ children, cardWidthPct = 88, cardMaxWidth = 360 }) {
+  const scrollRef = useRef(null);
+  const childArray = Array.isArray(children) ? children : [children].filter(Boolean);
+  const total = childArray.length;
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  const scrollByCard = (direction) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    // Largeur d'une carte = première carte enfant
+    const firstCard = el.querySelector("[data-card]");
+    const cardWidth = firstCard ? firstCard.offsetWidth + 10 : 300; // +10 pour le gap
+    el.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+  };
+
+  // Suivre la position de scroll pour mettre à jour les pastilles
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const firstCard = el.querySelector("[data-card]");
+    if (!firstCard) return;
+    const cardWidth = firstCard.offsetWidth + 10;
+    const idx = Math.round(el.scrollLeft / cardWidth);
+    if (idx !== activeIdx) setActiveIdx(idx);
+  };
 
   return (
     <div style={{ position: "relative", marginBottom: 16 }}>
+      {/* Flèche gauche (desktop) */}
+      {total > 1 && (
+        <button
+          type="button"
+          onClick={() => scrollByCard(-1)}
+          className="republica-carousel-arrow republica-carousel-arrow-left"
+          aria-label="Précédent"
+        >
+          ‹
+        </button>
+      )}
+
       <div
+        ref={scrollRef}
+        onScroll={onScroll}
         className="republica-carousel"
         style={{
           display: "flex",
@@ -2213,45 +2261,65 @@ function ScenariosCarousel({ scenarios, onSelectScenario }) {
           WebkitOverflowScrolling: "touch",
         }}
       >
-        {scenarios.map((s, i) => (
+        {childArray.map((child, i) => (
           <div
             key={i}
+            data-card="true"
             style={{
-              flex: "0 0 88%",
-              maxWidth: 360,
+              flex: `0 0 ${cardWidthPct}%`,
+              maxWidth: cardMaxWidth,
               scrollSnapAlign: "start",
               scrollSnapStop: "always",
             }}
           >
-            <ScenarioButton
-              code={s.code || `SCÉNARIO ${i + 1}`}
-              color={resolveColor(s.color || "blue")}
-              title={s.title || "Sans titre"}
-              risk={s.risk || ""}
-              desc={s.desc || ""}
-              tags={(s.tags || []).filter(Boolean).map((t) => (Array.isArray(t) ? t : [t, true]))}
-              onClick={() => onSelectScenario(i)}
-            />
+            {child}
           </div>
         ))}
       </div>
-      {/* Indicateur de pagination */}
+
+      {/* Flèche droite (desktop) */}
+      {total > 1 && (
+        <button
+          type="button"
+          onClick={() => scrollByCard(1)}
+          className="republica-carousel-arrow republica-carousel-arrow-right"
+          aria-label="Suivant"
+        >
+          ›
+        </button>
+      )}
+
+      {/* Pastilles cliquables */}
       {total > 1 && (
         <div style={{
           display: "flex",
           justifyContent: "center",
-          gap: 6,
-          marginTop: 6,
+          gap: 8,
+          marginTop: 8,
         }}>
           {Array.from({ length: total }).map((_, i) => (
-            <span
+            <button
               key={i}
-              style={{
-                width: 24,
-                height: 2,
-                background: COLORS.border,
-                borderRadius: 1,
+              type="button"
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el) return;
+                const firstCard = el.querySelector("[data-card]");
+                if (!firstCard) return;
+                const cardWidth = firstCard.offsetWidth + 10;
+                el.scrollTo({ left: i * cardWidth, behavior: "smooth" });
               }}
+              style={{
+                width: i === activeIdx ? 28 : 8,
+                height: 8,
+                borderRadius: 4,
+                border: "none",
+                background: i === activeIdx ? COLORS.navy : COLORS.border,
+                cursor: "pointer",
+                transition: "all 0.25s ease",
+                padding: 0,
+              }}
+              aria-label={`Aller à la carte ${i + 1}`}
             />
           ))}
         </div>
@@ -2264,7 +2332,7 @@ function ScenariosCarousel({ scenarios, onSelectScenario }) {
 // BOUTONS DE PARTAGE SUR RÉSEAUX SOCIAUX
 // ============================================================
 function SocialShareButtons({ family }) {
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://republica-prototype.vercel.app";
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://Moi Président(e)-prototype.vercel.app";
 
   // Construire le message
   const familyInclusive = genderInclusive(family.shortLabel);
@@ -2458,7 +2526,7 @@ function CommunityStats({ family }) {
           lineHeight: 1.55,
           fontStyle: "italic",
         }}>
-          Pas encore assez de joueurs pour comparer ({stats.total} session{stats.total > 1 ? "s" : ""} jouée{stats.total > 1 ? "s" : ""}). <strong style={{ fontStyle: "normal" }}>Partagez Republica</strong> pour faire grandir la communauté.
+          Pas encore assez de joueurs pour comparer. <strong style={{ fontStyle: "normal" }}>Partagez Moi Président(e)</strong> pour faire grandir la communauté.
         </div>
       </div>
     );
