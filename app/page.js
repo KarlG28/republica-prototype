@@ -319,6 +319,7 @@ const confirmChoice = () => {
       social: s.social + (deltas.social || 0),
       autorite: s.autorite + (deltas.autorite || 0),
       europe: s.europe + (deltas.europe || 0),
+      progressisme: s.progressisme + (deltas.progressisme || 0),
     }));
     setSelectedScenarioIdx(null);
     setSection(SECTIONS.consequence);
@@ -413,7 +414,7 @@ const goNext = () => {
           25% { transform: translateX(-1px); }
           75% { transform: translateX(1px); }
         }
-        .Moi Président(e)-fade-in { animation: fadeInUp 0.5s ease-out; }
+        .republica-fade-in { animation: fadeInUp 0.5s ease-out; }
         .Moi Président(e)-urgent-glow { animation: urgentGlow 2s ease-in-out infinite; }
         .Moi Président(e)-urgent-stripes-top, .Moi Président(e)-urgent-stripes-bottom {
           height: 14px;
@@ -507,7 +508,7 @@ const goNext = () => {
 }
 
 function FadeIn({ children, keyProp }) {
-  return <div key={keyProp} className="Moi Président(e)-fade-in">{children}</div>;
+  return <div key={keyProp} className="republica-fade-in">{children}</div>;
 }
 
 // ============================================================
@@ -1189,11 +1190,13 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       <Tag>— Votre famille politique —</Tag>
       <div style={{ textAlign: "center", padding: "26px 24px", border: `1px solid ${COLORS.navy}30`, background: COLORS.bgPanel, margin: "0 0 24px", position: "relative", boxShadow: `0 4px 12px ${COLORS.navy}10` }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.25em", marginBottom: 8, fontWeight: 600 }}>CLASSIFICATION</div>
-        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>{family.label}</div>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textMuted, letterSpacing: "0.15em", marginTop: 12 }}>PROCHE DE : {family.closeTo}</div>
+        <div style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, letterSpacing: "-0.01em" }}>
+          {family.shortLabel}{" "}
+          <em style={{ color: COLORS.gold, fontWeight: 600 }}>{family.adjective}</em>
+        </div>
       </div>
 
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", textAlign: "center", margin: "0 0 28px" }}>« {family.tagline} »</p>
+      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", textAlign: "center", margin: "0 0 28px" }}>« {family.shareQuote} »</p>
 
   {/* ═══ COMMUNAUTÉ ═══ */}
       <CommunityStats family={family} />
@@ -1452,7 +1455,6 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   );
 }
 
-function classifyFamily(scores, indicators) {
 function classifyFamily(scores, indicators) {
   const { liberal = 0, social = 0, autorite = 0, europe = 0, progressisme = 0 } = scores;
   const { debt = 115.6, confidence = 52, parliament = 287, tension = 4.2, spread = 64 } = indicators || {};
@@ -2136,7 +2138,7 @@ function ShareButton({ shareCardRef, family }) {
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
       if (!blob) throw new Error("Impossible de générer l'image");
 
-      const fileName = `Moi Président(e)-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
+     const fileName = `moi-president-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`; const fileName = `Moi Président(e)-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
 
       // Sur mobile : tenter Web Share API
       if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
@@ -2385,7 +2387,7 @@ function Carousel({ children, cardWidthPct = 88, cardMaxWidth = 360 }) {
 // BOUTONS DE PARTAGE SUR RÉSEAUX SOCIAUX
 // ============================================================
 function SocialShareButtons({ family }) {
-  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://Moi Président(e)-prototype.vercel.app";
+  const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://republica-prototype.vercel.app";
 
   // Construire le message
   const familyInclusive = genderInclusive(family.shortLabel);
