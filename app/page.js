@@ -1144,7 +1144,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
       <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", margin: "0 0 22px" }}>{data.narrative}</p>
       <SubTag>Chronologie des semaines suivantes</SubTag>
       <Timeline events={data.events || []} />
-      <BigButton onClick={onContinue}>{isLast ? "Voir le bilan de mon mandat ↗" : "Suite du mandat ↗"}</BigButton>
+      <BigButton onClick={onContinue}>{isLast ? "Voir le bilan de mes 100 jours ↗" : "Suite du mandat ↗"}</BigButton>
     </Section>
   );
 }
@@ -1168,7 +1168,6 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
 
   return (
    <Section>
-      <Tag>— Votre famille politique —</Tag>
 
   <SubTag>Partagez vos 100 jours</SubTag>
       <div style={{
