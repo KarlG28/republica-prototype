@@ -516,7 +516,8 @@ function FadeIn({ children, keyProp }) {
 
 function Welcome({ onContinue }) {
   return (
-    {/* Image Élysée — accueil */}
+    <>
+      {/* Image Élysée — accueil */}
       <div style={{
         width: "100%",
         marginBottom: 32,
@@ -615,6 +616,7 @@ function Welcome({ onContinue }) {
         </div>
       </div>
     </Section>
+    </>
   );
 }
 
