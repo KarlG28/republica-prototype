@@ -312,10 +312,10 @@ const confirmChoice = () => {
     setChoices((c) => ({ ...c, [currentIdx]: signature }));
     setIndicators((i) => ({
       debt: +(i.debt + (deltas.debt || 0)).toFixed(1),
-      confidence: Math.max(0, Math.min(100, i.confidence + (deltas.confidence || 0))),
-      parliament: i.parliament + (deltas.parliament || 0),
+      confidence: +Math.max(0, Math.min(100, i.confidence + (deltas.confidence || 0))).toFixed(1),
+      parliament: Math.round(i.parliament + (deltas.parliament || 0)),
       tension: +(Math.max(0, Math.min(10, i.tension + (deltas.tension || 0)))).toFixed(1),
-      spread: i.spread + (deltas.spread || 0),
+      spread: Math.round(i.spread + (deltas.spread || 0)),
     }));
     setScores((s) => ({
       liberal: s.liberal + (deltas.liberal || 0),
