@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 
 // ============================================================
 // MOI PRÉSIDENT(E) - PROTOTYPE
-// Génération IA en temps réel : 5 décisions par session
+// Génération IA en temps réel : 4 décisions par session
 // ============================================================
 
 const COLORS = {
@@ -42,7 +42,7 @@ const SECTIONS = {
   consequence: "consequence",
   profile: "profile",
 };
-const TOTAL_DECISIONS = 5;
+const TOTAL_DECISIONS = 4;
 
 function resolveColor(name) {
   const map = { blue: COLORS.blue, red: COLORS.red, redLight: COLORS.redLight, green: COLORS.green, gold: COLORS.gold, yellow: COLORS.yellow, muted: COLORS.textMuted, navy: COLORS.navy };
@@ -152,7 +152,7 @@ const FALLBACK_DOSSIER = {
   },
 };
 
-const FALLBACK_PARTNER_SUMMARY = `Vous avez gouverné cinq décisions sous tension. Voici comment Nouvelle Énergie aurait abordé ces mêmes choix.
+const FALLBACK_PARTNER_SUMMARY = `Vous avez gouverné quatre décisions sous tension. Voici comment Nouvelle Énergie aurait abordé ces mêmes choix.
 
 Chez Nouvelle Énergie, nous croyons qu'une France plus libre est une France qui respire, décide et agit davantage. Notre boussole : libérer avant d'encadrer, faire confiance avant de contrôler.
 
@@ -1209,7 +1209,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             fontWeight: 600,
           }}>
             <span>MANDAT TERMINÉ</span>
-            <span>5 DÉCISIONS · {dossiers.filter(d => d.urgent).length} CRISE{dossiers.filter(d => d.urgent).length > 1 ? "S" : ""}</span>
+            <span>4 DÉCISIONS · {dossiers.filter(d => d.urgent).length} CRISE{dossiers.filter(d => d.urgent).length > 1 ? "S" : ""}</span>
           </div>
 
           {/* "Vous avez gouverné en..." */}
