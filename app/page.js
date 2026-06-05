@@ -165,7 +165,7 @@ Si cette manière de gouverner vous parle, Nouvelle Énergie vous tend la main.`
 // ============================================================
 
 export default function Page() {
-  const [section, setSection] = useState(SECTIONS.welcome);
+const [section, setSection] = useState(SECTIONS.welcome);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [dossiers, setDossiers] = useState([]);
   const [choices, setChoices] = useState({});
@@ -176,6 +176,9 @@ export default function Page() {
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
   const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 1 : 2);
+  // Préchargement du 1er dossier pendant l'écran Intro
+  const [preloadedDossier, setPreloadedDossier] = useState(null);
+  const [preloadingError, setPreloadingError] = useState(null);
 
   // ID unique de session (pour relier l'opt-in à la session anonyme)
   const [sessionId] = useState(() => {
@@ -291,11 +294,52 @@ async function saveSessionAnonymous(familyData) {
     }
   }
   
-  const goToIntro = () => setSection(SECTIONS.intro);
+  const goToIntro = () => {
+    setSection(SECTIONS.intro);
+    // On lance le préchargement du 1er dossier en arrière-plan, pendant la lecture de l'écran d'investiture
+    preloadFirstDossier();
+  };
+
+  async function preloadFirstDossier() {
+    setPreloadingError(null);
+    try {
+      const forceUrgent = 0 === urgentDossierIdx; // si urgence prévue au 1er dossier
+      const response = await fetch("/api/generate-dossier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ previousTitles: [], forceUrgent }),
+      });
+      if (!response.ok) throw new Error(`Erreur ${response.status}`);
+      const data = await response.json();
+      const dossier = data.dossier;
+      if (!dossier || !dossier.title || !dossier.scenarios || dossier.scenarios.length < 2) {
+        throw new Error("Format de dossier invalide");
+      }
+      // Force la chronologie : 1er dossier à J+15
+      dossier.day = "J+15";
+      setPreloadedDossier(dossier);
+    } catch (err) {
+      console.error("Erreur préchargement:", err);
+      setPreloadingError(err.message);
+    }
+  }
   const startSession = () => {
     track("start_session");
     setCurrentIdx(0);
-    generateDossier();
+    // Si le 1er dossier est déjà préchargé : on l'utilise tout de suite, pas d'attente
+    if (preloadedDossier) {
+      setDossiers([preloadedDossier]);
+      setSection(SECTIONS.dossier);
+      track("preload_hit");
+    } else if (preloadingError) {
+      // Le préchargement a échoué : on relance via le flow classique (avec fallback)
+      track("preload_miss_error");
+      generateDossier();
+    } else {
+      // Le préchargement est encore en cours : on bascule sur le loading classique
+      track("preload_miss_pending");
+      generateDossier();
+    }
   };
 
   const selectScenario = (idx) => {
