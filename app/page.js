@@ -177,8 +177,17 @@ const [section, setSection] = useState(SECTIONS.welcome);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
   const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 1 : 2);
   // Préchargement du 1er dossier pendant l'écran Intro
+  // Préchargement du 1er dossier pendant l'écran Intro
   const [preloadedDossier, setPreloadedDossier] = useState(null);
   const [preloadingError, setPreloadingError] = useState(null);
+
+  // Quand le préchargement arrive ET qu'on est en train de l'attendre (loading sans dossier), bascule auto
+  useEffect(() => {
+    if (preloadedDossier && section === SECTIONS.loading && dossiers.length === 0) {
+      setDossiers([preloadedDossier]);
+      setSection(SECTIONS.dossier);
+    }
+  }, [preloadedDossier, section, dossiers.length]);
 
   // ID unique de session (pour relier l'opt-in à la session anonyme)
   const [sessionId] = useState(() => {
@@ -326,19 +335,21 @@ async function saveSessionAnonymous(familyData) {
   const startSession = () => {
     track("start_session");
     setCurrentIdx(0);
-    // Si le 1er dossier est déjà préchargé : on l'utilise tout de suite, pas d'attente
     if (preloadedDossier) {
+      // Cas 1 : le préchargement est terminé, on l'affiche immédiatement
       setDossiers([preloadedDossier]);
       setSection(SECTIONS.dossier);
       track("preload_hit");
     } else if (preloadingError) {
-      // Le préchargement a échoué : on relance via le flow classique (avec fallback)
+      // Cas 2 : le préchargement a échoué, on relance via le flow classique
       track("preload_miss_error");
       generateDossier();
     } else {
-      // Le préchargement est encore en cours : on bascule sur le loading classique
+      // Cas 3 : le préchargement est en cours, on affiche le loading et on attend
       track("preload_miss_pending");
-      generateDossier();
+      setLoadingMessage("L'actu ne dort jamais. Vous non plus d'ailleurs.");
+      setSection(SECTIONS.loading);
+      // On attend la fin du préchargement, sans relancer un 2ème appel
     }
   };
 
