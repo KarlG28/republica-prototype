@@ -521,15 +521,14 @@ function FadeIn({ children, keyProp }) {
 function Welcome({ onContinue }) {
   return (
     <Section>
- 
-      <div style={{ textAlign: "center", padding: "60px 20px 40px" }}>
+      <div style={{ textAlign: "center", padding: "80px 20px 60px" }}>
         <div style={{
           display: "inline-block",
           width: 90,
           height: 90,
           borderRadius: "50%",
           background: `radial-gradient(circle, ${COLORS.gold} 0%, ${COLORS.goldDim} 100%)`,
-          marginBottom: 28,
+          marginBottom: 32,
           position: "relative",
           boxShadow: `0 6px 20px ${COLORS.navy}25`,
         }}>
@@ -549,54 +548,32 @@ function Welcome({ onContinue }) {
           }}>R</div>
         </div>
 
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color: COLORS.gold, letterSpacing: "0.35em", marginBottom: 18, fontWeight: 600 }}>
-          — RÉPUBLIQUE FRANÇAISE —
-        </div>
-
         <h1 style={{
           fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 40,
+          fontSize: 38,
           fontWeight: 600,
           color: COLORS.navy,
-          lineHeight: 1.1,
-          margin: "0 0 24px",
+          lineHeight: 1.15,
+          margin: "0 0 18px",
           letterSpacing: "-0.015em",
         }}>
           Félicitations.<br/>
-        <em style={{ color: COLORS.gold, fontWeight: 700 }}>Vous venez d'être élu(e)</em><br/>
-        Président(e) de la République.
+          <em style={{ color: COLORS.gold, fontWeight: 700 }}>Vous êtes Président(e).</em>
         </h1>
 
         <p style={{
           fontFamily: "ui-serif, Georgia, serif",
           fontSize: 17,
-          color: COLORS.text,
-          lineHeight: 1.75,
+          color: COLORS.textMuted,
+          lineHeight: 1.6,
           fontStyle: "italic",
-          margin: "0 auto 36px",
-          maxWidth: 540,
+          margin: "0 auto 40px",
+          maxWidth: 480,
         }}>
-          Vous prendrez vos fonctions demain matin à l'Élysée.<br/>
-          Cent jours s'ouvrent devant vous pour imprimer votre marque sur la nation.<br/>
+          100 jours pour gouverner la France.
         </p>
 
-        <div style={{
-          display: "inline-block",
-          padding: "10px 24px",
-          background: `${COLORS.gold}10`,
-          border: `1px solid ${COLORS.gold}40`,
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 11,
-          color: COLORS.gold,
-          letterSpacing: "0.2em",
-          marginBottom: 36,
-        }}>
-          ◊ PROCLAMATION OFFICIELLE ◊
-        </div>
-
-        <div>
-          <BigButton onClick={onContinue}>Rejoindre l'Élysée ↗</BigButton>
-        </div>
+        <BigButton onClick={onContinue}>Entrer à l'Élysée ↗</BigButton>
       </div>
     </Section>
   );
@@ -676,13 +653,10 @@ function Footer() {
 function Intro({ onStart }) {
   return (
     <Section>
-      <Tag>— Investiture présidentielle —</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 34, fontWeight: 600, color: COLORS.navy, lineHeight: 1.1, margin: "0 0 18px", letterSpacing: "-0.01em" }}>
-        Cent jours pour gouverner.
+      <Tag>— Investiture —</Tag>
+      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, margin: "0 0 22px", letterSpacing: "-0.01em" }}>
+        Au travail.
       </h1>
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 16, color: COLORS.text, lineHeight: 1.75, fontStyle: "italic", margin: "0 0 26px" }}>
-        Tout le monde vous attend au tournant : Bercy, les syndicats, Bruxelles, l'opinion, les médias, les marchés, le Conseil d'État, les collectivités... Chaque décision a des conséquences sur la vie du pays et sur votre capacité à gouverner. Serez-vous à la hauteur ?
-      </p>
 
       <div style={{ background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, padding: 16, margin: "0 0 22px", boxShadow: `0 1px 3px ${COLORS.navy}10` }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>◊ ÉTAT DE LA NATION · DONNÉES VÉRIFIÉES</div>
@@ -694,8 +668,9 @@ function Intro({ onStart }) {
         </div>
       </div>
 
-      <p style={{ fontSize: 13, color: COLORS.textMuted, lineHeight: 1.65, fontStyle: "italic", margin: "0 0 20px" }}>
-Simulation prospective IA produite par Nouvelle Energie. Les chiffres de départ sont vérifiés. <strong style={{ color: COLORS.navy }}>Les conséquences chiffrées de vos choix sont générées par IA et doivent être appréhendées avec recul et esprit critique.</strong> Chaque dossier est rédigé en temps réel par Claude. Aucune session n'est identique.      </p>
+      <p style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 1.55, fontStyle: "italic", margin: "0 0 20px" }}>
+        Simulation prospective IA produite par Nouvelle Énergie. Les conséquences de vos choix sont générées par IA.
+      </p>
 
       {/* ═══ ENCART AVERTISSEMENT ═══ */}
       <div style={{
@@ -725,7 +700,7 @@ Simulation prospective IA produite par Nouvelle Energie. Les chiffres de départ
         </p>
       </div>
 
-      <BigButton onClick={onStart}>Prendre mes fonctions ↗</BigButton>
+      <BigButton onClick={onStart}>Commencer mon mandat ↗</BigButton>
     </Section>
   );
 }
