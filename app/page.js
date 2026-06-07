@@ -177,9 +177,12 @@ const [section, setSection] = useState(SECTIONS.welcome);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
   const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 1 : 2);
   // Préchargement du 1er dossier pendant l'écran Intro
-  // Préchargement du 1er dossier pendant l'écran Intro
   const [preloadedDossier, setPreloadedDossier] = useState(null);
   const [preloadingError, setPreloadingError] = useState(null);
+
+  // Conséquences générées en parallèle pour chaque dossier
+  // Structure : { 0: { A: {...}, B: {...}, C: {...} }, 1: {...}, ... }
+  const [consequencesByDossier, setConsequencesByDossier] = useState({});
 
   // Quand le préchargement arrive ET qu'on est en train de l'attendre (loading sans dossier), bascule auto
   useEffect(() => {
@@ -188,6 +191,35 @@ const [section, setSection] = useState(SECTIONS.welcome);
       setSection(SECTIONS.dossier);
     }
   }, [preloadedDossier, section, dossiers.length]);
+
+  // Quand on entre dans un nouveau dossier, on lance la génération des 3 conséquences en parallèle
+  useEffect(() => {
+    if (section === SECTIONS.dossier && dossiers[currentIdx] && !consequencesByDossier[currentIdx]) {
+      generateConsequencesForDossier(currentIdx, dossiers[currentIdx]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section, currentIdx, dossiers]);
+
+  // Quand les conséquences arrivent ET qu'on est en train de les attendre (loading après choix), bascule auto
+  useEffect(() => {
+    if (section === SECTIONS.loading && choices[currentIdx]) {
+      const signature = choices[currentIdx];
+      const conseq = consequencesByDossier[currentIdx]?.[signature];
+      if (conseq) {
+        setDossiers(prev => {
+          const updated = [...prev];
+          if (updated[currentIdx]) {
+            updated[currentIdx] = {
+              ...updated[currentIdx],
+              consequences: { ...(updated[currentIdx].consequences || {}), [signature]: conseq },
+            };
+          }
+          return updated;
+        });
+        setSection(SECTIONS.consequence);
+      }
+    }
+  }, [consequencesByDossier, section, choices, currentIdx]);
 
   // ID unique de session (pour relier l'opt-in à la session anonyme)
   const [sessionId] = useState(() => {
@@ -332,6 +364,58 @@ async function saveSessionAnonymous(familyData) {
       setPreloadingError(err.message);
     }
   }
+
+  async function generateConsequencesForDossier(dossierIdx, dossier) {
+    if (!dossier || !dossier.scenarios || dossier.scenarios.length === 0) return;
+
+    // On lance les 3 appels en parallèle
+    const promises = dossier.scenarios.map(async (scenario) => {
+      try {
+        const response = await fetch("/api/generate-consequences", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            dossierTitle: dossier.title || "",
+            dossierSubtitle: dossier.subtitle || "",
+            scenarioTitle: scenario.title || "",
+            scenarioDesc: scenario.desc || "",
+            scenarioRisk: scenario.risk || "",
+          }),
+        });
+        if (!response.ok) throw new Error(`Erreur ${response.status}`);
+        const data = await response.json();
+        return { signature: scenario.signature, consequence: data.consequence };
+      } catch (err) {
+        console.error(`Erreur conséquence scénario ${scenario.signature}:`, err);
+        // Fallback : on retourne une chronologie minimale
+        return {
+          signature: scenario.signature,
+          consequence: {
+            title: scenario.title || "Décision actée",
+            narrative: "La décision suit son cours. Les semaines passent, les effets se déploient.",
+            events: [
+              { day: "+5", label: "Annonce officielle de la décision", color: "blue" },
+              { day: "+15", label: "Premières réactions chiffrées dans la presse", color: "yellow" },
+              { day: "+30", label: "Réaction d'un acteur tiers concerné", color: "red" },
+              { day: "+50", label: "Échos médiatiques et sociaux", color: "green" },
+              { day: "+80", label: "Conséquence politique structurante", color: "gold" },
+            ]
+          }
+        };
+      }
+    });
+
+    const results = await Promise.all(promises);
+
+    // On range les conséquences par signature de scénario
+    const byScenario = {};
+    results.forEach(r => {
+      byScenario[r.signature] = r.consequence;
+    });
+
+    setConsequencesByDossier(prev => ({ ...prev, [dossierIdx]: byScenario }));
+  }
+  
   const startSession = () => {
     track("start_session");
     setCurrentIdx(0);
@@ -358,7 +442,7 @@ async function saveSessionAnonymous(familyData) {
     setSection(SECTIONS.scenarioDetail);
   };
 
-const confirmChoice = () => {
+const confirmChoice = async () => {
     const dossier = dossiers[currentIdx];
     const scenario = dossier.scenarios[selectedScenarioIdx];
     track("decision_made", { idx: String(currentIdx + 1), urgent: dossier.urgent ? "yes" : "no" });
@@ -380,7 +464,25 @@ const confirmChoice = () => {
       progressisme: s.progressisme + (deltas.progressisme || 0),
     }));
     setSelectedScenarioIdx(null);
-    setSection(SECTIONS.consequence);
+
+    // Si les conséquences sont déjà générées, on injecte dans le dossier et on affiche
+    // Sinon, on bascule sur loading et on attend (un useEffect dédié fera la transition)
+    if (consequencesByDossier[currentIdx] && consequencesByDossier[currentIdx][signature]) {
+      const consequence = consequencesByDossier[currentIdx][signature];
+      setDossiers(prev => {
+        const updated = [...prev];
+        updated[currentIdx] = {
+          ...updated[currentIdx],
+          consequences: { ...(updated[currentIdx].consequences || {}), [signature]: consequence },
+        };
+        return updated;
+      });
+      setSection(SECTIONS.consequence);
+    } else {
+      // Conséquences pas encore prêtes : on affiche le loading
+      setLoadingMessage("Vos décisions se mettent en marche...");
+      setSection(SECTIONS.loading);
+    }
   };
 
   const cancelChoice = () => {
