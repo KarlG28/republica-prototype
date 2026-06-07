@@ -55,6 +55,19 @@ europe : pro-UE, mondialisation, ouverture économique (−5 à +5)
 progressisme : ouverture culturelle, droits individuels, valeurs modernes (vs continuité culturelle, traditions) (−5 à +5)
 
 ═══════════════════════════════════════════
+ARCHÉTYPE PRÉSIDENTIEL DE CHAQUE SCÉNARIO
+═══════════════════════════════════════════
+Pour chaque scénario, tu assignes UN champ "archetype" choisi STRICTEMENT parmi :
+- "Réformateur" : veut changer les choses en profondeur, accepte les coûts politiques, ose la rupture
+- "Libéral" : mise sur la responsabilité individuelle, la liberté économique, l'initiative privée
+- "Progressiste" : ouverture sociétale, droits individuels, modernité culturelle
+- "Conservateur" : continuité, ordre, prudence, valeurs traditionnelles
+- "Réac" : restauration, refus du changement sociétal, retour aux valeurs d'avant
+- "Identitaire" : priorité à la cohésion culturelle, à la souveraineté nationale, fermeture aux influences extérieures
+
+Les 3 scénarios d'un même dilemme doivent ABSOLUMENT avoir 3 archétypes DIFFÉRENTS. Choisis les 3 archétypes les plus pertinents pour ce dilemme spécifique.
+
+═══════════════════════════════════════════
 FORMAT : JSON STRICT, aucun texte ni markdown autour.
 ═══════════════════════════════════════════
 {
@@ -75,9 +88,9 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
     {"name":"Acteur 4","color":"muted","stance":"Conservateur","quote":"..."}
   ],
   "scenarios":[
-    {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2,"progressisme":1},"signature":"A"},
-    {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2,"progressisme":2},"signature":"B"},
-    {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2,"progressisme":-1},"signature":"C"}
+    {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2,"progressisme":1},"archetype":"Libéral","signature":"A"},
+    {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2,"progressisme":2},"archetype":"Progressiste","signature":"B"},
+    {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2,"progressisme":-1},"archetype":"Conservateur","signature":"C"}
   ]
 ═══════════════════════════════════════════
 RISQUES — 3 conséquences immédiates si rien n'est décidé
