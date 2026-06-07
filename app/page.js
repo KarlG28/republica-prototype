@@ -42,7 +42,7 @@ const SECTIONS = {
   consequence: "consequence",
   profile: "profile",
 };
-const TOTAL_DECISIONS = 4;
+const TOTAL_DECISIONS = 1;
 
 function resolveColor(name) {
   const map = { blue: COLORS.blue, red: COLORS.red, redLight: COLORS.redLight, green: COLORS.green, gold: COLORS.gold, yellow: COLORS.yellow, muted: COLORS.textMuted, navy: COLORS.navy };
@@ -175,7 +175,8 @@ const [section, setSection] = useState(SECTIONS.welcome);
   const [generationError, setGenerationError] = useState(null);
   const [selectedScenarioIdx, setSelectedScenarioIdx] = useState(null);
   // Fixé au démarrage : à quel dossier l'urgence aura lieu (2 ou 3 sur 5)
-  const [urgentDossierIdx] = useState(() => Math.random() < 0.5 ? 1 : 2);
+ // Pas de notion d'urgence aléatoire en V2 : on a 1 seul dilemme
+  const urgentDossierIdx = -1;
   // Préchargement du 1er dossier pendant l'écran Intro
   const [preloadedDossier, setPreloadedDossier] = useState(null);
   const [preloadingError, setPreloadingError] = useState(null);
@@ -344,7 +345,7 @@ async function saveSessionAnonymous(familyData) {
   async function preloadFirstDossier() {
     setPreloadingError(null);
     try {
-      const forceUrgent = 0 === urgentDossierIdx; // si urgence prévue au 1er dossier
+      const forceUrgent = false;
       const response = await fetch("/api/generate-dossier", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
