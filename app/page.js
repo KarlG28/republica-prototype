@@ -677,61 +677,51 @@ function FadeIn({ children, keyProp }) {
 // ============================================================
 
 function Welcome({ onContinue }) {
+  // Date du jour formatée en français
+  const today = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+
   return (
     <Section>
       <div style={{ textAlign: "center", padding: "80px 20px 60px" }}>
         <div style={{
-          display: "inline-block",
-          width: 90,
-          height: 90,
-          borderRadius: "50%",
-          background: `radial-gradient(circle, ${COLORS.gold} 0%, ${COLORS.goldDim} 100%)`,
-          marginBottom: 32,
-          position: "relative",
-          boxShadow: `0 6px 20px ${COLORS.navy}25`,
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 11,
+          color: COLORS.gold,
+          letterSpacing: "0.3em",
+          marginBottom: 30,
+          fontWeight: 700,
+          textTransform: "uppercase",
         }}>
-          <div style={{
-            position: "absolute",
-            inset: 6,
-            borderRadius: "50%",
-            border: `2px solid ${COLORS.bg}`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "ui-serif, Georgia, serif",
-            fontSize: 32,
-            color: COLORS.bg,
-            fontWeight: 600,
-            fontStyle: "italic",
-          }}>R</div>
+          ◊ {today} ◊
         </div>
 
         <h1 style={{
           fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 38,
+          fontSize: 44,
           fontWeight: 600,
           color: COLORS.navy,
-          lineHeight: 1.15,
-          margin: "0 0 18px",
-          letterSpacing: "-0.015em",
+          lineHeight: 1.1,
+          margin: "0 0 22px",
+          letterSpacing: "-0.02em",
         }}>
-          Félicitations.<br/>
-          <em style={{ color: COLORS.gold, fontWeight: 700 }}>Vous êtes Président(e).</em>
+          Le dilemme<br/>
+          <em style={{ color: COLORS.gold, fontWeight: 700 }}>du jour.</em>
         </h1>
 
         <p style={{
           fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 17,
-          color: COLORS.textMuted,
-          lineHeight: 1.6,
+          fontSize: 18,
+          color: COLORS.text,
+          lineHeight: 1.55,
           fontStyle: "italic",
           margin: "0 auto 40px",
-          maxWidth: 480,
+          maxWidth: 460,
         }}>
-          100 jours pour gouverner la France.
+          Un dossier. Prenez une décision... et assumez-la.<br/>
+          Vous êtes le Président de la République.
         </p>
 
-        <BigButton onClick={onContinue}>Entrer à l'Élysée ↗</BigButton>
+        <BigButton onClick={onContinue}>Entrer dans le bureau ↗</BigButton>
       </div>
     </Section>
   );
@@ -807,58 +797,47 @@ function Footer() {
     </div>
   );
 }
-
 function Intro({ onStart }) {
   return (
     <Section>
-      <Tag>— Investiture —</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 32, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, margin: "0 0 22px", letterSpacing: "-0.01em" }}>
-        Au travail.
+      <Tag>— Avant d'entrer —</Tag>
+      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 30, fontWeight: 600, color: COLORS.navy, lineHeight: 1.2, margin: "0 0 22px", letterSpacing: "-0.01em" }}>
+        Vous arrivez dans le bureau présidentiel.
       </h1>
 
-      <div style={{ background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${COLORS.gold}`, padding: 16, margin: "0 0 22px", boxShadow: `0 1px 3px ${COLORS.navy}10` }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>◊ ÉTAT DE LA NATION · DONNÉES VÉRIFIÉES</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 1, background: COLORS.border }}>
-          <Stat label="Dette / PIB" value="115,6%" note="INSEE 2025" />
-          <Stat label="Déficit" value="5,1%" note="du PIB" />
-          <Stat label="Croissance" value="0,9%" note="annuelle" />
-          <Stat label="Chômage" value="7,3%" note="BIT" />
-        </div>
-      </div>
-
-      <p style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 1.55, fontStyle: "italic", margin: "0 0 20px" }}>
-        Simulation prospective IA produite par Nouvelle Énergie. Les conséquences de vos choix sont générées par IA.
+      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 17, color: COLORS.text, lineHeight: 1.65, margin: "0 0 26px" }}>
+        Sur la table, un dossier. Une décision à prendre, vite. Trois voies sont possibles, aucune n'est satisfaisante. Vous allez devoir trancher comme un Président.
       </p>
 
-      {/* ═══ ENCART AVERTISSEMENT ═══ */}
       <div style={{
-        background: `${COLORS.yellow}10`,
-        border: `1px solid ${COLORS.yellow}40`,
-        borderLeft: `3px solid ${COLORS.yellow}`,
-        padding: "14px 16px",
+        background: `${COLORS.gold}08`,
+        border: `1px solid ${COLORS.gold}40`,
+        borderLeft: `3px solid ${COLORS.gold}`,
+        padding: "16px 18px",
         marginBottom: 28,
       }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 10,
-          color: COLORS.yellow,
-          letterSpacing: "0.18em",
-          fontWeight: 700,
-          marginBottom: 8,
-        }}>
-          ⚠ AVERTISSEMENT
-        </div>
-        <p style={{
-          fontSize: 12.5,
-          color: COLORS.textMuted,
-          lineHeight: 1.6,
-          margin: 0,
-        }}>
-          Moi Président(e) est une simulation expérimentale lancée par <strong style={{ color: COLORS.navy }}>Nouvelle Energie, parti de la liberté en France</strong>. Les dossiers, indicateurs et conséquences sont générés en temps réel par une IA (Claude, Anthropic). Les chiffres, les organisations et les positions exprimées sont illustratifs.
-        </p>
+        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.2em", fontWeight: 700, marginBottom: 10 }}>◊ COMMENT ÇA SE PASSE</div>
+        <ul style={{ margin: 0, padding: 0, listStyle: "none", fontSize: 14, color: COLORS.text, lineHeight: 1.7 }}>
+          <li style={{ paddingLeft: 16, position: "relative", marginBottom: 4 }}>
+            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
+            Vous lirez le contexte et les positions des acteurs en présence
+          </li>
+          <li style={{ paddingLeft: 16, position: "relative", marginBottom: 4 }}>
+            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
+            Vous choisirez entre trois voies, chacune avec son prix politique
+          </li>
+          <li style={{ paddingLeft: 16, position: "relative" }}>
+            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
+            Vous verrez les conséquences se déployer sur 90 jours
+          </li>
+        </ul>
       </div>
 
-      <BigButton onClick={onStart}>Commencer mon mandat ↗</BigButton>
+      <p style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 1.55, fontStyle: "italic", margin: "0 0 24px" }}>
+        Simulation prospective IA produite par Nouvelle Énergie. Les conséquences de vos choix sont générées par IA. <strong style={{ color: COLORS.navy }}>Aucune partie n'est identique.</strong>
+      </p>
+
+      <BigButton onClick={onStart}>Lire le dossier ↗</BigButton>
     </Section>
   );
 }
