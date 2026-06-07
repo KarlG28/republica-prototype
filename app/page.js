@@ -931,46 +931,143 @@ function Footer() {
 }
 function Intro({ onStart }) {
   return (
-    <Section>
-      <Tag>— Avant d'entrer —</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 30, fontWeight: 600, color: COLORS.navy, lineHeight: 1.2, margin: "0 0 22px", letterSpacing: "-0.01em" }}>
-        Vous arrivez dans le bureau présidentiel.
+    <div style={{ padding: "20px 4px 40px" }}>
+      {/* Badge */}
+      <div style={{
+        background: "rgba(255,255,255,0.15)",
+        backdropFilter: "blur(8px)",
+        borderRadius: 32,
+        padding: "8px 16px",
+        display: "inline-block",
+        marginBottom: 24,
+        marginLeft: 4,
+      }}>
+        <span style={{ color: COLORS.white, fontSize: 12, fontWeight: 500, letterSpacing: "1px" }}>AVANT D'ENTRER</span>
+      </div>
+
+      {/* Titre principal */}
+      <h1 style={{
+        fontSize: 38,
+        fontWeight: 500,
+        color: COLORS.white,
+        lineHeight: 1.05,
+        margin: "0 0 24px",
+        letterSpacing: "-1.5px",
+        padding: "0 4px",
+      }}>
+        Vous arrivez<br/>
+        dans le bureau<br/>
+        <span style={{ color: COLORS.lime }}>présidentiel.</span>
       </h1>
 
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 17, color: COLORS.text, lineHeight: 1.65, margin: "0 0 26px" }}>
+      {/* Texte intro */}
+      <p style={{
+        fontSize: 16,
+        color: COLORS.whiteSoft,
+        lineHeight: 1.55,
+        margin: "0 0 28px",
+        padding: "0 4px",
+      }}>
         Sur la table, un dossier. Une décision à prendre, vite. Trois voies sont possibles, aucune n'est satisfaisante. Vous allez devoir trancher comme un Président.
       </p>
 
+      {/* Card "Comment ça se passe" */}
       <div style={{
-        background: `${COLORS.gold}08`,
-        border: `1px solid ${COLORS.gold}40`,
-        borderLeft: `3px solid ${COLORS.gold}`,
-        padding: "16px 18px",
-        marginBottom: 28,
+        background: COLORS.white,
+        borderRadius: 22,
+        padding: "22px 22px 24px",
+        marginBottom: 24,
+        boxShadow: "0 8px 24px rgba(20,18,26,0.18)",
       }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.2em", fontWeight: 700, marginBottom: 10 }}>◊ COMMENT ÇA SE PASSE</div>
-        <ul style={{ margin: 0, padding: 0, listStyle: "none", fontSize: 14, color: COLORS.text, lineHeight: 1.7 }}>
-          <li style={{ paddingLeft: 16, position: "relative", marginBottom: 4 }}>
-            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
-            Vous lirez le contexte et les positions des acteurs en présence
-          </li>
-          <li style={{ paddingLeft: 16, position: "relative", marginBottom: 4 }}>
-            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
-            Vous choisirez entre trois voies, chacune avec son prix politique
-          </li>
-          <li style={{ paddingLeft: 16, position: "relative" }}>
-            <span style={{ position: "absolute", left: 0, color: COLORS.gold, fontWeight: 700 }}>—</span>
-            Vous verrez les conséquences se déployer sur 90 jours
-          </li>
-        </ul>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 16,
+        }}>
+          <div style={{
+            width: 24,
+            height: 24,
+            borderRadius: 8,
+            background: COLORS.lime,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 14,
+          }}>⚡</div>
+          <span style={{ color: COLORS.ink, fontSize: 12, fontWeight: 500, letterSpacing: "1px" }}>COMMENT ÇA SE PASSE</span>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {[
+            { n: "1", text: "Vous lirez le contexte et les positions des acteurs" },
+            { n: "2", text: "Vous choisirez entre trois voies, chacune avec son prix" },
+            { n: "3", text: "Vous verrez les conséquences se déployer sur 90 jours" },
+          ].map((step, i) => (
+            <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+              <div style={{
+                width: 28,
+                height: 28,
+                borderRadius: "50%",
+                background: COLORS.magenta,
+                color: COLORS.white,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 500,
+                fontSize: 14,
+                flexShrink: 0,
+              }}>{step.n}</div>
+              <p style={{
+                margin: 0,
+                fontSize: 14.5,
+                color: COLORS.ink,
+                lineHeight: 1.4,
+                paddingTop: 4,
+              }}>{step.text}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      <p style={{ fontSize: 12, color: COLORS.textMuted, lineHeight: 1.55, fontStyle: "italic", margin: "0 0 24px" }}>
-        Simulation prospective IA produite par Nouvelle Énergie. Les conséquences de vos choix sont générées par IA. <strong style={{ color: COLORS.navy }}>Aucune partie n'est identique.</strong>
+      {/* Disclaimer */}
+      <p style={{
+        fontSize: 12,
+        color: COLORS.whiteDim,
+        lineHeight: 1.5,
+        margin: "0 0 28px",
+        padding: "0 4px",
+        fontStyle: "italic",
+      }}>
+        Simulation IA produite par Nouvelle Énergie. Conséquences générées par IA. <span style={{ color: COLORS.white, fontStyle: "normal", fontWeight: 500 }}>Aucune partie n'est identique.</span>
       </p>
 
-      <BigButton onClick={onStart}>Lire le dossier ↗</BigButton>
-    </Section>
+      {/* CTA principal */}
+      <button onClick={onStart} style={{
+        width: "100%",
+        background: COLORS.lime,
+        color: COLORS.ink,
+        border: "none",
+        borderRadius: 18,
+        padding: "20px 24px",
+        fontSize: 17,
+        fontWeight: 500,
+        cursor: "pointer",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 6px 28px rgba(214,255,0,0.55)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 4px 20px rgba(214,255,0,0.4)";
+      }}>
+        Lire le dossier →
+      </button>
+    </div>
   );
 }
 function Loading({ message, isUrgent }) {
