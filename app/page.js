@@ -2,10 +2,6 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 
-"use client";
-
-import { useState, useMemo, useEffect, useRef } from "react";
-
 // Charger Inter depuis Google Fonts en V2 Acid Pop
 if (typeof document !== "undefined" && !document.querySelector('link[data-inter]')) {
   const link = document.createElement('link');
