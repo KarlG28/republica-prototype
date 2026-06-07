@@ -700,53 +700,162 @@ function FadeIn({ children, keyProp }) {
 // ============================================================
 
 function Welcome({ onContinue }) {
-  // Date du jour formatée en français
-  const today = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  const today = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }).toUpperCase();
 
   return (
-    <Section>
-      <div style={{ textAlign: "center", padding: "80px 20px 60px" }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 11,
-          color: COLORS.gold,
-          letterSpacing: "0.3em",
-          marginBottom: 30,
-          fontWeight: 700,
-          textTransform: "uppercase",
-        }}>
-          ◊ {today} ◊
+    <div style={{ padding: "20px 4px 40px" }}>
+      {/* Header logo + date */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 60, padding: "0 8px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{
+            width: 30,
+            height: 30,
+            borderRadius: 9,
+            background: COLORS.lime,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: COLORS.ink,
+            fontWeight: 700,
+            fontSize: 17,
+            letterSpacing: "-1px",
+          }}>M</div>
+          <span style={{
+            color: COLORS.white,
+            fontSize: 13,
+            fontWeight: 500,
+            letterSpacing: "0.3px",
+          }}>Moi Président(e)</span>
         </div>
-
-        <h1 style={{
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 44,
-          fontWeight: 600,
-          color: COLORS.navy,
-          lineHeight: 1.1,
-          margin: "0 0 22px",
-          letterSpacing: "-0.02em",
-        }}>
-          Le dilemme<br/>
-          <em style={{ color: COLORS.gold, fontWeight: 700 }}>du jour.</em>
-        </h1>
-
-        <p style={{
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 18,
-          color: COLORS.text,
-          lineHeight: 1.55,
-          fontStyle: "italic",
-          margin: "0 auto 40px",
-          maxWidth: 460,
-        }}>
-          Un dossier. Prenez une décision... et assumez-la.<br/>
-          Vous êtes le Président de la République.
-        </p>
-
-        <BigButton onClick={onContinue}>Entrer dans le bureau ↗</BigButton>
+        <span style={{
+          color: COLORS.whiteSoft,
+          fontSize: 11,
+          letterSpacing: "1px",
+          fontWeight: 500,
+        }}>{today}</span>
       </div>
-    </Section>
+
+      {/* Badge nouveau dilemme */}
+      <div style={{
+        background: COLORS.lime,
+        borderRadius: 32,
+        padding: "8px 16px",
+        display: "inline-block",
+        marginBottom: 22,
+        marginLeft: 8,
+      }}>
+        <span style={{ color: COLORS.ink, fontSize: 13, fontWeight: 500 }}>⚡ Nouveau dilemme</span>
+      </div>
+
+      {/* Titre principal */}
+      <h1 style={{
+        fontSize: 56,
+        fontWeight: 500,
+        color: COLORS.white,
+        lineHeight: 0.95,
+        margin: "0 0 24px",
+        letterSpacing: "-2px",
+        padding: "0 8px",
+      }}>
+        Le dilemme<br/>
+        <span style={{ color: COLORS.lime }}>du jour.</span>
+      </h1>
+
+      {/* Sous-titre */}
+      <p style={{
+        fontSize: 17,
+        color: COLORS.whiteSoft,
+        lineHeight: 1.5,
+        margin: "0 0 40px",
+        padding: "0 8px",
+        maxWidth: 340,
+      }}>
+        Trois voies. Aucune satisfaisante.<br/>
+        Vous êtes Président de la République.
+      </p>
+
+      {/* Stats du jour */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 32, padding: "0 8px" }}>
+        <div style={{
+          flex: 1,
+          background: "rgba(255,255,255,0.12)",
+          borderRadius: 16,
+          padding: "14px 16px",
+          backdropFilter: "blur(8px)",
+        }}>
+          <p style={{
+            fontSize: 11,
+            color: COLORS.whiteDim,
+            margin: "0 0 4px",
+            letterSpacing: "1px",
+            fontWeight: 500,
+          }}>JOUEURS</p>
+          <p style={{
+            fontSize: 22,
+            color: COLORS.white,
+            fontWeight: 500,
+            margin: 0,
+          }}>2 487</p>
+        </div>
+        <div style={{
+          flex: 1,
+          background: "rgba(255,255,255,0.12)",
+          borderRadius: 16,
+          padding: "14px 16px",
+          backdropFilter: "blur(8px)",
+        }}>
+          <p style={{
+            fontSize: 11,
+            color: COLORS.whiteDim,
+            margin: "0 0 4px",
+            letterSpacing: "1px",
+            fontWeight: 500,
+          }}>DURÉE</p>
+          <p style={{
+            fontSize: 22,
+            color: COLORS.white,
+            fontWeight: 500,
+            margin: 0,
+          }}>2 min</p>
+        </div>
+      </div>
+
+      {/* CTA principal */}
+      <button onClick={onContinue} style={{
+        width: "100%",
+        background: COLORS.lime,
+        color: COLORS.ink,
+        border: "none",
+        borderRadius: 18,
+        padding: "20px 24px",
+        fontSize: 17,
+        fontWeight: 500,
+        cursor: "pointer",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 6px 28px rgba(214,255,0,0.55)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 4px 20px rgba(214,255,0,0.4)";
+      }}>
+        Entrer dans le bureau →
+      </button>
+
+      {/* Signature */}
+      <p style={{
+        textAlign: "center",
+        marginTop: 24,
+        fontSize: 12,
+        color: COLORS.whiteDim,
+      }}>
+        par <span style={{ color: COLORS.white, fontWeight: 500 }}>Nouvelle Énergie</span>
+      </p>
+    </div>
   );
 }
 
