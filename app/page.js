@@ -1292,7 +1292,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   return (
    <Section>
 
-  <SubTag>Partagez vos 100 jours</SubTag>
+  <SubTag>Partagez votre bilan</SubTag>
       <div style={{
         background: "#fafaf7",
         border: `1px solid ${COLORS.border}`,
@@ -1331,8 +1331,8 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             letterSpacing: "0.2em",
             fontWeight: 600,
           }}>
-            <span>MANDAT TERMINÉ</span>
-            <span>4 DÉCISIONS · {dossiers.filter(d => d.urgent).length} CRISE{dossiers.filter(d => d.urgent).length > 1 ? "S" : ""}</span>
+            <span>BILAN</span>
+            <span>{new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }).toUpperCase()}</span>
           </div>
 
           {/* "Vous avez gouverné en..." */}
@@ -1344,7 +1344,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             fontWeight: 600,
             marginBottom: 10,
           }}>
-            VOUS AVEZ GOUVERNÉ EN
+            VOUS AVEZ TRANCHÉ EN
           </div>
 
           {/* La famille en serif gros + adjectif en gold italique */}
@@ -1410,7 +1410,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   {/* ═══ COMMUNAUTÉ ═══ */}
       <CommunityStats family={family} />
         
-      <SubTag>La situation à la fin de vos 100 premiers jours</SubTag>
+      <SubTag>Les conséquences à 90 jours</SubTag>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
         <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
         <Stat label="Confiance" value={`${indicators.confidence}%`} note={delta(indicators.confidence - 52)} />
@@ -1418,7 +1418,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         <Stat label="Tension" value={`${indicators.tension}/10`} note={delta(indicators.tension - 4.2)} />
       </div>
 
-      <SubTag>Vos décisions du mandat</SubTag>
+      <SubTag>Votre décision</SubTag>
       <div style={{ marginBottom: 24 }}>
         {dossiers.map((d, i) => {
           const c = choices[i];
@@ -2079,7 +2079,7 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
           }}>R</div>
           <div>
             <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 20, color: "#0a1a3a", letterSpacing: "0.2em", fontWeight: 700, lineHeight: 1 }}>Moi Président(e)</div>
-            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, color: "rgba(10,26,58,0.5)", letterSpacing: "0.15em", marginTop: 8 }}>MES 100 JOURS</div>
+            <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 14, color: "rgba(10,26,58,0.5)", letterSpacing: "0.15em", marginTop: 8 }}>LE BILAN</div>
           </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
@@ -2093,7 +2093,7 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
       {/* Bloc principal : famille politique */}
       <div style={{ position: "absolute", top: 290, left: 96, right: 96 }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#e6b94f", letterSpacing: "0.28em", fontWeight: 700, marginBottom: 24 }}>
-          J'AI GOUVERNÉ EN
+          J'AI TRANCHÉ EN
         </div>
         <div style={{ fontFamily: "Georgia, serif", fontSize: 128, fontWeight: 600, color: "#0a1a3a", lineHeight: 0.95, letterSpacing: "-0.025em", marginBottom: 8 }}>
           {family.shortLabel}
@@ -2123,7 +2123,7 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
       {/* Stats + signature */}
       <div style={{ position: "absolute", bottom: 100, left: 96, right: 96, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#0a1a3a", letterSpacing: "0.18em", fontWeight: 700 }}>
-          4 DÉCISIONS · {nbCrises} CRISE{nbCrises > 1 ? "S" : ""}
+          {new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }).toUpperCase()}
         </div>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 22, color: "#e6b94f", letterSpacing: "0.18em", fontWeight: 700 }}>
           Moi Président(e).FR
@@ -2131,7 +2131,7 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
       </div>
 
       <div style={{ position: "absolute", bottom: 44, left: 96, right: 96, textAlign: "center", fontFamily: "ui-monospace, monospace", fontSize: 18, color: "rgba(10,26,58,0.4)", letterSpacing: "0.3em", fontWeight: 600 }}>
-        #JOUEZ_LE_VÔTRE
+        #VOTREBILAN
       </div>
     </div>
   );
