@@ -78,19 +78,7 @@ FORMAT : JSON STRICT, aucun texte ni markdown autour.
     {"code":"SCÉNARIO A","color":"blue","title":"Verbe d'action 3-4 mots","risk":"QUALIF","desc":"1 phrase","tags":[["+ Acteur",true],["− Autre",false]],"deltas":{"debt":0.3,"confidence":3,"parliament":1,"tension":-0.2,"spread":2,"liberal":2,"progressisme":1},"signature":"A"},
     {"code":"SCÉNARIO B","color":"gold","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"social":2,"progressisme":2},"signature":"B"},
     {"code":"SCÉNARIO C","color":"muted","title":"...","risk":"...","desc":"...","tags":[],"deltas":{"europe":2,"progressisme":-1},"signature":"C"}
-  ],
-  "consequences":{
-    "A":{"title":"Titre 4 mots","narrative":"3 phrases qui racontent vraiment ce qui se passe","events":[
-      {"day":"+3","label":"Effet immédiat avec détails (média, chiffre, fonction)","color":"blue"},
-      {"day":"+14","label":"Chiffre non-rond enchaîné sur l'effet immédiat","color":"yellow"},
-      {"day":"+27","label":"Réaction acteur tiers qui réagit aux 2 events précédents","color":"red"},
-      {"day":"+45","label":"Moment viral qui prolonge l'ambiance créée","color":"green"},
-      {"day":"+82","label":"Aboutissement structurant pour la suite du mandat","color":"gold"}
-    ]},
-    "B":{"title":"...","narrative":"...","events":[...]},
-    "C":{"title":"...","narrative":"...","events":[...]}
-  }
-
+  ]
 ═══════════════════════════════════════════
 RISQUES — 3 conséquences immédiates si rien n'est décidé
 ═══════════════════════════════════════════
@@ -107,35 +95,6 @@ NARRATIVE — la phrase qui ouvre les conséquences
 Le champ "narrative" doit raconter en 3 phrases ce qui se passe, comme un journaliste qui résume la séquence. Ton vivant, presque romanesque. JAMAIS technocratique. Premier mot fort.
 Ex: "Le pays gronde. Les marchés vacillent. Mais vous tenez."
 Ex: "Bruxelles s'inquiète, l'opinion applaudit, l'opposition vous tend un piège."
-
-═══════════════════════════════════════════
-CONSÉQUENCES — RÈGLE D'OR : ce sont elles qui font raconter sa partie
-═══════════════════════════════════════════
-Chaque scénario doit générer EXACTEMENT 5 events qui s'ENCHAÎNENT EN CASCADE : l'event N+1 RÉAGIT à ce qui s'est passé en event N. Pas d'événements indépendants qui se juxtaposent. Le joueur doit lire la chronologie et avoir l'impression qu'une seule histoire se déroule.
-
-Chaque "label" doit FAIRE 12 À 18 MOTS et inclure des détails crédibles : un sondage avec institut nommé (Elabe, IFOP, OpinionWay, Odoxa), un chiffre précis non-rond (-4 points, +12 pb, 287 députés, +1.2M de mentions), un nom de média réel (Le Monde, BFMTV, France Inter, Le Figaro, Mediapart, L'Express), une institution réelle (Bercy, Conseil d'État, Sénat, ARCOM), un titre de fonction concret (le ministre de l'Intérieur, la présidente d'un groupe à l'Assemblée, le secrétaire général d'un syndicat). JAMAIS de personne réelle nommée.
-
-5 saveurs OBLIGATOIRES (mais qui s'enchaînent causalement) :
-
-1. **EFFET IMMÉDIAT** (day +2 à +6) — la décision est annoncée, première réaction concrète. Couleur "blue".
-   Ex: "Décret publié au JORF, BFMTV ouvre son antenne en direct, premières réactions politiques attendues d'ici minuit"
-   Ex: "Allocution surprise depuis l'Élysée à 20h, audience pic à 14.2M de téléspectateurs, hashtag #100Jours saturé"
-
-2. **CHIFFRE QUI FRAPPE** (day +10 à +18) — un chiffre dramatique non-rond qui s'enchaîne sur la saveur 1. Couleur "yellow".
-   Ex: "Sondage Elabe pour BFMTV : 47% favorables (+6 vs J-7), score le plus élevé depuis l'élection"
-   Ex: "Spread OAT s'écarte de 12 pb sur la clôture, le ministre des Finances convoque une réunion d'urgence à Bercy"
-
-3. **RÉACTION INATTENDUE D'UN ACTEUR EXTERNE** (day +20 à +35) — un acteur tiers réagit à ce qui s'est passé. Couleur "red".
-   Ex: "Le Commissaire européen au marché intérieur convoque l'ambassadeur français à Bruxelles, Le Figaro titre 'Premier choc européen'"
-   Ex: "Le syndicat des transporteurs déclenche un blocage des grands axes, la CGT-Cheminots se solidarise, 87 préfectures en alerte"
-
-4. **MOMENT VIRAL OU DRÔLE** (day +38 à +58) — un événement viral qui réagit à l'ambiance créée. Couleur "green".
-   Ex: "Un humoriste anonyme parodie votre discours sur TikTok, 4.7M de vues en 48h, cote +3 chez les 18-25"
-   Ex: "Une députée d'opposition pleure à l'Assemblée pendant le débat, séquence partagée 280 000 fois, l'opinion bascule"
-
-5. **CONSÉQUENCE LONG-TERME** (day +65 à +90) — l'aboutissement structurant de toute la séquence. Couleur "gold".
-   Ex: "Trois députés Renaissance quittent leur groupe pour vous rejoindre, votre majorité atteint 296 sièges (+9)"
-   Ex: "Le Conseil constitutionnel valide la mesure, l'opposition saisit la CEDH, votre cote remonte de 7.2 points à 51.4%"
 
 INTERDITS ABSOLUS :
 - Aucun jargon technocratique (matelas connectés, quotas d'IA dans le service public, statut juridique d'une langue régionale, encadrement du lobbying : MORTS).
