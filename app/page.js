@@ -1537,12 +1537,12 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       <SubTag>Découvrir Nouvelle Énergie</SubTag>
       <NouvelleEnergieQRBlock />
           
-      <BigButton onClick={onRestart}>Rejouer un autre mandat ↗</BigButton>
+      <BigButton onClick={onRestart}>Décider à nouveau↗</BigButton>
 
       <div style={{ marginTop: 24, padding: 16, background: `${COLORS.gold}08`, border: `1px solid ${COLORS.gold}30`, borderLeft: `3px solid ${COLORS.gold}` }}>
         <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.2em", marginBottom: 8, fontWeight: 600 }}>◊ PROTOTYPE — VERSION DE DÉMONSTRATION</div>
         <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.65, margin: 0 }}>
-          Chaque dossier est généré en temps réel par Claude. La version finale proposera un mandat complet de 100 jours, des indicateurs vivants, et un comparatif anonymisé entre joueurs.
+          Chaque dilemme est généré en temps réel par Claude. Revenez demain pour un nouveau dilemme. La version complète proposera un dilemme quotidien partagé par toute la communauté, avec statistiques collectives.
         </p>
       </div>
     </Section>
@@ -2180,8 +2180,8 @@ function ShareButton({ shareCardRef, family }) {
         const file = new File([blob], fileName, { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: "Mon mandat sur Moi Président(e)",
-          text: `J'ai gouverné en ${family.shortLabel} ${family.adjective}. Et toi ?`,
+          title: "Mon choix",
+          text: `J'ai tranché en ${family.shortLabel} ${family.adjective}. Et toi ?`,
         });
         track("share_card_shared", { mode: "native", family: family.shortLabel });
       } else {
@@ -2427,7 +2427,7 @@ function SocialShareButtons({ family }) {
   // Construire le message
   const familyInclusive = genderInclusive(family.shortLabel);
   const adjectiveInclusive = genderInclusive(family.adjective);
-  const message = `Moi Président(e), j'ai gouverné en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
+  const message = `J'ai tranché le dilemme du jour en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
 
   // URLs des partages
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${siteUrl}`)}`;
