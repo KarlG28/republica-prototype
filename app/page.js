@@ -530,7 +530,7 @@ const goNext = () => {
         <FadeIn keyProp={section + "-" + currentIdx}>
           {section === SECTIONS.welcome && <Welcome onContinue={goToIntro} />}
           {section === SECTIONS.intro && <Intro onStart={startSession} />}
-          {section === SECTIONS.loading && <Loading message={loadingMessage} />}
+          {section === SECTIONS.loading && <Loading message={loadingMessage} isUrgent={dossiers.length > 0 ? dossiers[dossiers.length - 1]?.urgent : (dossiers.length === urgentDossierIdx)} />}
           {section === SECTIONS.dossier && currentDossier && (
             <DossierView dossier={currentDossier} indicators={indicators} onSelectScenario={selectScenario} fallbackError={generationError} />
           )}
@@ -861,98 +861,109 @@ function Intro({ onStart }) {
     </Section>
   );
 }
-function Loading({ message }) {
-  // Étapes qui défilent pour donner l'impression que Claude travaille
-  const steps = [
-    "RÉDACTION EN COURS",
-    "NOTE D'ARBITRAGE PRÉSIDENTIEL",
-    "CONSULTATION DES CENTRES DE POUVOIR",
-    "ÉVALUATION DES SCÉNARIOS",
-    "FINALISATION DU DOSSIER",
+function Loading({ message, isUrgent }) {
+  // Scènes immersives qui défilent en fade : on est à l'Élysée
+  const scenesNormal = [
+    "Vous prenez place dans votre bureau, Élysée",
+    "Votre directeur de cabinet entre avec une chemise cartonnée",
+    "Bercy a fait porter sa note ce matin",
+    "Le pays attend votre arbitrage",
   ];
+  const scenesUrgent = [
+    "L'huissier frappe deux fois, il entre sans attendre",
+    "Votre directeur de cabinet vous tend un dossier marqué « URGENT »",
+    "Les services s'activent dans tout le palais",
+    "Une réponse est attendue dans les heures qui viennent",
+  ];
+  const scenes = isUrgent ? scenesUrgent : scenesNormal;
 
-  const [stepIdx, setStepIdx] = useState(0);
-  const [typed, setTyped] = useState("");
-  const [phase, setPhase] = useState("typing"); // typing | hold | erasing
+  const [sceneIdx, setSceneIdx] = useState(0);
+  const [visible, setVisible] = useState(true);
 
-  const currentText = steps[stepIdx];
-
+  // Cycle : 3s visible → fade out → scène suivante → fade in
   useEffect(() => {
-    let timer;
+    const visibleDuration = 2700;
+    const fadeDuration = 300;
 
-    if (phase === "typing") {
-      if (typed.length < currentText.length) {
-        timer = setTimeout(() => {
-          setTyped(currentText.slice(0, typed.length + 1));
-        }, 45); // vitesse de frappe
-      } else {
-        timer = setTimeout(() => setPhase("hold"), 1400);
-      }
-    } else if (phase === "hold") {
-      timer = setTimeout(() => setPhase("erasing"), 200);
-    } else if (phase === "erasing") {
-      if (typed.length > 0) {
-        timer = setTimeout(() => {
-          setTyped(typed.slice(0, -1));
-        }, 25); // effacement plus rapide
-      } else {
-        // Passer à l'étape suivante
-        setStepIdx((idx) => (idx + 1) % steps.length);
-        setPhase("typing");
-      }
-    }
+    const timer = setTimeout(() => {
+      setVisible(false);
+      const next = setTimeout(() => {
+        setSceneIdx((idx) => (idx + 1) % scenes.length);
+        setVisible(true);
+      }, fadeDuration);
+      return () => clearTimeout(next);
+    }, visibleDuration);
 
     return () => clearTimeout(timer);
-  }, [typed, phase, currentText, steps.length]);
+  }, [sceneIdx, scenes.length]);
 
   return (
     <Section>
-      <div style={{ textAlign: "center", padding: "100px 20px 80px" }}>
-        {/* Bloc machine à écrire */}
+      <div style={{ textAlign: "center", padding: "120px 24px 100px" }}>
+        {/* Indicateur subtil "en cours" en haut */}
         <div style={{
-          display: "inline-block",
-          padding: "26px 30px",
-          background: "#000",
-          border: "1px solid #000",
-          minWidth: 280,
-          maxWidth: 480,
-          textAlign: "left",
-          boxShadow: `0 6px 20px ${COLORS.navy}30`,
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 10,
+          fontFamily: "ui-monospace, monospace",
+          fontSize: 10,
+          color: isUrgent ? COLORS.red : COLORS.gold,
+          letterSpacing: "0.25em",
+          fontWeight: 700,
+          marginBottom: 60,
+          padding: "8px 16px",
+          border: `1px solid ${isUrgent ? COLORS.red : COLORS.gold}40`,
+          background: `${isUrgent ? COLORS.red : COLORS.gold}08`,
+        }}>
+          <span style={{
+            display: "inline-block",
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: isUrgent ? COLORS.red : COLORS.gold,
+            animation: "pulse 1.5s ease-in-out infinite",
+          }} />
+          {isUrgent ? "URGENCE EN COURS" : "ÉLYSÉE — EN COURS"}
+        </div>
+
+        {/* Scène immersive avec fade */}
+        <div style={{
+          minHeight: "120px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "0 20px",
         }}>
           <div style={{
-            fontFamily: "ui-monospace, 'Courier New', monospace",
-            fontSize: 13,
-            color: "#fafaf7",
-            letterSpacing: "0.12em",
-            fontWeight: 600,
-            lineHeight: 1.5,
-            minHeight: "1.5em",
-            wordBreak: "break-word",
+            fontFamily: "ui-serif, Georgia, serif",
+            fontSize: 22,
+            color: COLORS.navy,
+            lineHeight: 1.4,
+            fontStyle: "italic",
+            fontWeight: 500,
+            maxWidth: 540,
+            opacity: visible ? 1 : 0,
+            transform: visible ? "translateY(0)" : "translateY(8px)",
+            transition: "opacity 0.3s ease, transform 0.3s ease",
+            letterSpacing: "-0.005em",
           }}>
-            {typed}<span className="Moi Président(e)-cursor">▮</span>
+            {scenes[sceneIdx]}
           </div>
         </div>
 
-        {/* Message contextuel discret en dessous */}
-        <div style={{
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 14,
-          color: COLORS.textMuted,
-          marginTop: 28,
-          fontStyle: "italic",
-        }}>
-          {message}
-        </div>
-
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 10,
-          color: COLORS.textDim,
-          marginTop: 14,
-          letterSpacing: "0.2em",
-        }}>
-          ~ 15 SECONDES
-        </div>
+        {/* Message contextuel très discret en bas */}
+        {message && (
+          <div style={{
+            fontFamily: "ui-monospace, monospace",
+            fontSize: 10,
+            color: COLORS.textDim,
+            marginTop: 60,
+            letterSpacing: "0.2em",
+            fontWeight: 600,
+          }}>
+            {message}
+          </div>
+        )}
       </div>
     </Section>
   );
