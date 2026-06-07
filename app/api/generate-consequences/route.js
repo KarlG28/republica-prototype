@@ -54,4 +54,100 @@ INTERDITS ABSOLUS :
 - Aucun nom propre de personne réelle vivante. Préfère toujours la FONCTION.
 - N'invente pas non plus de personnes fictives. Reste sur des fonctions, institutions, organisations.
 
-CO
+COULEURS : blue, red, gold, green, yellow
+
+CONTRAINTE : tous les "day" doivent rester entre +2 et +90.
+`;
+
+export async function POST(request) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const dossierTitle = body.dossierTitle || "";
+    const dossierSubtitle = body.dossierSubtitle || "";
+    const scenarioTitle = body.scenarioTitle || "";
+    const scenarioDesc = body.scenarioDesc || "";
+    const scenarioRisk = body.scenarioRisk || "";
+
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return jsonResponse({ error: "Clé API manquante" }, 500);
+    }
+
+    const userMessage = `Dossier en cours : "${dossierTitle}"${dossierSubtitle ? ` (${dossierSubtitle})` : ""}
+
+Décision prise par le président : "${scenarioTitle}"${scenarioRisk ? ` [${scenarioRisk}]` : ""}
+Description : ${scenarioDesc}
+
+Génère la chronologie des conséquences sur 90 jours. JSON uniquement, concis.`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5",
+        max_tokens: 1500,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: userMessage }],
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => "");
+      return jsonResponse({ error: `API Claude: ${response.status}`, details: errorText.slice(0, 200) }, 500);
+    }
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "";
+    const stopReason = data.stop_reason || "";
+
+    if (stopReason === "max_tokens") {
+      return jsonResponse({
+        error: "Réponse Claude tronquée (max_tokens atteint)",
+        details: `stop_reason: ${stopReason}, longueur: ${text.length}`,
+      }, 500);
+    }
+
+    let cleaned = text.trim();
+    if (cleaned.startsWith("```json")) cleaned = cleaned.slice(7);
+    if (cleaned.startsWith("```")) cleaned = cleaned.slice(3);
+    if (cleaned.endsWith("```")) cleaned = cleaned.slice(0, -3);
+    cleaned = cleaned.trim();
+
+    const firstBrace = cleaned.indexOf("{");
+    const lastBrace = cleaned.lastIndexOf("}");
+    if (firstBrace !== -1 && lastBrace !== -1) {
+      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    }
+
+    let consequence;
+    try {
+      consequence = JSON.parse(cleaned);
+    } catch (parseError) {
+      return jsonResponse({
+        error: "JSON invalide",
+        details: parseError.message,
+        rawPreview: cleaned.slice(0, 500),
+      }, 500);
+    }
+
+    if (!consequence.title || !Array.isArray(consequence.events) || consequence.events.length < 4) {
+      return jsonResponse({ error: "Structure invalide" }, 500);
+    }
+
+    return jsonResponse({ consequence }, 200);
+
+  } catch (err) {
+    return jsonResponse({ error: "Erreur serveur", details: err.message }, 500);
+  }
+}
+
+function jsonResponse(payload, status) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
