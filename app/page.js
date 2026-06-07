@@ -1273,7 +1273,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
 }
 
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
-  const family = useMemo(() => classifyFamily(scores, indicators), [scores, indicators]);
+  const family = useMemo(() => classifyArchetype(dossiers, choices, indicators), [dossiers, choices, indicators]);
   const shareCardRef = useRef(null);
 
   useEffect(() => {
@@ -1549,68 +1549,22 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   );
 }
 
-function classifyFamily(scores, indicators) {
-  const { liberal = 0, social = 0, autorite = 0, europe = 0, progressisme = 0 } = scores;
+function classifyArchetype(dossiers, choices, indicators) {
+  // En V2 : on utilise directement l'archetype du scénario choisi
+  // dossiers[0] et choices[0] doivent exister (1 seule décision)
+  const dossier = dossiers[0];
+  const signature = choices[0];
+  let archetype = "Réformateur"; // fallback par défaut
+
+  if (dossier && dossier.scenarios && signature) {
+    const scenario = dossier.scenarios.find(s => s.signature === signature);
+    if (scenario && scenario.archetype) {
+      archetype = scenario.archetype;
+    }
+  }
+
+  // ═══ Déterminer l'adjectif selon les indicateurs finaux
   const { debt = 115.6, confidence = 52, parliament = 287, tension = 4.2, spread = 64 } = indicators || {};
-
-  // ═══ Étape A : on liste les 12 familles avec un score de "match" calculé
-  // selon la grille des dimensions et un signal distinctif fort.
-  const families = [
-    {
-      family: "Communiste",
-      match: (social >= 8 && liberal <= 2) ? social * 1.3 - liberal : 0,
-    },
-    {
-      family: "Anarchiste",
-      match: (autorite <= 2 && liberal <= 4 && progressisme >= 5) ? progressisme + (5 - autorite) : 0,
-    },
-    {
-      family: "Gauche radicale",
-      match: (social >= 6 && liberal <= 4 && progressisme >= 6 && autorite <= 4) ? social + progressisme * 0.5 : 0,
-    },
-    {
-      family: "Social-démocrate",
-      match: (social >= 5 && liberal >= 3 && liberal <= 6 && progressisme >= 4) ? social + 2 : 0,
-    },
-    {
-      family: "Progressiste",
-      match: (progressisme >= 7 && europe >= 6 && social <= 6) ? progressisme + europe * 0.6 : 0,
-    },
-    {
-      family: "Écologiste",
-      match: (progressisme >= 5 && social >= 5 && autorite <= 4 && europe >= 4) ? progressisme + social * 0.5 : 0,
-    },
-    {
-      family: "Centriste",
-      match: (Math.abs(liberal - 5) <= 2 && Math.abs(social - 5) <= 2 && Math.abs(autorite - 5) <= 2 && europe >= 4) ? 6 : 0,
-    },
-    {
-      family: "Libéral",
-      match: (liberal >= 6 && social <= 4 && europe >= 5) ? liberal + europe * 0.4 : 0,
-    },
-    {
-      family: "Conservateur",
-      match: (autorite >= 5 && progressisme <= 3 && social >= 3 && social <= 6 && europe >= 3) ? autorite + (5 - progressisme) : 0,
-    },
-    {
-      family: "Souverainiste",
-      match: (europe <= 3 && autorite >= 4 && autorite <= 7 && social >= 3) ? (10 - europe) + autorite * 0.5 : 0,
-    },
-    {
-      family: "National-populaire",
-      match: (autorite >= 5 && europe <= 3 && social >= 5 && progressisme <= 4) ? autorite + social + (5 - europe) : 0,
-    },
-    {
-      family: "Identitaire",
-      match: (autorite >= 7 && progressisme <= 2 && europe <= 4) ? autorite + (3 - progressisme) * 1.5 : 0,
-    },
-  ];
-
-  families.sort((a, b) => b.match - a.match);
-  const top = families[0];
-  const family = top.match > 0 ? top.family : "Centriste";
-
-  // ═══ Étape B : déterminer l'adjectif qui pique selon le BILAN réel
   let adjective = "";
   if (confidence < 35) adjective = "isolé";
   else if (debt > 119) adjective = "endetté";
@@ -1620,58 +1574,46 @@ function classifyFamily(scores, indicators) {
   else if (confidence > 65 && debt > 117) adjective = "généreux";
   else if (confidence > 65) adjective = "rassembleur";
   else if (debt < 114 && confidence < 50) adjective = "rigoureux";
-  else adjective = "réformateur";
+  else adjective = "déterminé";
 
-  // ═══ Étape C : pourcentage indicatif (effet de rareté pour le partage)
+  // ═══ Pourcentage indicatif par archétype
   const pctMap = {
-    "Communiste": 4,
-    "Anarchiste": 3,
-    "Gauche radicale": 7,
-    "Social-démocrate": 13,
-    "Progressiste": 11,
-    "Écologiste": 9,
-    "Centriste": 15,
-    "Libéral": 12,
-    "Conservateur": 11,
-    "Souverainiste": 6,
-    "National-populaire": 6,
-    "Identitaire": 3,
+    "Réformateur": 18,
+    "Libéral": 16,
+    "Progressiste": 19,
+    "Conservateur": 21,
+    "Réac": 12,
+    "Identitaire": 14,
   };
-  const pct = pctMap[family] || 10;
+  const pct = pctMap[archetype] || 15;
 
-  // ═══ Étape D : construire le twist « Vous avez X… mais Y »
+  // ═══ Twist : phrase qui résume sous forme de paradoxe
   const positives = {
-    "Communiste": "renversé l'ordre économique",
-    "Anarchiste": "tordu le cou aux institutions",
-    "Gauche radicale": "refusé les cadres imposés",
-    "Social-démocrate": "apaisé le pays",
+    "Réformateur": "osé la rupture",
+    "Libéral": "fait confiance aux acteurs",
     "Progressiste": "ouvert la société",
-    "Écologiste": "préparé la transition",
-    "Centriste": "tenu votre ligne",
-    "Libéral": "libéré l'économie",
-    "Conservateur": "rétabli l'ordre",
-    "Souverainiste": "repris en main la souveraineté",
-    "National-populaire": "parlé fort à la nation",
-    "Identitaire": "réaffirmé l'identité nationale",
+    "Conservateur": "tenu votre ligne",
+    "Réac": "rétabli l'ordre ancien",
+    "Identitaire": "défendu l'identité nationale",
   };
   const negatives = {
     "endetté": "creusé la dette",
-    "isolé": "isolé la France à Bruxelles",
+    "isolé": "isolé la France",
     "contesté": "déclenché la rue",
     "fragilisé": "perdu votre majorité",
     "sous pression": "fait grimper le spread",
     "généreux": "creusé les comptes publics",
     "rassembleur": "déçu vos alliés",
     "rigoureux": "tendu le pays",
-    "réformateur": "déçu vos électeurs",
+    "déterminé": "déçu vos électeurs",
   };
 
-  const positive = positives[family] || "tenu votre cap";
+  const positive = positives[archetype] || "tenu votre cap";
   const negative = negatives[adjective] || "déçu vos électeurs";
   const shareQuote = `Vous avez ${positive}… mais ${negative}.`;
 
   return {
-    shortLabel: family,
+    shortLabel: archetype,
     adjective,
     pct,
     shareQuote,
