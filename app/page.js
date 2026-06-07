@@ -1267,7 +1267,7 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
       <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", margin: "0 0 22px" }}>{data.narrative}</p>
       <SubTag>Chronologie des semaines suivantes</SubTag>
       <Timeline events={data.events || []} />
-      <BigButton onClick={onContinue}>{isLast ? "Voir le bilan de mes 100 jours ↗" : "Suite du mandat ↗"}</BigButton>
+      <BigButton onClick={onContinue}>Conséquences de mes choix ↗</BigButton>
     </Section>
   );
 }
@@ -1530,7 +1530,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       </div>
 
     {/* ═══ BLOC OPT-IN EMAIL ═══ */}
-      <SubTag>◊ Mes 100 jours à l'Élysée</SubTag>
+      <SubTag>◊ Recevoir le dilemme du jour</SubTag>
       <OptInForm sessionId={sessionId} family={family} />
 
     {/* ═══ BLOC QR CODE NOUVELLE ÉNERGIE ═══ */}
@@ -1875,7 +1875,7 @@ function OptInForm({ sessionId, family }) {
         marginBottom: 14,
         fontWeight: 600,
       }}>
-        Recevez votre profil de président par email.
+        Recevez chaque jour une décision à prendre pour la France.
       </div>
       <div style={{
         fontSize: 13,
@@ -1927,7 +1927,7 @@ function OptInForm({ sessionId, family }) {
               transition: "all 0.2s",
             }}
           >
-            {status === "loading" ? "Enregistrement..." : "Mes 100 jours à l'Élysée →"}
+            {status === "loading" ? "Enregistrement..." : "Recevoir le dilemme par email →"}
           </button>
         </div>
       </form>
