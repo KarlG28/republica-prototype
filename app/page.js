@@ -2,32 +2,65 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 
+"use client";
+
+import { useState, useMemo, useEffect, useRef } from "react";
+
+// Charger Inter depuis Google Fonts en V2 Acid Pop
+if (typeof document !== "undefined" && !document.querySelector('link[data-inter]')) {
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap';
+  link.setAttribute('data-inter', 'true');
+  document.head.appendChild(link);
+}
+
 // ============================================================
 // MOI PRÉSIDENT(E) - PROTOTYPE
 // Génération IA en temps réel : 4 décisions par session
 // ============================================================
 
 const COLORS = {
-  bg: "#fafaf7",
-  bgPanel: "#ffffff",
-  bgDark: "#0a1a3a",
-  bgDarker: "#061226",
-  navy: "#0a1a3a",
-  navyLight: "#1e3a7a",
-  gold: "#b8954a",
-  goldDim: "#8a7037",
-  goldLight: "#d9b86b",
-  text: "#1a1a1a",
-  textBright: "#0a1a3a",
-  textMuted: "#5a5a5a",
-  textDim: "#8a8a8a",
-  textOnDark: "#fafaf7",
-  border: "#e0dcd3",
-  red: "#a83232",
-  redLight: "#c95a5a",
-  green: "#3a7a4a",
-  blue: "#2a5a8a",
-  yellow: "#a87a2a",
+  // ═══ V2 ACID POP ═══
+  // Fonds : dégradé magenta → violet
+  bgGradient: "linear-gradient(180deg, #FF2E93 0%, #B026FF 100%)",
+  bgGradientReverse: "linear-gradient(180deg, #B026FF 0%, #FF2E93 100%)",
+  magenta: "#FF2E93",
+  violet: "#B026FF",
+  lime: "#D6FF00",
+  // Texte
+  ink: "#14121A",            // texte sur fond clair (cartes blanches)
+  inkSoft: "#5C5266",        // texte secondaire sur cartes
+  white: "#FFFFFF",
+  whiteSoft: "rgba(255,255,255,0.85)",
+  whiteDim: "rgba(255,255,255,0.6)",
+  // Couleurs archétypes (un par profil)
+  archReformateur: "#00E5FF",
+  archLiberal: "#D6FF00",
+  archProgressiste: "#FF2E93",
+  archConservateur: "#FF6B35",
+  archReac: "#8B4513",
+  archIdentitaire: "#1A1A4E",
+  // Alias rétrocompatibles (pour ne pas casser les composants V1)
+  bg: "#FF2E93",
+  bgPanel: "#FFFFFF",
+  bgDark: "#14121A",
+  navy: "#14121A",
+  navyLight: "#5C5266",
+  gold: "#D6FF00",
+  goldDim: "#B5D900",
+  goldLight: "#D6FF00",
+  text: "#14121A",
+  textBright: "#14121A",
+  textMuted: "#5C5266",
+  textDim: "rgba(20,18,26,0.6)",
+  textOnDark: "#FFFFFF",
+  border: "rgba(20,18,26,0.12)",
+  red: "#FF2E93",
+  redLight: "#FF6BAE",
+  green: "#3ACB72",
+  blue: "#B026FF",
+  yellow: "#D6FF00",
 };
 
 // Image de fond : Élysée stylisé (uploadé dans public/elysee.png)
@@ -510,20 +543,14 @@ const goNext = () => {
   return (
     <main style={{
       minHeight: "100vh",
-      background: `linear-gradient(rgba(250,250,247,0.82), rgba(250,250,247,0.88)), url(${BG_IMAGE}) center / cover no-repeat fixed`,
-      color: COLORS.text,
-      fontFamily: "system-ui, -apple-system, sans-serif",
+      background: COLORS.bgGradient,
+      color: COLORS.white,
+      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       padding: 0,
       margin: 0,
       position: "relative",
     }}>
-      <div style={{
-        position: "fixed",
-        inset: 0,
-        background: "radial-gradient(ellipse at center, transparent 40%, rgba(10,26,58,0.15) 100%)",
-        pointerEvents: "none",
-        zIndex: 0,
-      }} />
+  
 
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "20px 16px 80px", position: "relative", zIndex: 1 }}>
         {section !== SECTIONS.welcome && <Header section={section} currentIdx={currentIdx} total={TOTAL_DECISIONS} />}
