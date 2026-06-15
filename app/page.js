@@ -1635,23 +1635,197 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
   const data = dossier.consequences?.[choice];
   if (!data) {
     return (
-      <Section>
-        <p>Erreur d'affichage des conséquences.</p>
-        <BigButton onClick={onContinue}>Continuer ↗</BigButton>
-      </Section>
+      <div style={{ padding: "40px 12px", textAlign: "center" }}>
+        <p style={{ color: COLORS.white, fontSize: 15, marginBottom: 24 }}>Erreur d'affichage des conséquences.</p>
+        <button onClick={onContinue} style={{
+          background: COLORS.lime,
+          color: COLORS.ink,
+          border: "none",
+          borderRadius: 18,
+          padding: "16px 24px",
+          fontSize: 15,
+          fontWeight: 500,
+          cursor: "pointer",
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}>Continuer →</button>
+      </div>
     );
   }
+
+  // Mapping couleur événement → couleur Acid Pop
+  const eventColorMap = {
+    blue: COLORS.archReformateur,   // cyan
+    yellow: COLORS.lime,
+    red: COLORS.magenta,
+    green: "#3ACB72",
+    gold: COLORS.lime,
+    muted: COLORS.inkSoft,
+  };
+
   return (
-    <Section>
-      <Dashboard indicators={indicators} highlight />
-      <Tag>◊ Conséquences de votre arbitrage</Tag>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 25, fontWeight: 600, color: COLORS.navy, lineHeight: 1.2, margin: "0 0 14px", letterSpacing: "-0.01em" }}>{data.title}</h1>
-      <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, fontStyle: "italic", margin: "0 0 22px" }}>{data.narrative}</p>
-      <SubTag>Chronologie des semaines suivantes</SubTag>
-      <Timeline events={data.events || []} />
-      <BigButton onClick={onContinue}>Conséquences de mes choix ↗</BigButton>
-    </Section>
+    <div style={{ padding: "12px 4px 40px" }}>
+      {/* Badge "DÉCISION ACTÉE" */}
+      <div style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        background: COLORS.lime,
+        borderRadius: 32,
+        padding: "8px 16px",
+        marginBottom: 18,
+        marginLeft: 4,
+      }}>
+        <span style={{ fontSize: 14 }}>⚡</span>
+        <span style={{ color: COLORS.ink, fontSize: 12, fontWeight: 500, letterSpacing: "1px" }}>DÉCISION ACTÉE</span>
+      </div>
+
+      {/* Titre conséquences */}
+      <h1 style={{
+        fontSize: 34,
+        fontWeight: 500,
+        color: COLORS.white,
+        lineHeight: 1.05,
+        margin: "0 0 18px",
+        letterSpacing: "-1.2px",
+        padding: "0 4px",
+      }}>
+        {data.title}
+      </h1>
+
+      {/* Narrative en grosse phrase */}
+      <p style={{
+        fontSize: 17,
+        color: COLORS.whiteSoft,
+        lineHeight: 1.5,
+        margin: "0 0 28px",
+        padding: "0 4px",
+        fontStyle: "italic",
+      }}>
+        {data.narrative}
+      </p>
+
+      {/* Indicateurs finaux (en gros badges) */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(72px, 1fr))",
+        gap: 6,
+        marginBottom: 24,
+      }}>
+        {[
+          { label: "Dette", value: `${indicators.debt}%` },
+          { label: "Confiance", value: `${indicators.confidence}%` },
+          { label: "AN", value: `${indicators.parliament}` },
+          { label: "Tension", value: `${indicators.tension}/10` },
+          { label: "Spread", value: `${indicators.spread}` },
+        ].map((stat, i) => (
+          <div key={i} style={{
+            background: "rgba(255,255,255,0.15)",
+            backdropFilter: "blur(8px)",
+            borderRadius: 14,
+            padding: "10px 8px",
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontSize: 9,
+              color: COLORS.whiteDim,
+              fontWeight: 500,
+              letterSpacing: "1px",
+              margin: "0 0 3px",
+              textTransform: "uppercase",
+            }}>{stat.label}</p>
+            <p style={{
+              fontSize: 14,
+              color: COLORS.white,
+              fontWeight: 500,
+              margin: 0,
+            }}>{stat.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Section timeline */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        textAlign: "center",
+        margin: "0 0 14px",
+      }}>LES 90 JOURS QUI SUIVENT</p>
+
+      {/* Timeline en cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+        {(data.events || []).map((e, i) => {
+          const eventColor = eventColorMap[e.color] || COLORS.lime;
+          return (
+            <div key={i} style={{
+              background: COLORS.white,
+              borderRadius: 18,
+              padding: "14px 16px",
+              boxShadow: "0 4px 14px rgba(20,18,26,0.15)",
+              display: "flex",
+              gap: 14,
+              alignItems: "flex-start",
+              position: "relative",
+              overflow: "hidden",
+            }}>
+              <div style={{
+                position: "absolute",
+                left: 0, top: 0, bottom: 0,
+                width: 5,
+                background: eventColor,
+              }} />
+              <div style={{
+                background: eventColor,
+                color: COLORS.ink,
+                fontSize: 11,
+                fontWeight: 700,
+                padding: "6px 10px",
+                borderRadius: 12,
+                letterSpacing: "0.5px",
+                flexShrink: 0,
+                marginLeft: 8,
+              }}>J{e.day}</div>
+              <p style={{
+                fontSize: 14,
+                color: COLORS.ink,
+                lineHeight: 1.45,
+                margin: 0,
+                paddingTop: 2,
+              }}>{e.label}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Bouton suite */}
+      <button onClick={onContinue} style={{
+        width: "100%",
+        background: COLORS.lime,
+        color: COLORS.ink,
+        border: "none",
+        borderRadius: 18,
+        padding: "20px 24px",
+        fontSize: 17,
+        fontWeight: 500,
+        cursor: "pointer",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 6px 28px rgba(214,255,0,0.55)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = "0 4px 20px rgba(214,255,0,0.4)";
+      }}>
+        Voir le verdict →
+      </button>
+    </div>
   );
+}
 }
 
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
