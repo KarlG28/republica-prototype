@@ -1073,10 +1073,8 @@ function Intro({ onStart }) {
 function Loading({ message, isUrgent }) {
   // Scènes immersives qui défilent en fade : on est à l'Élysée
   const scenesNormal = [
-    "Vous prenez place dans votre bureau, Élysée",
-    "Votre directeur de cabinet entre avec une chemise cartonnée",
-    "Bercy a fait porter sa note ce matin",
-    "Le pays attend votre arbitrage",
+    "Vous prenez place dans votre bureau à l'Élysée",
+    "Le pays attend votre décision",
   ];
   const scenesUrgent = [
     "L'huissier frappe deux fois, il entre sans attendre",
@@ -1089,7 +1087,6 @@ function Loading({ message, isUrgent }) {
   const [sceneIdx, setSceneIdx] = useState(0);
   const [visible, setVisible] = useState(true);
 
-  // Cycle : 3s visible → fade out → scène suivante → fade in
   useEffect(() => {
     const visibleDuration = 2700;
     const fadeDuration = 300;
@@ -1106,75 +1103,91 @@ function Loading({ message, isUrgent }) {
     return () => clearTimeout(timer);
   }, [sceneIdx, scenes.length]);
 
+  const accentColor = isUrgent ? COLORS.magenta : COLORS.lime;
+
   return (
-    <Section>
-      <div style={{ textAlign: "center", padding: "120px 24px 100px" }}>
-        {/* Indicateur subtil "en cours" en haut */}
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: 10,
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 10,
-          color: isUrgent ? COLORS.red : COLORS.gold,
-          letterSpacing: "0.25em",
-          fontWeight: 700,
-          marginBottom: 60,
-          padding: "8px 16px",
-          border: `1px solid ${isUrgent ? COLORS.red : COLORS.gold}40`,
-          background: `${isUrgent ? COLORS.red : COLORS.gold}08`,
-        }}>
-          <span style={{
-            display: "inline-block",
-            width: 8,
-            height: 8,
-            borderRadius: "50%",
-            background: isUrgent ? COLORS.red : COLORS.gold,
-            animation: "pulse 1.5s ease-in-out infinite",
-          }} />
-          {isUrgent ? "URGENCE EN COURS" : "ÉLYSÉE — EN COURS"}
-        </div>
-
-        {/* Scène immersive avec fade */}
-        <div style={{
-          minHeight: "120px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "0 20px",
-        }}>
-          <div style={{
-            fontFamily: "ui-serif, Georgia, serif",
-            fontSize: 22,
-            color: COLORS.navy,
-            lineHeight: 1.4,
-            fontStyle: "italic",
-            fontWeight: 500,
-            maxWidth: 540,
-            opacity: visible ? 1 : 0,
-            transform: visible ? "translateY(0)" : "translateY(8px)",
-            transition: "opacity 0.3s ease, transform 0.3s ease",
-            letterSpacing: "-0.005em",
-          }}>
-            {scenes[sceneIdx]}
-          </div>
-        </div>
-
-        {/* Message contextuel très discret en bas */}
-        {message && (
-          <div style={{
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 10,
-            color: COLORS.textDim,
-            marginTop: 60,
-            letterSpacing: "0.2em",
-            fontWeight: 600,
-          }}>
-            {message}
-          </div>
-        )}
+    <div style={{ padding: "60px 4px 80px", textAlign: "center", minHeight: 480 }}>
+      {/* Badge en cours */}
+      <div style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 10,
+        background: "rgba(255,255,255,0.15)",
+        backdropFilter: "blur(8px)",
+        borderRadius: 32,
+        padding: "10px 18px",
+        marginBottom: 50,
+      }}>
+        <span style={{
+          display: "inline-block",
+          width: 10,
+          height: 10,
+          borderRadius: "50%",
+          background: accentColor,
+          animation: "pulse 1.4s ease-in-out infinite",
+        }} />
+        <span style={{
+          color: COLORS.white,
+          fontSize: 11,
+          fontWeight: 500,
+          letterSpacing: "1.5px",
+        }}>{isUrgent ? "URGENCE EN COURS" : "ÉLYSÉE EN ACTION"}</span>
       </div>
-    </Section>
+
+      {/* Scène immersive en gros */}
+      <div style={{
+        minHeight: 160,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 16px",
+      }}>
+        <div style={{
+          fontSize: 26,
+          color: COLORS.white,
+          lineHeight: 1.3,
+          fontWeight: 500,
+          maxWidth: 360,
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(10px)",
+          transition: "opacity 0.3s ease, transform 0.3s ease",
+          letterSpacing: "-0.5px",
+        }}>
+          {scenes[sceneIdx]}
+        </div>
+      </div>
+
+      {/* Petits points indicateurs de progression */}
+      <div style={{
+        display: "flex",
+        gap: 6,
+        justifyContent: "center",
+        marginTop: 50,
+      }}>
+        {scenes.map((_, i) => (
+          <div key={i} style={{
+            width: i === sceneIdx ? 24 : 6,
+            height: 6,
+            borderRadius: 3,
+            background: i === sceneIdx ? COLORS.lime : "rgba(255,255,255,0.3)",
+            transition: "width 0.4s ease, background 0.4s ease",
+          }} />
+        ))}
+      </div>
+
+      {/* Message contextuel optionnel */}
+      {message && (
+        <div style={{
+          fontSize: 11,
+          color: COLORS.whiteDim,
+          marginTop: 40,
+          letterSpacing: "1.5px",
+          fontWeight: 500,
+        }}>
+          {message}
+        </div>
+      )}
+    </div>
   );
 }
 
