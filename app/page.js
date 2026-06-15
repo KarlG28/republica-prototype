@@ -1418,90 +1418,216 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
 
 function ScenarioDetail({ dossier, scenarioIdx, onConfirm, onCancel }) {
   const scenario = dossier.scenarios[scenarioIdx];
-  const color = resolveColor(scenario.color);
   const deltas = scenario.deltas || {};
 
+  // Couleur d'accent selon la position du scénario
+  const accentColors = [COLORS.lime, COLORS.magenta, COLORS.archReformateur];
+  const accent = accentColors[scenarioIdx] || COLORS.lime;
+  const accentTextDark = scenarioIdx === 0 ? COLORS.ink : COLORS.white;
+
   const impacts = [
-    { label: "Dette / PIB", value: deltas.debt, unit: " pts", inverse: true },
-    { label: "Confiance", value: deltas.confidence, unit: " pts" },
-    { label: "Soutien AN", value: deltas.parliament, unit: " sièges" },
-    { label: "Tension sociale", value: deltas.tension, unit: " pts", inverse: true },
-    { label: "Spread OAT", value: deltas.spread, unit: " pb", inverse: true },
+    { label: "Dette", value: deltas.debt, unit: "pts", inverse: true },
+    { label: "Confiance", value: deltas.confidence, unit: "pts" },
+    { label: "Assemblée", value: deltas.parliament, unit: "siège", inverse: false, isInt: true },
+    { label: "Tension", value: deltas.tension, unit: "/10", inverse: true },
+    { label: "Spread", value: deltas.spread, unit: "pb", inverse: true, isInt: true },
   ].filter(i => i.value !== undefined && i.value !== 0);
 
   return (
-    <Section>
-      <Tag>Approfondissement du scénario</Tag>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
-        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 11, color, letterSpacing: "0.15em", fontWeight: 700, padding: "4px 10px", border: `1px solid ${color}40`, background: `${color}10` }}>{scenario.code}</span>
-        <span style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.textDim, fontWeight: 600, letterSpacing: "0.1em" }}>{scenario.risk}</span>
+    <div style={{ padding: "12px 4px 40px" }}>
+      {/* Badge code voie */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14, padding: "0 4px" }}>
+        <span style={{
+          background: accent,
+          color: accentTextDark,
+          fontSize: 11,
+          fontWeight: 500,
+          padding: "5px 12px",
+          borderRadius: 20,
+          letterSpacing: "1px",
+        }}>{scenario.code || `VOIE ${["A","B","C"][scenarioIdx]}`}</span>
+        {scenario.risk && (
+          <span style={{
+            background: "rgba(255,255,255,0.15)",
+            backdropFilter: "blur(8px)",
+            color: COLORS.white,
+            fontSize: 10,
+            fontWeight: 500,
+            padding: "4px 10px",
+            borderRadius: 20,
+            letterSpacing: "1px",
+          }}>{scenario.risk}</span>
+        )}
       </div>
-      <h1 style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 28, fontWeight: 600, color: COLORS.navy, lineHeight: 1.15, margin: "0 0 16px", letterSpacing: "-0.01em" }}>
+
+      {/* Titre du scénario */}
+      <h1 style={{
+        fontSize: 30,
+        fontWeight: 500,
+        color: COLORS.white,
+        lineHeight: 1.1,
+        margin: "0 0 22px",
+        letterSpacing: "-1px",
+        padding: "0 4px",
+      }}>
         {scenario.title}
       </h1>
 
-      <div style={{ padding: 18, background: COLORS.bgPanel, border: `1px solid ${color}30`, borderLeft: `3px solid ${color}`, marginBottom: 20 }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color, letterSpacing: "0.15em", marginBottom: 10, fontWeight: 600 }}>◊ DESCRIPTION DÉTAILLÉE</div>
-        <p style={{ fontFamily: "ui-serif, Georgia, serif", fontSize: 15, color: COLORS.text, lineHeight: 1.7, margin: 0 }}>
-          {scenario.desc}
-        </p>
+      {/* Carte description */}
+      <div style={{
+        background: COLORS.white,
+        borderRadius: 20,
+        padding: "18px 20px",
+        marginBottom: 18,
+        boxShadow: "0 6px 20px rgba(20,18,26,0.2)",
+        position: "relative",
+      }}>
+        <div style={{
+          position: "absolute",
+          left: 0, top: 0, bottom: 0,
+          width: 5,
+          background: accent,
+          borderTopLeftRadius: 20,
+          borderBottomLeftRadius: 20,
+        }} />
+        <div style={{ paddingLeft: 10 }}>
+          <p style={{
+            fontSize: 11,
+            color: accent === COLORS.lime ? COLORS.inkSoft : accent,
+            fontWeight: 500,
+            letterSpacing: "1.5px",
+            margin: "0 0 8px",
+          }}>CONTEXTE DE LA DÉCISION</p>
+          <p style={{
+            fontSize: 15,
+            color: COLORS.ink,
+            lineHeight: 1.55,
+            margin: 0,
+            fontWeight: 400,
+          }}>
+            {scenario.desc}
+          </p>
+        </div>
       </div>
 
+      {/* Tags d'effets sur les acteurs */}
       {scenario.tags && scenario.tags.length > 0 && (
-        <>
-          <SubTag>Effets attendus sur les acteurs</SubTag>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 7, marginBottom: 24 }}>
-            {(scenario.tags || []).map((t, i) => {
+        <div style={{ marginBottom: 18 }}>
+          <p style={{
+            fontSize: 11,
+            color: COLORS.whiteSoft,
+            fontWeight: 500,
+            letterSpacing: "1.5px",
+            margin: "0 0 10px",
+            padding: "0 4px",
+          }}>EFFETS ATTENDUS</p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {scenario.tags.map((t, i) => {
               const tag = Array.isArray(t) ? { label: t[0], positive: t[1] } : t;
+              const tagBg = tag.positive === true
+                ? "rgba(58,203,114,0.95)"
+                : tag.positive === false
+                ? "rgba(255,46,147,0.95)"
+                : "rgba(255,255,255,0.95)";
+              const tagText = tag.positive === null ? COLORS.ink : COLORS.white;
               return (
                 <span key={i} style={{
+                  background: tagBg,
+                  color: tagText,
+                  fontSize: 12,
+                  fontWeight: 500,
                   padding: "6px 12px",
-                  fontFamily: "ui-monospace, monospace",
-                  fontSize: 11,
-                  background: tag.positive === true ? `${COLORS.green}15` : tag.positive === false ? `${COLORS.red}12` : `${COLORS.yellow}15`,
-                  color: tag.positive === true ? COLORS.green : tag.positive === false ? COLORS.red : COLORS.yellow,
-                  fontWeight: 600,
-                  border: `1px solid ${tag.positive === true ? COLORS.green : tag.positive === false ? COLORS.red : COLORS.yellow}30`,
+                  borderRadius: 16,
                 }}>{tag.label}</span>
               );
             })}
           </div>
-        </>
+        </div>
       )}
 
+      {/* Impacts chiffrés */}
       {impacts.length > 0 && (
-        <>
-          <SubTag>Impact projeté sur les indicateurs. Ces impacts sont générés à l'aide de l'intelligence artificielle.</SubTag>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8, marginBottom: 26 }}>
+        <div style={{ marginBottom: 22 }}>
+          <p style={{
+            fontSize: 11,
+            color: COLORS.whiteSoft,
+            fontWeight: 500,
+            letterSpacing: "1.5px",
+            margin: "0 0 10px",
+            padding: "0 4px",
+          }}>IMPACT PROJETÉ · GÉNÉRÉ PAR IA</p>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(105px, 1fr))",
+            gap: 8,
+          }}>
             {impacts.map((imp, i) => {
               const sign = imp.value > 0 ? "+" : "";
               const isGood = imp.inverse ? imp.value < 0 : imp.value > 0;
-              const isBad = imp.inverse ? imp.value > 0 : imp.value < 0;
-              const c = isGood ? COLORS.green : isBad ? COLORS.red : COLORS.textMuted;
+              const valueColor = isGood ? "#3ACB72" : COLORS.magenta;
+              const displayValue = imp.isInt ? Math.round(imp.value) : imp.value;
               return (
-                <div key={i} style={{ padding: "10px 12px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}` }}>
-                  <div style={{ fontSize: 10, color: COLORS.textDim, letterSpacing: "0.1em", textTransform: "uppercase", fontWeight: 600, marginBottom: 4 }}>{imp.label}</div>
-                  <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 15, color: c, fontWeight: 700 }}>{sign}{imp.value}{imp.unit}</div>
+                <div key={i} style={{
+                  background: COLORS.white,
+                  borderRadius: 14,
+                  padding: "10px 12px",
+                }}>
+                  <p style={{
+                    fontSize: 10,
+                    color: COLORS.inkSoft,
+                    fontWeight: 500,
+                    letterSpacing: "0.5px",
+                    margin: "0 0 4px",
+                    textTransform: "uppercase",
+                  }}>{imp.label}</p>
+                  <p style={{
+                    fontSize: 16,
+                    color: valueColor,
+                    fontWeight: 700,
+                    margin: 0,
+                  }}>{sign}{displayValue} <span style={{ fontSize: 11, fontWeight: 500 }}>{imp.unit}</span></p>
                 </div>
               );
             })}
           </div>
-        </>
+        </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 10, marginBottom: 16 }}>
+      {/* Boutons */}
+      <div style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: 10 }}>
         <button onClick={onCancel} style={{
-          padding: "14px 18px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, color: COLORS.textMuted,
-          fontFamily: "ui-monospace, monospace", fontSize: 12, letterSpacing: "0.15em", cursor: "pointer", textTransform: "uppercase", fontWeight: 600,
-          transition: "all 0.15s",
-        }}
-       onMouseEnter={(e) => { e.currentTarget.style.borderColor = color; e.currentTarget.style.background = `${color}06`; e.currentTarget.style.boxShadow = `0 4px 12px ${COLORS.navy}12`; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = `${color}50`; e.currentTarget.style.borderLeftColor = color; e.currentTarget.style.background = COLORS.bgPanel; e.currentTarget.style.boxShadow = `0 1px 3px ${COLORS.navy}08`; }}>
-          ← Revenir
+          background: "rgba(255,255,255,0.15)",
+          backdropFilter: "blur(8px)",
+          color: COLORS.white,
+          border: "none",
+          borderRadius: 18,
+          padding: "18px 20px",
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: "pointer",
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}>
+          ← Retour
         </button>
-        <BigButton onClick={onConfirm}>Valider ce choix ✓</BigButton>
+        <button onClick={onConfirm} style={{
+          background: COLORS.lime,
+          color: COLORS.ink,
+          border: "none",
+          borderRadius: 18,
+          padding: "18px 24px",
+          fontSize: 16,
+          fontWeight: 500,
+          cursor: "pointer",
+          fontFamily: "'Inter', system-ui, sans-serif",
+          boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
+          transition: "transform 0.15s ease",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}>
+          Trancher ⚡
+        </button>
       </div>
-    </Section>
+    </div>
   );
 }
 
