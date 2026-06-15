@@ -1194,211 +1194,225 @@ function Loading({ message, isUrgent }) {
 function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
   const isUrgent = dossier.urgent;
   const timer = dossier.timer || "48H";
-  const risks = Array.isArray(dossier.risks) ? dossier.risks : [];
+  const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }).toUpperCase();
 
   return (
-    <Section>
-      <Dashboard indicators={indicators} />
-
+    <div style={{ padding: "12px 4px 40px" }}>
       {fallbackError && (
-        <div style={{ padding: 10, background: `${COLORS.yellow}15`, border: `1px solid ${COLORS.yellow}40`, fontSize: 11, color: COLORS.yellow, marginBottom: 14, fontFamily: "ui-monospace, monospace" }}>
-          ⚠ GÉNÉRATION IA INDISPONIBLE — Dossier de secours utilisé
+        <div style={{
+          padding: "10px 14px",
+          background: "rgba(255,255,255,0.15)",
+          backdropFilter: "blur(8px)",
+          borderRadius: 12,
+          fontSize: 11,
+          color: COLORS.white,
+          marginBottom: 14,
+          fontWeight: 500,
+          letterSpacing: "0.5px",
+        }}>
+          ⚠ Génération IA indisponible · Dossier de secours
         </div>
       )}
 
-     {/* ═══ MODE URGENT : irruption visuelle ═══ */}
-      {isUrgent ? (
-        <div className="Moi Président(e)-urgent-card" style={{
-          marginBottom: 22,
-          border: `2px solid ${COLORS.red}`,
-          background: "#fff",
-          position: "relative",
-          overflow: "hidden",
+      {/* ═══ Carte centrale : le dossier ═══ */}
+      <div style={{
+        background: COLORS.ink,
+        borderRadius: 22,
+        padding: "20px 22px 22px",
+        marginBottom: 22,
+        boxShadow: "0 8px 24px rgba(20,18,26,0.3)",
+        position: "relative",
+        overflow: "hidden",
+      }}>
+        {/* Header du dossier */}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 14,
+          flexWrap: "wrap",
+          gap: 8,
         }}>
-          {/* Bandes rayées rouges qui défilent en haut */}
-          <div className="Moi Président(e)-urgent-stripes-top" />
-
-          <div style={{ padding: "20px 22px" }}>
-            {/* Bandeau d'urgence avec sirène clignotante */}
-            <div style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-              fontFamily: "ui-monospace, monospace",
-              fontSize: 11,
-              letterSpacing: "0.2em",
-            }}>
-              <span style={{ display: "flex", alignItems: "center", gap: 10, color: COLORS.red, fontWeight: 700 }}>
-                <span className="Moi Président(e)-urgent-blink" />
-                URGENCE ÉLYSÉE — INTERRUPTION DE MANDAT
-              </span>
-              <span style={{
-                color: COLORS.red,
-                fontWeight: 800,
-                background: `${COLORS.red}15`,
-                padding: "4px 10px",
-                border: `1px solid ${COLORS.red}50`,
-              }}>
-                {timer}
-              </span>
-            </div>
-
-            {/* Le titre choc */}
-            <div style={{
-              fontFamily: "ui-serif, Georgia, serif",
-              fontSize: 28,
-              fontWeight: 700,
-              color: COLORS.red,
-              lineHeight: 1.15,
-              letterSpacing: "-0.015em",
-              marginBottom: 10,
-            }}>
-              {dossier.title}
-            </div>
-
-            {/* Le subtitle direct, sans italique mou */}
-            {dossier.subtitle && (
-              <div style={{
-                fontSize: 15,
-                color: COLORS.text,
-                lineHeight: 1.5,
-                fontWeight: 500,
-              }}>
-                {renderRich(dossier.subtitle)}
-              </div>
-            )}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <span style={{
+              background: isUrgent ? COLORS.magenta : COLORS.lime,
+              color: isUrgent ? COLORS.white : COLORS.ink,
+              fontSize: 10,
+              fontWeight: 500,
+              padding: "4px 10px",
+              borderRadius: 20,
+              letterSpacing: "1px",
+            }}>{isUrgent ? "⚡ URGENT" : today}</span>
+            <span style={{
+              background: "rgba(255,255,255,0.12)",
+              color: COLORS.white,
+              fontSize: 10,
+              fontWeight: 500,
+              padding: "4px 10px",
+              borderRadius: 20,
+              letterSpacing: "1px",
+            }}>⏱ {timer}</span>
           </div>
-
-          {/* Bandes rayées rouges qui défilent en bas */}
-          <div className="Moi Président(e)-urgent-stripes-bottom" />
         </div>
-      ) : (
-        <>
-          {/* ═══ MODE NORMAL : timer + bloc CE QUI SE PASSE ═══ */}
+
+        {/* Titre du dilemme */}
+        <h2 style={{
+          fontSize: 26,
+          fontWeight: 500,
+          color: COLORS.white,
+          lineHeight: 1.15,
+          margin: "0 0 10px",
+          letterSpacing: "-0.5px",
+        }}>
+          {dossier.title}
+        </h2>
+
+        {/* Subtitle */}
+        {dossier.subtitle && (
+          <p style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,0.7)",
+            lineHeight: 1.5,
+            margin: "0 0 14px",
+          }}>
+            {renderRich(dossier.subtitle)}
+          </p>
+        )}
+
+        {/* Acteurs en mini cartes inline */}
+        {(dossier.agents || []).length > 0 && (
           <div style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "10px 14px",
-            background: "transparent",
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: 4,
-            marginBottom: 18,
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 11,
-            letterSpacing: "0.18em",
+            flexWrap: "wrap",
+            gap: 6,
+            marginTop: 16,
+            paddingTop: 14,
+            borderTop: "1px solid rgba(255,255,255,0.1)",
           }}>
-            <span style={{ color: COLORS.textDim }}>
-              JOUR {dossier.day || "?"} · MANDAT EN COURS
-            </span>
-            <span style={{
-              color: COLORS.navy,
-              fontWeight: 700,
-            }}>
-              VOUS AVEZ {timer}
-            </span>
-          </div>
-
-          <div style={{
-            border: `1px solid ${COLORS.border}`,
-            borderLeft: `3px solid ${COLORS.navy}`,
-            padding: "16px 18px",
-            marginBottom: 14,
-            background: "#fff",
-          }}>
-            <div style={{
-              fontFamily: "ui-monospace, monospace",
-              fontSize: 10,
-              letterSpacing: "0.2em",
-              color: COLORS.textDim,
-              marginBottom: 10,
-              fontWeight: 600,
-            }}>
-              CE QUI SE PASSE
-            </div>
-            <div style={{
-              fontFamily: "ui-serif, Georgia, serif",
-              fontSize: 22,
-              fontWeight: 600,
-              color: COLORS.navy,
-              lineHeight: 1.25,
-              letterSpacing: "-0.01em",
-            }}>
-              {dossier.title}
-            </div>
-            {dossier.subtitle && (
-              <div style={{
-                fontSize: 14,
-                color: COLORS.textMuted,
-                marginTop: 8,
-                fontStyle: "italic",
-                lineHeight: 1.45,
-              }}>
-                {dossier.subtitle}
-              </div>
-            )}
-          </div>
-        </>
-      )}
-
-      {/* ═══ BLOC 2 : CE QUE VOUS RISQUEZ ═══ */}
-      {risks.length > 0 && (
-        <div style={{
-          border: `1px solid ${COLORS.border}`,
-          borderLeft: `3px solid ${COLORS.gold}`,
-          padding: "14px 18px",
-          marginBottom: 18,
-          background: "#fff",
-        }}>
-          <div style={{
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 10,
-            letterSpacing: "0.2em",
-            color: COLORS.textDim,
-            marginBottom: 10,
-            fontWeight: 600,
-          }}>
-            CE QUE VOUS RISQUEZ
-          </div>
-          <ul style={{
-            margin: 0,
-            padding: 0,
-            listStyle: "none",
-          }}>
-            {risks.map((r, i) => (
-              <li key={i} style={{
-                fontSize: 14,
-                color: COLORS.navy,
-                lineHeight: 1.5,
-                padding: "6px 0",
-                borderTop: i > 0 ? `1px dashed ${COLORS.border}` : "none",
-                display: "flex",
-                gap: 10,
-                alignItems: "flex-start",
-              }}>
-                <span style={{ color: COLORS.gold, fontWeight: 700, flexShrink: 0 }}>—</span>
-                <span dangerouslySetInnerHTML={{ __html: String(r).replace(/\*\*(.+?)\*\*/g, '<strong style="color: ' + COLORS.navy + '; font-weight: 600">$1</strong>') }} />
-              </li>
+            {(dossier.agents || []).slice(0, 4).map((a, i) => (
+              <span key={i} style={{
+                fontSize: 11,
+                color: COLORS.white,
+                background: "rgba(255,255,255,0.1)",
+                padding: "5px 10px",
+                borderRadius: 14,
+                fontWeight: 500,
+              }}>{a.name}</span>
             ))}
-          </ul>
-        </div>
-      )}
+          </div>
+        )}
+      </div>
 
-      {/* ═══ LE RESTE : agents + scénarios, inchangé ═══ */}
-      <SubTag>Ils ont deux mots à vous dire...</SubTag>
-      <AgentsGrid>
-        {(dossier.agents || []).filter(Boolean).map((a, i) => (
-          <Agent key={i} name={a.name || "Acteur"} color={resolveColor(a.color || "muted")} stance={a.stance || ""} quote={a.quote || ""} />
-        ))}
-      </AgentsGrid>
+      {/* ═══ Instruction de jeu ═══ */}
+      <div style={{
+        textAlign: "center",
+        marginBottom: 16,
+      }}>
+        <span style={{
+          fontSize: 11,
+          color: COLORS.whiteSoft,
+          letterSpacing: "2px",
+          fontWeight: 500,
+        }}>CHOISISSEZ UNE VOIE</span>
+      </div>
 
-<SubTag>Votre arbitrage · {(dossier.scenarios || []).filter(Boolean).length} voies</SubTag>
-      <ScenariosCarousel
-        scenarios={(dossier.scenarios || []).filter(Boolean)}
-        onSelectScenario={onSelectScenario}
-      />
-    </Section>
+      {/* ═══ Les 3 cartes scénarios ═══ */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {(dossier.scenarios || []).filter(Boolean).map((scenario, i) => {
+          // Couleur d'accent par scénario A/B/C
+          const accentColors = [COLORS.lime, COLORS.magenta, COLORS.archReformateur];
+          const accent = accentColors[i] || COLORS.lime;
+          // Couleur de texte du badge (lisible)
+          const accentText = i === 0 ? COLORS.ink : COLORS.white;
+
+          return (
+            <button
+              key={i}
+              onClick={() => onSelectScenario(i)}
+              style={{
+                background: COLORS.white,
+                border: "none",
+                borderRadius: 20,
+                padding: "16px 18px",
+                textAlign: "left",
+                cursor: "pointer",
+                width: "100%",
+                fontFamily: "'Inter', system-ui, sans-serif",
+                boxShadow: "0 4px 14px rgba(20,18,26,0.18)",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-3px)";
+                e.currentTarget.style.boxShadow = "0 8px 22px rgba(20,18,26,0.28)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 4px 14px rgba(20,18,26,0.18)";
+              }}
+            >
+              {/* Barre de couleur à gauche */}
+              <div style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 5,
+                background: accent,
+              }} />
+
+              <div style={{ paddingLeft: 8 }}>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 8,
+                }}>
+                  <span style={{
+                    background: COLORS.ink,
+                    color: accent,
+                    fontSize: 10,
+                    fontWeight: 500,
+                    padding: "3px 9px",
+                    borderRadius: 14,
+                    letterSpacing: "1px",
+                  }}>{scenario.code || `VOIE ${["A","B","C"][i]}`}</span>
+                  {scenario.risk && (
+                    <span style={{
+                      fontSize: 10,
+                      color: COLORS.inkSoft,
+                      fontWeight: 500,
+                      letterSpacing: "0.5px",
+                    }}>{scenario.risk}</span>
+                  )}
+                </div>
+
+                <h3 style={{
+                  fontSize: 16,
+                  fontWeight: 500,
+                  color: COLORS.ink,
+                  lineHeight: 1.3,
+                  margin: "0 0 4px",
+                  letterSpacing: "-0.3px",
+                }}>
+                  {scenario.title}
+                </h3>
+
+                <p style={{
+                  fontSize: 13,
+                  color: COLORS.inkSoft,
+                  lineHeight: 1.4,
+                  margin: 0,
+                }}>
+                  {scenario.desc}
+                </p>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
