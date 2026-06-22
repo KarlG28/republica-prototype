@@ -1830,25 +1830,27 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
   const family = useMemo(() => classifyArchetype(dossiers, choices, indicators), [dossiers, choices, indicators]);
   const shareCardRef = useRef(null);
 
-  // Couleur signature selon l'archétype
+// Couleur signature selon l'archétype + couleur de texte adaptée
   const archColors = {
-    "Réformateur": COLORS.archReformateur,
-    "Libéral": COLORS.archLiberal,
-    "Progressiste": COLORS.archProgressiste,
-    "Conservateur": COLORS.archConservateur,
-    "Réac": COLORS.archReac,
-    "Identitaire": COLORS.archIdentitaire,
+    "Réformateur": { bg: COLORS.archReformateur, text: COLORS.ink },
+    "Libéral":     { bg: COLORS.archLiberal,     text: COLORS.ink },
+    "Progressiste":{ bg: COLORS.archProgressiste,text: COLORS.white },
+    "Conservateur":{ bg: COLORS.archConservateur,text: COLORS.white },
+    "Réac":        { bg: COLORS.archReac,        text: COLORS.white },
+    "Identitaire": { bg: COLORS.archIdentitaire, text: COLORS.white },
   };
-  const archColor = archColors[family.shortLabel] || COLORS.lime;
+  const archScheme = archColors[family.shortLabel] || { bg: COLORS.lime, text: COLORS.ink };
+  const archColor = archScheme.bg;
+  const archText = archScheme.text;
 
   // Emoji par archétype
   const archEmojis = {
     "Réformateur": "⚡",
-    "Libéral": "🪙",
+    "Libéral": "💼",
     "Progressiste": "🌈",
-    "Conservateur": "🏛",
-    "Réac": "⚔️",
-    "Identitaire": "🛡",
+    "Conservateur": "🏛️",
+    "Réac": "⏳",
+    "Identitaire": "🇫🇷",
   };
   const archEmoji = archEmojis[family.shortLabel] || "⚡";
 
@@ -1895,29 +1897,31 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         {/* Filigrane emoji énorme en fond */}
         <div style={{
           position: "absolute",
-          right: -30,
-          top: -30,
-          fontSize: 220,
-          opacity: 0.08,
+          right: -20,
+          bottom: -40,
+          fontSize: 180,
+          opacity: 0.12,
           pointerEvents: "none",
           lineHeight: 1,
+          transform: "rotate(-12deg)",
         }}>{archEmoji}</div>
 
         <div style={{ position: "relative" }}>
           {/* Header */}
           <p style={{
             fontSize: 11,
-            color: COLORS.ink,
+            color: archText,
             fontWeight: 700,
             letterSpacing: "2px",
             margin: "0 0 8px",
+            opacity: 0.85,
           }}>VOUS AVEZ TRANCHÉ EN</p>
 
           {/* Archétype en GROS */}
           <h1 style={{
             fontSize: 52,
             fontWeight: 500,
-            color: COLORS.ink,
+            color: archText,
             lineHeight: 0.95,
             margin: "0 0 6px",
             letterSpacing: "-2.5px",
@@ -1926,7 +1930,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
           {/* Adjectif */}
           <p style={{
             fontSize: 22,
-            color: COLORS.ink,
+            color: archText,
             fontWeight: 500,
             margin: "0 0 22px",
             opacity: 0.7,
