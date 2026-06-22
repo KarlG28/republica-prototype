@@ -1826,7 +1826,6 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
     </div>
   );
 }
-}
 
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
   const family = useMemo(() => classifyArchetype(dossiers, choices, indicators), [dossiers, choices, indicators]);
