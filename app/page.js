@@ -1826,13 +1826,33 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
     </div>
   );
 }
-
 function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSummary, partnerLoading, partnerError, sessionId, onSaveAnonymous }) {
   const family = useMemo(() => classifyArchetype(dossiers, choices, indicators), [dossiers, choices, indicators]);
   const shareCardRef = useRef(null);
 
+  // Couleur signature selon l'archétype
+  const archColors = {
+    "Réformateur": COLORS.archReformateur,
+    "Libéral": COLORS.archLiberal,
+    "Progressiste": COLORS.archProgressiste,
+    "Conservateur": COLORS.archConservateur,
+    "Réac": COLORS.archReac,
+    "Identitaire": COLORS.archIdentitaire,
+  };
+  const archColor = archColors[family.shortLabel] || COLORS.lime;
+
+  // Emoji par archétype
+  const archEmojis = {
+    "Réformateur": "⚡",
+    "Libéral": "🪙",
+    "Progressiste": "🌈",
+    "Conservateur": "🏛",
+    "Réac": "⚔️",
+    "Identitaire": "🛡",
+  };
+  const archEmoji = archEmojis[family.shortLabel] || "⚡";
+
   useEffect(() => {
-    // Scroll en haut de la page quand le bilan apparait
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "auto" });
     }
@@ -1840,203 +1860,257 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       family: family.shortLabel,
       adjective: family.adjective,
     });
-    // Sauvegarde anonyme dans Airtable, une seule fois à l'arrivée du bilan
     if (onSaveAnonymous) onSaveAnonymous(family);
   }, []);
 
-  return (
-   <Section>
+  const today = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }).toUpperCase();
 
-  <SubTag>Partagez votre bilan</SubTag>
+  return (
+    <div style={{ padding: "12px 4px 40px" }}>
+      {/* ═══ Badge VERDICT ═══ */}
       <div style={{
-        background: "#fafaf7",
-        border: `1px solid ${COLORS.border}`,
-        padding: "28px 26px",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 8,
+        background: "rgba(255,255,255,0.15)",
+        backdropFilter: "blur(8px)",
+        borderRadius: 32,
+        padding: "8px 16px",
+        marginBottom: 18,
+        marginLeft: 4,
+      }}>
+        <span style={{ color: COLORS.white, fontSize: 11, fontWeight: 500, letterSpacing: "2px" }}>VERDICT · {today}</span>
+      </div>
+
+      {/* ═══ CARTE VERDICT (la grosse) ═══ */}
+      <div style={{
+        background: archColor,
+        borderRadius: 28,
+        padding: "28px 24px 30px",
+        marginBottom: 22,
+        boxShadow: "0 10px 30px rgba(20,18,26,0.3)",
         position: "relative",
         overflow: "hidden",
-        marginBottom: 26,
-        color: COLORS.text,
-        boxShadow: `0 8px 24px ${COLORS.navy}15`,
       }}>
-        {/* Filigrane R en arrière-plan */}
+        {/* Filigrane emoji énorme en fond */}
         <div style={{
           position: "absolute",
+          right: -30,
           top: -30,
-          right: -20,
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 200,
-          color: `${COLORS.gold}10`,
-          fontWeight: 600,
+          fontSize: 220,
+          opacity: 0.08,
+          pointerEvents: "none",
           lineHeight: 1,
-          fontStyle: "italic",
-        }}>R</div>
+        }}>{archEmoji}</div>
 
         <div style={{ position: "relative" }}>
-          {/* En-tête type "Vos 100 jours · X ans · Y crises" */}
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingBottom: 14,
-            marginBottom: 20,
-            borderBottom: `1px solid ${COLORS.border}`,
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 10,
-            color: COLORS.textDim,
-            letterSpacing: "0.2em",
-            fontWeight: 600,
-          }}>
-            <span>BILAN</span>
-            <span>{new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long" }).toUpperCase()}</span>
-          </div>
-
-          {/* "Vous avez gouverné en..." */}
-          <div style={{
-            fontFamily: "ui-monospace, monospace",
+          {/* Header */}
+          <p style={{
             fontSize: 11,
-            color: COLORS.gold,
-            letterSpacing: "0.25em",
-            fontWeight: 600,
-            marginBottom: 10,
-          }}>
-            VOUS AVEZ TRANCHÉ EN
-          </div>
+            color: COLORS.ink,
+            fontWeight: 700,
+            letterSpacing: "2px",
+            margin: "0 0 8px",
+          }}>VOUS AVEZ TRANCHÉ EN</p>
 
-          {/* La famille en serif gros + adjectif en gold italique */}
-          <div style={{
-            fontFamily: "ui-serif, Georgia, serif",
-            fontSize: 36,
-            fontWeight: 600,
-            color: COLORS.navy,
-            lineHeight: 1.05,
-            letterSpacing: "-0.02em",
-            marginBottom: 24,
-          }}>
-            {family.shortLabel}{" "}
-            <em style={{ color: COLORS.gold, fontWeight: 600 }}>{family.adjective}.</em>
-          </div>
+          {/* Archétype en GROS */}
+          <h1 style={{
+            fontSize: 52,
+            fontWeight: 500,
+            color: COLORS.ink,
+            lineHeight: 0.95,
+            margin: "0 0 6px",
+            letterSpacing: "-2.5px",
+          }}>{family.shortLabel}</h1>
 
-          {/* LE TWIST en gros — la phrase qui pique */}
+          {/* Adjectif */}
+          <p style={{
+            fontSize: 22,
+            color: COLORS.ink,
+            fontWeight: 500,
+            margin: "0 0 22px",
+            opacity: 0.7,
+            letterSpacing: "-0.5px",
+          }}>{family.adjective}.</p>
+
+          {/* Twist phrase */}
           <div style={{
-            paddingLeft: 14,
-            borderLeft: `3px solid ${COLORS.red}`,
-            marginBottom: 22,
+            background: COLORS.ink,
+            borderRadius: 16,
+            padding: "16px 18px",
           }}>
-            <div style={{
-              fontFamily: "ui-serif, Georgia, serif",
-              fontSize: 19,
+            <p style={{
+              fontSize: 15,
+              color: COLORS.white,
+              lineHeight: 1.45,
+              margin: 0,
               fontStyle: "italic",
-              color: COLORS.navy,
-              lineHeight: 1.4,
-              fontWeight: 500,
+              fontWeight: 400,
             }}>
               « {renderTwist(family.shareQuote)} »
-            </div>
-          </div>
-
-          {/* Footer signature */}
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            paddingTop: 16,
-            borderTop: `1px solid ${COLORS.border}`,
-            fontFamily: "ui-monospace, monospace",
-            fontSize: 10,
-            color: COLORS.textDim,
-            letterSpacing: "0.2em",
-            fontWeight: 600,
-          }}>
-            <span>Moi Président(e).FR</span>
-            <span style={{ color: COLORS.gold }}>#MOIPRESIDENT #MOIPRESIDENTE</span>
+            </p>
           </div>
         </div>
       </div>
 
-{/* Bouton de partage intelligent (mobile = Web Share / desktop = download) */}
+      {/* ═══ BOUTON PARTAGER ═══ */}
       <ShareButton shareCardRef={shareCardRef} family={family} />
 
-      {/* Boutons de partage direct sur réseaux sociaux */}
+      {/* ═══ BOUTONS SOCIAUX ═══ */}
       <SocialShareButtons family={family} />
 
-      {/* Carte 1080x1080 cachée pour la capture html2canvas */}
+      {/* ═══ CARTE 1080 CACHÉE ═══ */}
       <ShareCardImage family={family} dossiers={dossiers} shareCardRef={shareCardRef} />
 
-  {/* ═══ COMMUNAUTÉ ═══ */}
+      {/* ═══ STATS COMMUNAUTÉ ═══ */}
       <CommunityStats family={family} />
-        
-      <SubTag>Les conséquences à 90 jours</SubTag>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(110px, 1fr))", gap: 1, background: COLORS.border, marginBottom: 24 }}>
-        <Stat label="Dette / PIB" value={`${indicators.debt}%`} note={delta(indicators.debt - 115.6)} />
-        <Stat label="Confiance" value={`${indicators.confidence}%`} note={delta(indicators.confidence - 52)} />
-        <Stat label="Soutien AN" value={`${indicators.parliament}`} note={delta(indicators.parliament - 287)} />
-        <Stat label="Tension" value={`${indicators.tension}/10`} note={delta(indicators.tension - 4.2)} />
+
+      {/* ═══ INDICATEURS FINAUX ═══ */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        margin: "24px 4px 12px",
+      }}>LES CONSÉQUENCES À 90 JOURS</p>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(86px, 1fr))",
+        gap: 8,
+        marginBottom: 24,
+      }}>
+        {[
+          { label: "Dette/PIB", value: `${indicators.debt}%` },
+          { label: "Confiance", value: `${indicators.confidence}%` },
+          { label: "AN", value: `${indicators.parliament}` },
+          { label: "Tension", value: `${indicators.tension}/10` },
+          { label: "Spread", value: `${indicators.spread}pb` },
+        ].map((stat, i) => (
+          <div key={i} style={{
+            background: COLORS.white,
+            borderRadius: 14,
+            padding: "10px 8px",
+            textAlign: "center",
+          }}>
+            <p style={{
+              fontSize: 9,
+              color: COLORS.inkSoft,
+              fontWeight: 500,
+              letterSpacing: "1px",
+              margin: "0 0 4px",
+              textTransform: "uppercase",
+            }}>{stat.label}</p>
+            <p style={{
+              fontSize: 16,
+              color: COLORS.ink,
+              fontWeight: 700,
+              margin: 0,
+            }}>{stat.value}</p>
+          </div>
+        ))}
       </div>
 
-      <SubTag>Votre décision</SubTag>
+      {/* ═══ VOTRE DÉCISION ═══ */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        margin: "0 4px 12px",
+      }}>VOTRE DÉCISION</p>
       <div style={{ marginBottom: 24 }}>
         {dossiers.map((d, i) => {
           const c = choices[i];
           const sc = d.scenarios?.find(s => s.signature === c);
           return (
-            <div key={i} style={{ padding: "10px 14px", background: COLORS.bgPanel, border: `1px solid ${COLORS.border}`, borderLeft: `3px solid ${d.urgent ? COLORS.red : COLORS.gold}`, marginBottom: 6 }}>
-              <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 9, color: COLORS.textDim, letterSpacing: "0.1em", marginBottom: 3 }}>{d.day} · {d.urgent ? "CRISE" : "DOSSIER"}</div>
-              <div style={{ fontSize: 13, color: COLORS.navy, fontWeight: 600, marginBottom: 2 }}>{d.title}</div>
-              <div style={{ fontSize: 12, color: COLORS.textMuted, fontStyle: "italic" }}>→ {sc ? sc.title : "—"}</div>
+            <div key={i} style={{
+              background: COLORS.white,
+              borderRadius: 16,
+              padding: "14px 16px",
+              marginBottom: 8,
+              position: "relative",
+              overflow: "hidden",
+            }}>
+              <div style={{
+                position: "absolute",
+                left: 0, top: 0, bottom: 0,
+                width: 4,
+                background: archColor,
+              }} />
+              <p style={{
+                fontSize: 10,
+                color: COLORS.inkSoft,
+                fontWeight: 500,
+                letterSpacing: "1px",
+                margin: "0 0 4px 8px",
+              }}>{d.day} · LE DILEMME</p>
+              <p style={{
+                fontSize: 14,
+                color: COLORS.ink,
+                fontWeight: 500,
+                margin: "0 0 2px 8px",
+                lineHeight: 1.3,
+              }}>{d.title}</p>
+              <p style={{
+                fontSize: 13,
+                color: COLORS.inkSoft,
+                margin: "0 0 0 8px",
+                lineHeight: 1.35,
+                fontStyle: "italic",
+              }}>→ {sc ? sc.title : "—"}</p>
             </div>
           );
         })}
       </div>
 
-{/* ═══ BLOC PARTENAIRE NOUVELLE ÉNERGIE ═══ */}
-      <SubTag>Une autre manière de gouverner ?</SubTag>
+      {/* ═══ BLOC NOUVELLE ÉNERGIE ═══ */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        margin: "0 4px 12px",
+      }}>UNE AUTRE MANIÈRE DE GOUVERNER ?</p>
       <div style={{
-        background: COLORS.bgPanel,
-        border: `1px solid ${COLORS.border}`,
-        borderTop: `3px solid ${COLORS.gold}`,
-        padding: "24px 22px",
-        marginBottom: 26,
-        boxShadow: `0 2px 8px ${COLORS.navy}08`,
+        background: COLORS.white,
+        borderRadius: 22,
+        padding: "22px 22px",
+        marginBottom: 24,
+        boxShadow: "0 6px 20px rgba(20,18,26,0.18)",
       }}>
         <div style={{
           display: "flex",
           alignItems: "center",
           gap: 10,
-          marginBottom: 18,
+          marginBottom: 16,
           paddingBottom: 14,
-          borderBottom: `1px solid ${COLORS.border}`,
+          borderBottom: "1px solid rgba(20,18,26,0.08)",
         }}>
-          <span style={{
-            display: "inline-block",
-            width: 12,
-            height: 12,
+          <div style={{
+            width: 10,
+            height: 10,
             borderRadius: "50%",
-            border: `2px solid ${COLORS.gold}`,
-            background: "transparent",
+            background: COLORS.magenta,
           }} />
           <span style={{
-            fontFamily: "ui-monospace, monospace",
             fontSize: 11,
-            color: COLORS.gold,
-            letterSpacing: "0.2em",
+            color: COLORS.ink,
             fontWeight: 700,
-          }}>
-            NOUVELLE ÉNERGIE
-          </span>
+            letterSpacing: "1.5px",
+          }}>NOUVELLE ÉNERGIE</span>
         </div>
 
         {partnerLoading && (
-          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 0" }}>
             <div style={{
-              display: "inline-block",
               width: 18,
               height: 18,
-              border: `2px solid ${COLORS.border}`,
-              borderTopColor: COLORS.gold,
+              border: `2px solid ${COLORS.inkSoft}40`,
+              borderTopColor: COLORS.magenta,
               borderRadius: "50%",
               animation: "spin 1s linear infinite",
             }} />
-            <span style={{ fontSize: 13, color: COLORS.textMuted, fontStyle: "italic" }}>
+            <span style={{ fontSize: 13, color: COLORS.inkSoft, fontStyle: "italic" }}>
               Nouvelle Énergie analyse votre mandat...
             </span>
           </div>
@@ -2047,33 +2121,33 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             {partnerError && (
               <div style={{
                 padding: "8px 12px",
-                background: `${COLORS.yellow}15`,
-                border: `1px solid ${COLORS.yellow}40`,
+                background: "rgba(255,46,147,0.08)",
+                borderRadius: 10,
                 fontSize: 10,
-                color: COLORS.yellow,
-                marginBottom: 14,
-                fontFamily: "ui-monospace, monospace",
-                letterSpacing: "0.1em",
+                color: COLORS.magenta,
+                marginBottom: 12,
+                fontWeight: 500,
+                letterSpacing: "0.5px",
               }}>
-                ⚠ TEXTE DE SECOURS — GÉNÉRATION IA INDISPONIBLE
+                ⚠ Texte de secours · génération IA indisponible
               </div>
             )}
-            <div style={{
-              fontFamily: "ui-serif, Georgia, serif",
-              fontSize: 14.5,
-              color: COLORS.text,
-              lineHeight: 1.7,
+            <p style={{
+              fontSize: 14,
+              color: COLORS.ink,
+              lineHeight: 1.6,
+              margin: 0,
               whiteSpace: "pre-line",
             }}>
               {partnerSummary}
-            </div>
+            </p>
           </>
         )}
 
         <div style={{
-          marginTop: 22,
-          paddingTop: 18,
-          borderTop: `1px solid ${COLORS.border}`,
+          marginTop: 18,
+          paddingTop: 16,
+          borderTop: "1px solid rgba(20,18,26,0.08)",
           display: "flex",
           flexDirection: "column",
           gap: 8,
@@ -2084,23 +2158,71 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         </div>
       </div>
 
-    {/* ═══ BLOC OPT-IN EMAIL ═══ */}
-      <SubTag>◊ Recevoir le dilemme du jour</SubTag>
+      {/* ═══ OPT-IN EMAIL ═══ */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        margin: "0 4px 12px",
+      }}>◊ RECEVOIR LE DILEMME DU JOUR</p>
       <OptInForm sessionId={sessionId} family={family} />
 
-    {/* ═══ BLOC QR CODE NOUVELLE ÉNERGIE ═══ */}
-      <SubTag>Découvrir Nouvelle Énergie</SubTag>
+      {/* ═══ QR CODE NOUVELLE ÉNERGIE ═══ */}
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
+        margin: "0 4px 12px",
+      }}>DÉCOUVRIR NOUVELLE ÉNERGIE</p>
       <NouvelleEnergieQRBlock />
-          
-      <BigButton onClick={onRestart}>Décider à nouveau↗</BigButton>
 
-      <div style={{ marginTop: 24, padding: 16, background: `${COLORS.gold}08`, border: `1px solid ${COLORS.gold}30`, borderLeft: `3px solid ${COLORS.gold}` }}>
-        <div style={{ fontFamily: "ui-monospace, monospace", fontSize: 10, color: COLORS.gold, letterSpacing: "0.2em", marginBottom: 8, fontWeight: 600 }}>◊ PROTOTYPE — VERSION DE DÉMONSTRATION</div>
-        <p style={{ fontSize: 13, color: COLORS.text, lineHeight: 1.65, margin: 0 }}>
-          Chaque dilemme est généré en temps réel par Claude. Revenez demain pour un nouveau dilemme. La version complète proposera un dilemme quotidien partagé par toute la communauté, avec statistiques collectives.
+      {/* ═══ BOUTON REJOUER ═══ */}
+      <button onClick={onRestart} style={{
+        width: "100%",
+        background: COLORS.lime,
+        color: COLORS.ink,
+        border: "none",
+        borderRadius: 18,
+        padding: "20px 24px",
+        fontSize: 17,
+        fontWeight: 500,
+        cursor: "pointer",
+        fontFamily: "'Inter', system-ui, sans-serif",
+        boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
+        transition: "transform 0.15s ease",
+        marginBottom: 20,
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}>
+        Un autre dilemme →
+      </button>
+
+      {/* ═══ DISCLAIMER PROTOTYPE ═══ */}
+      <div style={{
+        background: "rgba(255,255,255,0.12)",
+        backdropFilter: "blur(8px)",
+        borderRadius: 16,
+        padding: "14px 16px",
+      }}>
+        <p style={{
+          fontSize: 10,
+          color: COLORS.lime,
+          fontWeight: 700,
+          letterSpacing: "1.5px",
+          margin: "0 0 6px",
+        }}>◊ PROTOTYPE</p>
+        <p style={{
+          fontSize: 12,
+          color: COLORS.whiteSoft,
+          lineHeight: 1.5,
+          margin: 0,
+        }}>
+          Chaque dilemme est généré en temps réel par IA. Revenez demain pour un nouveau dilemme. La version complète proposera un dilemme quotidien partagé par toute la communauté.
         </p>
       </div>
-    </Section>
+    </div>
   );
 }
 
