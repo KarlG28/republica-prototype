@@ -2434,37 +2434,29 @@ function PartnerCTA({ href, label, primary }) {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: "12px 16px",
-      border: `1px solid ${primary ? COLORS.gold : COLORS.border}`,
-      background: primary ? `${COLORS.gold}08` : "transparent",
-      color: primary ? COLORS.gold : COLORS.navy,
+      padding: "14px 16px",
+      borderRadius: 14,
+      background: primary ? COLORS.magenta : "rgba(255,46,147,0.08)",
+      color: primary ? COLORS.white : COLORS.ink,
       textDecoration: "none",
-      fontSize: 13.5,
-      fontWeight: 600,
-      transition: "all 0.15s",
+      fontSize: 14,
+      fontWeight: 500,
+      transition: "transform 0.15s",
     }}
     onMouseEnter={(e) => {
-      e.currentTarget.style.background = primary ? `${COLORS.gold}15` : `${COLORS.gold}06`;
-      e.currentTarget.style.borderColor = COLORS.gold;
-      e.currentTarget.style.color = COLORS.gold;
+      e.currentTarget.style.transform = "translateY(-2px)";
     }}
     onMouseLeave={(e) => {
-      e.currentTarget.style.background = primary ? `${COLORS.gold}08` : "transparent";
-      e.currentTarget.style.borderColor = primary ? COLORS.gold : COLORS.border;
-      e.currentTarget.style.color = primary ? COLORS.gold : COLORS.navy;
+      e.currentTarget.style.transform = "translateY(0)";
     }}>
       <span>{label}</span>
       <span style={{ fontSize: 16 }}>→</span>
     </a>
   );
 }
-
-// ============================================================
-// COMPOSANT OPT-IN EMAIL
-// ============================================================
 function OptInForm({ sessionId, family }) {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | loading | success | error
+  const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e) => {
@@ -2502,70 +2494,67 @@ function OptInForm({ sessionId, family }) {
   if (status === "success") {
     return (
       <div style={{
-        background: `${COLORS.green}08`,
-        border: `1px solid ${COLORS.green}40`,
-        borderLeft: `3px solid ${COLORS.green}`,
+        background: COLORS.lime,
+        borderRadius: 22,
         padding: "20px 22px",
-        marginBottom: 26,
+        marginBottom: 24,
       }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 10,
-          color: COLORS.green,
-          letterSpacing: "0.2em",
+        <p style={{
+          fontSize: 11,
+          color: COLORS.ink,
           fontWeight: 700,
-          marginBottom: 10,
+          letterSpacing: "1.5px",
+          margin: "0 0 8px",
+        }}>◊ INSCRIT</p>
+        <p style={{
+          fontSize: 17,
+          color: COLORS.ink,
+          fontWeight: 500,
+          lineHeight: 1.35,
+          margin: "0 0 6px",
+          letterSpacing: "-0.3px",
         }}>
-          ◊ ENREGISTRÉ
-        </div>
-        <div style={{
-          fontFamily: "ui-serif, Georgia, serif",
-          fontSize: 16,
-          color: COLORS.navy,
-          lineHeight: 1.55,
-          marginBottom: 6,
-          fontWeight: 600,
-        }}>
-          Votre bilan vous attendra dans votre boîte mail.
-        </div>
-        <div style={{
+          Le dilemme arrivera chaque matin dans votre boîte mail.
+        </p>
+        <p style={{
           fontSize: 13,
-          color: COLORS.textMuted,
-          lineHeight: 1.55,
+          color: COLORS.ink,
+          opacity: 0.75,
+          lineHeight: 1.5,
+          margin: 0,
         }}>
-          Vous recevrez votre profil de président et l'analyse détaillée de votre mandat. Vos données restent confidentielles.
-        </div>
+          Vos données restent confidentielles. Pas de spam, jamais.
+        </p>
       </div>
     );
   }
 
   return (
     <div style={{
-      background: COLORS.bgPanel,
-      border: `1px solid ${COLORS.border}`,
-      borderLeft: `3px solid ${COLORS.gold}`,
-      padding: "20px 22px",
-      marginBottom: 26,
-      boxShadow: `0 2px 6px ${COLORS.navy}06`,
+      background: COLORS.white,
+      borderRadius: 22,
+      padding: "22px 22px",
+      marginBottom: 24,
+      boxShadow: "0 6px 20px rgba(20,18,26,0.18)",
     }}>
-      <div style={{
-        fontFamily: "ui-serif, Georgia, serif",
-        fontSize: 16,
-        color: COLORS.navy,
-        lineHeight: 1.5,
-        marginBottom: 14,
-        fontWeight: 600,
+      <p style={{
+        fontSize: 18,
+        color: COLORS.ink,
+        fontWeight: 500,
+        lineHeight: 1.3,
+        margin: "0 0 8px",
+        letterSpacing: "-0.4px",
       }}>
-        Recevez chaque jour une décision à prendre pour la France.
-      </div>
-      <div style={{
+        Recevoir le dilemme chaque matin
+      </p>
+      <p style={{
         fontSize: 13,
-        color: COLORS.textMuted,
-        lineHeight: 1.55,
-        marginBottom: 18,
+        color: COLORS.inkSoft,
+        lineHeight: 1.5,
+        margin: "0 0 16px",
       }}>
-        Votre famille politique, vos décisions, vos indicateurs finaux et une analyse de votre mandat.
-      </div>
+        Un nouveau dilemme dans votre boîte chaque matin. Plus votre analyse personnalisée.
+      </p>
 
       <form onSubmit={handleSubmit}>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -2577,61 +2566,76 @@ function OptInForm({ sessionId, family }) {
             disabled={status === "loading"}
             style={{
               width: "100%",
-              padding: "14px 16px",
-              background: "#fff",
-              border: `1px solid ${status === "error" ? COLORS.red : COLORS.border}`,
-              fontFamily: "system-ui, -apple-system, sans-serif",
-              fontSize: 14,
-              color: COLORS.navy,
+              padding: "16px 18px",
+              background: "rgba(20,18,26,0.04)",
+              border: `2px solid ${status === "error" ? COLORS.magenta : "transparent"}`,
+              borderRadius: 14,
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: 15,
+              color: COLORS.ink,
               outline: "none",
-              transition: "border-color 0.15s",
+              transition: "border-color 0.15s, background 0.15s",
+              boxSizing: "border-box",
             }}
-            onFocus={(e) => { e.currentTarget.style.borderColor = COLORS.navy; }}
-            onBlur={(e) => { e.currentTarget.style.borderColor = status === "error" ? COLORS.red : COLORS.border; }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = COLORS.magenta;
+              e.currentTarget.style.background = COLORS.white;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = status === "error" ? COLORS.magenta : "transparent";
+              e.currentTarget.style.background = "rgba(20,18,26,0.04)";
+            }}
           />
           <button
             type="submit"
             disabled={status === "loading"}
             style={{
               width: "100%",
-              padding: "14px 18px",
-              background: COLORS.navy,
+              padding: "16px 20px",
+              background: COLORS.ink,
               border: "none",
-              color: COLORS.textOnDark,
-              fontFamily: "ui-monospace, monospace",
-              fontSize: 12,
-              letterSpacing: "0.2em",
+              color: COLORS.lime,
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: 15,
+              fontWeight: 500,
               cursor: status === "loading" ? "wait" : "pointer",
-              textTransform: "uppercase",
-              fontWeight: 600,
+              borderRadius: 14,
               opacity: status === "loading" ? 0.6 : 1,
-              transition: "all 0.2s",
+              transition: "transform 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              if (status !== "loading") e.currentTarget.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
             }}
           >
-            {status === "loading" ? "Enregistrement..." : "Recevoir le dilemme par email →"}
+            {status === "loading" ? "Enregistrement..." : "S'inscrire →"}
           </button>
         </div>
       </form>
 
       {status === "error" && errorMsg && (
-        <div style={{
+        <p style={{
           marginTop: 10,
           fontSize: 12,
-          color: COLORS.red,
+          color: COLORS.magenta,
           fontStyle: "italic",
+          margin: "10px 0 0",
         }}>
           {errorMsg}
-        </div>
+        </p>
       )}
 
-      <div style={{
+      <p style={{
         marginTop: 12,
         fontSize: 11,
-        color: COLORS.textDim,
+        color: COLORS.inkSoft,
         fontStyle: "italic",
+        margin: "12px 0 0",
       }}>
         Vos données restent confidentielles. Pas de spam, jamais.
-      </div>
+      </p>
     </div>
   );
 }
@@ -2641,27 +2645,27 @@ function OptInForm({ sessionId, family }) {
 // ============================================================
 function NouvelleEnergieQRBlock() {
   const url = "https://www.unenouvelleenergie.fr/";
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=0a1a3a&bgcolor=ffffff&margin=10`;
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=14121A&bgcolor=ffffff&margin=10`;
 
   return (
     <div style={{
-      background: COLORS.bgPanel,
-      border: `1px solid ${COLORS.border}`,
-      borderTop: `3px solid ${COLORS.gold}`,
+      background: COLORS.white,
+      borderRadius: 22,
       padding: "22px 22px",
-      marginBottom: 26,
+      marginBottom: 24,
       display: "flex",
-      gap: 20,
+      gap: 18,
       alignItems: "center",
-      boxShadow: `0 2px 8px ${COLORS.navy}08`,
+      boxShadow: "0 6px 20px rgba(20,18,26,0.18)",
     }}>
       <div style={{
         flexShrink: 0,
-        width: 110,
-        height: 110,
-        background: "#fff",
+        width: 100,
+        height: 100,
+        background: COLORS.white,
         padding: 4,
-        border: `1px solid ${COLORS.border}`,
+        borderRadius: 12,
+        border: `2px solid ${COLORS.magenta}`,
       }}>
         <img
           src={qrUrl}
@@ -2672,37 +2676,35 @@ function NouvelleEnergieQRBlock() {
         />
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
+        <p style={{
           fontSize: 10,
-          color: COLORS.gold,
-          letterSpacing: "0.2em",
+          color: COLORS.magenta,
+          letterSpacing: "1.5px",
           fontWeight: 700,
-          marginBottom: 6,
+          margin: "0 0 6px",
         }}>
           NOUVELLE ÉNERGIE
-        </div>
-        <div style={{
-          fontFamily: "ui-serif, Georgia, serif",
+        </p>
+        <p style={{
           fontSize: 16,
-          color: COLORS.navy,
-          lineHeight: 1.4,
-          marginBottom: 8,
-          fontWeight: 600,
+          color: COLORS.ink,
+          lineHeight: 1.35,
+          margin: "0 0 8px",
+          fontWeight: 500,
+          letterSpacing: "-0.3px",
         }}>
           Scannez pour découvrir notre vision.
-        </div>
-
-        <a
+        </p>
+        
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => track("cta_clicked", { label: "QR site Nouvelle Énergie" })}
           style={{
             fontSize: 12,
-            color: COLORS.gold,
+            color: COLORS.magenta,
             textDecoration: "underline",
-            fontWeight: 600,
+            fontWeight: 500,
           }}
         >
           unenouvelleenergie.fr →
@@ -2818,14 +2820,10 @@ function ShareCardImage({ family, dossiers, shareCardRef }) {
   );
 }
 
-// ============================================================
-// BOUTON DE PARTAGE INTELLIGENT (mobile = Web Share, desktop = download)
-// ============================================================
 function ShareButton({ shareCardRef, family }) {
-  const [status, setStatus] = useState("idle"); // idle | generating | success | error
+  const [status, setStatus] = useState("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Détection mobile pour décider Web Share vs download
   const isMobile = typeof navigator !== "undefined" && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const handleClick = async () => {
@@ -2834,7 +2832,6 @@ function ShareButton({ shareCardRef, family }) {
     setErrorMsg("");
 
     try {
-      // Charger html2canvas dynamiquement (depuis CDN)
       if (typeof window.html2canvas === "undefined") {
         await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
       }
@@ -2845,28 +2842,26 @@ function ShareButton({ shareCardRef, family }) {
 
       const canvas = await window.html2canvas(shareCardRef.current, {
         backgroundColor: "#fafaf7",
-        scale: 1, // déjà en 1080px natif
+        scale: 1,
         useCORS: true,
         allowTaint: false,
         logging: false,
       });
 
-      // Convertir en blob
       const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png", 0.95));
       if (!blob) throw new Error("Impossible de générer l'image");
 
       const fileName = `moi-president-${family.shortLabel.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
-      // Sur mobile : tenter Web Share API
+
       if (isMobile && navigator.share && navigator.canShare && navigator.canShare({ files: [new File([blob], fileName, { type: "image/png" })] })) {
         const file = new File([blob], fileName, { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: "Mon choix",
+          title: "Mon dilemme du jour sur Moi Président(e)",
           text: `J'ai tranché en ${family.shortLabel} ${family.adjective}. Et toi ?`,
         });
         track("share_card_shared", { mode: "native", family: family.shortLabel });
       } else {
-        // Sur desktop ou si Web Share indisponible : download direct
         const dataUrl = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = dataUrl;
@@ -2881,7 +2876,6 @@ function ShareButton({ shareCardRef, family }) {
       setStatus("success");
       setTimeout(() => setStatus("idle"), 2500);
     } catch (err) {
-      // Web Share annulé par l'utilisateur ≠ erreur
       if (err && err.name === "AbortError") {
         setStatus("idle");
         return;
@@ -2898,33 +2892,49 @@ function ShareButton({ shareCardRef, family }) {
     isMobile ? "Partager ma carte" : "Télécharger ma carte";
 
   return (
-    <div style={{ marginBottom: 24 }}>
+    <div style={{ marginBottom: 16 }}>
       <button
         onClick={handleClick}
         disabled={status === "generating"}
         style={{
           width: "100%",
-          padding: "16px 22px",
-          background: status === "success" ? "#3a7a4a" : "#e63946",
+          padding: "18px 22px",
+          background: status === "success" ? "#3ACB72" : COLORS.white,
           border: "none",
-          color: "#fafaf7",
-          fontFamily: "ui-monospace, monospace",
-          fontSize: 13,
-          letterSpacing: "0.2em",
+          borderRadius: 18,
+          color: COLORS.ink,
+          fontFamily: "'Inter', system-ui, sans-serif",
+          fontSize: 16,
+          fontWeight: 500,
           cursor: status === "generating" ? "wait" : "pointer",
-          textTransform: "uppercase",
-          fontWeight: 700,
           opacity: status === "generating" ? 0.7 : 1,
-          transition: "all 0.2s",
-          boxShadow: `0 4px 12px rgba(230,57,70,0.3)`,
+          transition: "transform 0.15s ease, box-shadow 0.15s ease",
+          boxShadow: "0 4px 20px rgba(255,255,255,0.2)",
+          letterSpacing: "-0.2px",
+        }}
+        onMouseEnter={(e) => {
+          if (status !== "generating") {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 6px 28px rgba(255,255,255,0.3)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow = "0 4px 20px rgba(255,255,255,0.2)";
         }}
       >
         {label} {status === "idle" && "↗"}
       </button>
       {status === "error" && errorMsg && (
-        <div style={{ marginTop: 8, fontSize: 12, color: "#a83232", fontStyle: "italic", textAlign: "center" }}>
+        <p style={{
+          marginTop: 8,
+          fontSize: 12,
+          color: COLORS.lime,
+          fontStyle: "italic",
+          textAlign: "center"
+        }}>
           {errorMsg}
-        </div>
+        </p>
       )}
     </div>
   );
@@ -3099,18 +3109,13 @@ function Carousel({ children, cardWidthPct = 88, cardMaxWidth = 360 }) {
   );
 }
 
-// ============================================================
-// BOUTONS DE PARTAGE SUR RÉSEAUX SOCIAUX
-// ============================================================
 function SocialShareButtons({ family }) {
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "https://republica-prototype.vercel.app";
 
-  // Construire le message
   const familyInclusive = genderInclusive(family.shortLabel);
   const adjectiveInclusive = genderInclusive(family.adjective);
   const message = `J'ai tranché le dilemme du jour en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
 
-  // URLs des partages
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${siteUrl}`)}`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(siteUrl)}`;
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(siteUrl)}&quote=${encodeURIComponent(message)}`;
@@ -3122,103 +3127,55 @@ function SocialShareButtons({ family }) {
   };
 
   return (
-    <div style={{ marginBottom: 26 }}>
-      <div style={{
-        fontFamily: "ui-monospace, monospace",
-        fontSize: 10,
-        color: COLORS.textMuted,
-        letterSpacing: "0.2em",
-        fontWeight: 600,
-        marginBottom: 10,
+    <div style={{ marginBottom: 24 }}>
+      <p style={{
+        fontSize: 11,
+        color: COLORS.whiteSoft,
+        fontWeight: 500,
+        letterSpacing: "2px",
         textAlign: "center",
-      }}>
-        ◊ PARTAGER DIRECTEMENT
-      </div>
+        margin: "0 0 12px",
+      }}>OU PARTAGER DIRECTEMENT</p>
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(2, 1fr)",
+        gridTemplateColumns: "repeat(4, 1fr)",
         gap: 8,
       }}>
-        <SocialButton
-          label="WhatsApp"
-          icon="W"
-          bg="#25D366"
-          onClick={() => handleClick("whatsapp", whatsappUrl)}
-        />
-        <SocialButton
-          label="X / Twitter"
-          icon="X"
-          bg="#000"
-          onClick={() => handleClick("twitter", twitterUrl)}
-        />
-        <SocialButton
-          label="Facebook"
-          icon="f"
-          bg="#1877F2"
-          onClick={() => handleClick("facebook", facebookUrl)}
-        />
-        <SocialButton
-          label="LinkedIn"
-          icon="in"
-          bg="#0A66C2"
-          onClick={() => handleClick("linkedin", linkedinUrl)}
-        />
-      </div>
-      <div style={{
-        marginTop: 10,
-        fontSize: 11,
-        color: COLORS.textDim,
-        fontStyle: "italic",
-        textAlign: "center",
-      }}>
-        Le message est pré-rempli. Vous validez avant l'envoi.
+        <SocialButton icon="W" bg="#25D366" onClick={() => handleClick("whatsapp", whatsappUrl)} />
+        <SocialButton icon="X" bg="#000000" onClick={() => handleClick("twitter", twitterUrl)} />
+        <SocialButton icon="f" bg="#1877F2" onClick={() => handleClick("facebook", facebookUrl)} />
+        <SocialButton icon="in" bg="#0A66C2" onClick={() => handleClick("linkedin", linkedinUrl)} />
       </div>
     </div>
   );
 }
 
-function SocialButton({ label, icon, bg, onClick }) {
+function SocialButton({ icon, bg, onClick }) {
   return (
     <button
       onClick={onClick}
       style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        padding: "12px 14px",
         background: bg,
         border: "none",
         color: "#fff",
-        fontFamily: "system-ui, -apple-system, sans-serif",
-        fontSize: 13,
-        fontWeight: 600,
+        fontFamily: "'Inter', system-ui, sans-serif",
+        fontSize: 18,
+        fontWeight: 700,
         cursor: "pointer",
-        transition: "transform 0.15s, box-shadow 0.15s",
+        borderRadius: 16,
+        padding: "16px 8px",
+        transition: "transform 0.15s ease, box-shadow 0.15s ease",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-1px)";
-        e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.15)";
+        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,0,0,0.25)";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      <span style={{
-        width: 22,
-        height: 22,
-        borderRadius: "50%",
-        background: "rgba(255,255,255,0.2)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 12,
-        fontWeight: 800,
-      }}>
-        {icon}
-      </span>
-      {label}
+      {icon}
     </button>
   );
 }
@@ -3228,7 +3185,7 @@ function SocialButton({ label, icon, bg, onClick }) {
 // Affiche le % de joueurs partageant la même famille politique
 // ============================================================
 function CommunityStats({ family }) {
-  const [status, setStatus] = useState("loading"); // loading | ready | not_enough | error
+  const [status, setStatus] = useState("loading");
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
@@ -3265,48 +3222,39 @@ function CommunityStats({ family }) {
     return () => { cancelled = true; };
   }, [family.shortLabel]);
 
-  // Pendant le chargement, on n'affiche rien (évite un flicker)
   if (status === "loading") return null;
-  // En cas d'erreur silencieuse (on ne casse pas l'expérience)
   if (status === "error") return null;
 
-  // Pas assez de sessions : message d'invitation
   if (status === "not_enough") {
     return (
       <div style={{
-        background: `${COLORS.gold}08`,
-        border: `1px solid ${COLORS.gold}30`,
-        borderLeft: `3px solid ${COLORS.gold}`,
-        padding: "16px 20px",
-        marginBottom: 26,
+        background: "rgba(255,255,255,0.15)",
+        backdropFilter: "blur(8px)",
+        borderRadius: 18,
+        padding: "16px 18px",
+        marginBottom: 22,
       }}>
-        <div style={{
-          fontFamily: "ui-monospace, monospace",
+        <p style={{
           fontSize: 10,
-          color: COLORS.gold,
-          letterSpacing: "0.2em",
+          color: COLORS.lime,
           fontWeight: 700,
-          marginBottom: 6,
-        }}>
-          ◊ COMMUNAUTÉ
-        </div>
-        <div style={{
-          fontFamily: "ui-serif, Georgia, serif",
+          letterSpacing: "1.5px",
+          margin: "0 0 6px",
+        }}>◊ COMMUNAUTÉ</p>
+        <p style={{
           fontSize: 14,
-          color: COLORS.navy,
-          lineHeight: 1.55,
-          fontStyle: "italic",
+          color: COLORS.white,
+          lineHeight: 1.5,
+          margin: 0,
         }}>
-          Pas encore assez de joueurs pour comparer. <strong style={{ fontStyle: "normal" }}>Partagez Moi Président(e)</strong> pour faire grandir la communauté.
-        </div>
+          Pas encore assez de joueurs pour comparer. <span style={{ fontWeight: 500 }}>Partagez Moi Président(e)</span> pour faire grandir la communauté.
+        </p>
       </div>
     );
   }
 
-  // Stats prêtes
-  const { pct, total, familyCount } = stats;
+  const { pct, total } = stats;
 
-  // Adjectif accordé selon la rareté
   let rarity = "";
   if (pct >= 30) rarity = "C'est l'un des profils les plus fréquents.";
   else if (pct >= 15) rarity = "Un profil courant.";
@@ -3315,44 +3263,42 @@ function CommunityStats({ family }) {
 
   return (
     <div style={{
-      background: `${COLORS.navy}05`,
-      border: `1px solid ${COLORS.navy}20`,
-      borderLeft: `3px solid ${COLORS.navy}`,
-      padding: "18px 20px",
-      marginBottom: 26,
+      background: "rgba(255,255,255,0.15)",
+      backdropFilter: "blur(8px)",
+      borderRadius: 18,
+      padding: "16px 18px",
+      marginBottom: 22,
     }}>
-      <div style={{
-        fontFamily: "ui-monospace, monospace",
+      <p style={{
         fontSize: 10,
-        color: COLORS.navy,
-        letterSpacing: "0.2em",
+        color: COLORS.lime,
         fontWeight: 700,
-        marginBottom: 10,
-      }}>
-        ◊ VOTRE PROFIL DANS LA COMMUNAUTÉ
-      </div>
-      <div style={{
-        fontFamily: "ui-serif, Georgia, serif",
+        letterSpacing: "1.5px",
+        margin: "0 0 10px",
+      }}>◊ DANS LA COMMUNAUTÉ</p>
+      <p style={{
         fontSize: 17,
-        color: COLORS.navy,
-        lineHeight: 1.5,
-        marginBottom: 8,
-        fontWeight: 600,
+        color: COLORS.white,
+        lineHeight: 1.4,
+        margin: "0 0 8px",
+        fontWeight: 500,
+        letterSpacing: "-0.3px",
       }}>
-        Vous êtes <span style={{ color: COLORS.gold }}>{family.shortLabel} {family.adjective}</span>, comme <span style={{
-          color: COLORS.red,
+        Vous êtes <span style={{ color: COLORS.lime }}>{family.shortLabel} {family.adjective}</span>, comme <span style={{
+          color: COLORS.lime,
           fontWeight: 700,
           fontSize: 22,
         }}>{pct}%</span> des joueurs.
-      </div>
-      <div style={{
-        fontSize: 13,
-        color: COLORS.textMuted,
-        lineHeight: 1.55,
+      </p>
+      <p style={{
+        fontSize: 12,
+        color: COLORS.whiteSoft,
+        lineHeight: 1.5,
+        margin: 0,
         fontStyle: "italic",
       }}>
-        {rarity} Calcul sur {total} mandats joués.
-      </div>
+        {rarity} Sur {total} parties jouées.
+      </p>
     </div>
   );
 }
