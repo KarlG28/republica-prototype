@@ -2695,7 +2695,7 @@ function NouvelleEnergieQRBlock() {
         }}>
           Scannez pour découvrir notre vision.
         </p>
-        
+        <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
