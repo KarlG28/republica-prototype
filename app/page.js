@@ -744,7 +744,7 @@ function Welcome({ onContinue }) {
         marginBottom: 22,
         marginLeft: 8,
       }}>
-        <span style={{ color: COLORS.ink, fontSize: 13, fontWeight: 500 }}>⚡ Nouveau dilemme</span>
+        <span style={{ color: COLORS.ink, fontSize: 13, fontWeight: 500 }}>⚡ Le dossier chaud du jour</span>
       </div>
 
       {/* Titre principal */}
@@ -762,16 +762,15 @@ function Welcome({ onContinue }) {
       </h1>
 
       {/* Sous-titre */}
-      <p style={{
+            <p style={{
         fontSize: 17,
         color: COLORS.whiteSoft,
         lineHeight: 1.5,
         margin: "0 0 40px",
         padding: "0 8px",
-        maxWidth: 340,
+        maxWidth: 360,
       }}>
-        Trois voies. Aucune satisfaisante.<br/>
-        Vous êtes Président de la République.
+        Vous avez remporté l'élection présidentielle. Pas le temps de niaiser, il est déjà l'heure de bosser.
       </p>
 
       {/* Stats du jour */}
@@ -869,7 +868,7 @@ function Header({ section, currentIdx, total }) {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ display: "inline-block", width: 7, height: 7, background: COLORS.gold, borderRadius: "50%" }}></span>
-          <span style={{ color: COLORS.navy, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>Moi Président(e) V2 </span>
+          <span style={{ color: COLORS.navy, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>Moi Président(e) </span>
         </div>
         <span style={{ color: COLORS.textDim, fontFamily: "ui-monospace, monospace", fontSize: 10, letterSpacing: "0.1em" }}>{stepLabel}</span>
       </div>
@@ -932,43 +931,28 @@ function Footer() {
 function Intro({ onStart }) {
   return (
     <div style={{ padding: "20px 4px 40px" }}>
-      {/* Badge */}
-      <div style={{
-        background: "rgba(255,255,255,0.15)",
-        backdropFilter: "blur(8px)",
-        borderRadius: 32,
-        padding: "8px 16px",
-        display: "inline-block",
-        marginBottom: 24,
-        marginLeft: 4,
-      }}>
-        <span style={{ color: COLORS.white, fontSize: 12, fontWeight: 500, letterSpacing: "1px" }}>AVANT D'ENTRER</span>
-      </div>
-
-      {/* Titre principal */}
+            {/* Titre principal */}
       <h1 style={{
-        fontSize: 38,
+        fontSize: 44,
         fontWeight: 500,
         color: COLORS.white,
         lineHeight: 1.05,
-        margin: "0 0 24px",
+        margin: "20px 0 24px",
         letterSpacing: "-1.5px",
         padding: "0 4px",
       }}>
-        Vous arrivez<br/>
-        dans le bureau<br/>
-        <span style={{ color: COLORS.lime }}>présidentiel.</span>
+        <span style={{ color: COLORS.lime }}>Installez-vous.</span>
       </h1>
 
       {/* Texte intro */}
-      <p style={{
+       <p style={{
         fontSize: 16,
         color: COLORS.whiteSoft,
         lineHeight: 1.55,
         margin: "0 0 28px",
         padding: "0 4px",
       }}>
-        Sur la table, un dossier. Une décision à prendre, vite. Trois voies sont possibles, aucune n'est satisfaisante. Vous allez devoir trancher comme un Président.
+        Vos équipes n'ont pas dormi : elles ont planché sur un sujet chaud et vous proposent des solutions. À vous de trancher. Vous ne ferez pas que des heureux...
       </p>
 
       {/* Card "Comment ça se passe" */}
@@ -1000,9 +984,9 @@ function Intro({ onStart }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {[
-            { n: "1", text: "Vous lirez le contexte et les positions des acteurs" },
-            { n: "2", text: "Vous choisirez entre trois voies, chacune avec son prix" },
-            { n: "3", text: "Vous verrez les conséquences se déployer sur 90 jours" },
+            { n: "1", text: "Prenez connaissance du contexte" },
+            { n: "2", text: "Choisissez entre trois solutions" },
+            { n: "3", text: "Observez les conséquences de votre décision" },
           ].map((step, i) => (
             <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
               <div style={{
@@ -1039,7 +1023,7 @@ function Intro({ onStart }) {
         padding: "0 4px",
         fontStyle: "italic",
       }}>
-        Simulation IA produite par Nouvelle Énergie. Conséquences générées par IA. <span style={{ color: COLORS.white, fontStyle: "normal", fontWeight: 500 }}>Aucune partie n'est identique.</span>
+        Simulation IA. Conséquences générées par IA. <span style={{ color: COLORS.white, fontStyle: "normal", fontWeight: 500 }}>Aucune partie n'est identique.</span>
       </p>
 
       {/* CTA principal */}
