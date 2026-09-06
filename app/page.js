@@ -1705,10 +1705,9 @@ function ConsequenceView({ dossier, choice, indicators, isLast, onContinue }) {
         gap: 6,
         marginBottom: 24,
       }}>
-        {[
+                {[
           { label: "Dette", value: `${indicators.debt}%` },
           { label: "Confiance", value: `${indicators.confidence}%` },
-          { label: "AN", value: `${indicators.parliament}` },
           { label: "Tension", value: `${indicators.tension}/10` },
           { label: "Spread", value: `${indicators.spread}` },
         ].map((stat, i) => (
@@ -1977,10 +1976,9 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         gap: 8,
         marginBottom: 24,
       }}>
-        {[
+          {[
           { label: "Dette/PIB", value: `${indicators.debt}%` },
           { label: "Confiance", value: `${indicators.confidence}%` },
-          { label: "AN", value: `${indicators.parliament}` },
           { label: "Tension", value: `${indicators.tension}/10` },
           { label: "Spread", value: `${indicators.spread}pb` },
         ].map((stat, i) => (
