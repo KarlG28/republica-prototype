@@ -1291,10 +1291,11 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
                   borderRadius: 14,
                   fontWeight: 500,
                 }}>{a.name}</span>
-              ))}
+                           ))}
             </div>
           </div>
         )}
+      </div>
 
       {/* ═══ Instruction de jeu ═══ */}
       <div style={{
