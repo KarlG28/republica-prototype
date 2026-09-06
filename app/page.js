@@ -744,7 +744,7 @@ function Welcome({ onContinue }) {
         marginBottom: 22,
         marginLeft: 8,
       }}>
-        <span style={{ color: COLORS.ink, fontSize: 13, fontWeight: 500 }}>⚡ Le dossier chaud du jour</span>
+        <span style={{ color: COLORS.ink, fontSize: 13, fontWeight: 500 }}>⚡ JOUEZ</span>
       </div>
 
       {/* Titre principal */}
@@ -757,7 +757,7 @@ function Welcome({ onContinue }) {
         letterSpacing: "-2px",
         padding: "0 8px",
       }}>
-        Le sujet chaud<br/>
+        Le dossier chaud<br/>
         <span style={{ color: COLORS.lime }}>du jour.</span>
       </h1>
 
