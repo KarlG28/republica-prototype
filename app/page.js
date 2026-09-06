@@ -735,7 +735,7 @@ function Welcome({ onContinue }) {
         }}>{today}</span>
       </div>
 
-      {/* Badge nouveau dilemme */}
+      {/* Badge nouveau sujet */}
       <div style={{
         background: COLORS.lime,
         borderRadius: 32,
@@ -757,7 +757,7 @@ function Welcome({ onContinue }) {
         letterSpacing: "-2px",
         padding: "0 8px",
       }}>
-        Le dilemme<br/>
+        Le sujet chaud<br/>
         <span style={{ color: COLORS.lime }}>du jour.</span>
       </h1>
 
@@ -1239,7 +1239,7 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
           </div>
         </div>
 
-        {/* Titre du dilemme */}
+        {/* Sujet chaud */}
         <h2 style={{
           fontSize: 26,
           fontWeight: 500,
@@ -2031,7 +2031,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
                 fontWeight: 500,
                 letterSpacing: "1px",
                 margin: "0 0 4px 8px",
-              }}>{d.day} · LE DILEMME</p>
+              }}>{d.day} · LE SUJET CHAUD</p>
               <p style={{
                 fontSize: 14,
                 color: COLORS.ink,
@@ -2153,7 +2153,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         fontWeight: 500,
         letterSpacing: "2px",
         margin: "0 4px 12px",
-      }}>◊ RECEVOIR LE DILEMME DU JOUR</p>
+      }}>◊ DECOUVRIR LE DOSSIER CHAUD DU JOUR</p>
       <OptInForm sessionId={sessionId} family={family} />
 
       {/* ═══ QR CODE NOUVELLE ÉNERGIE ═══ */}
@@ -2184,7 +2184,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
       }}
       onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
       onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}>
-        Un autre dilemme →
+        Un autre sujet chaud →
       </button>
 
       {/* ═══ DISCLAIMER PROTOTYPE ═══ */}
@@ -2207,7 +2207,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
           lineHeight: 1.5,
           margin: 0,
         }}>
-          Chaque dilemme est généré en temps réel par IA. Revenez demain pour un nouveau dilemme. La version complète proposera un dilemme quotidien partagé par toute la communauté.
+          Chaque sujet est généré en temps réel par IA. Revenez demain pour un nouveau sujet chaud.
         </p>
       </div>
     </div>
@@ -2498,7 +2498,7 @@ function OptInForm({ sessionId, family }) {
           margin: "0 0 6px",
           letterSpacing: "-0.3px",
         }}>
-          Le dilemme arrivera chaque matin dans votre boîte mail.
+          Le sujet chaud arrivera chaque matin dans votre boîte mail.
         </p>
         <p style={{
           fontSize: 13,
@@ -2529,7 +2529,7 @@ function OptInForm({ sessionId, family }) {
         margin: "0 0 8px",
         letterSpacing: "-0.4px",
       }}>
-        Recevoir le dilemme chaque matin
+        Recevoir le sujet chaud chaque matin
       </p>
       <p style={{
         fontSize: 13,
@@ -2537,7 +2537,7 @@ function OptInForm({ sessionId, family }) {
         lineHeight: 1.5,
         margin: "0 0 16px",
       }}>
-        Un nouveau dilemme dans votre boîte chaque matin. Plus votre analyse personnalisée.
+        Un nouveau sujet chaud dans votre boîte chaque matin.
       </p>
 
       <form onSubmit={handleSubmit}>
@@ -2841,7 +2841,6 @@ function ShareButton({ shareCardRef, family }) {
         const file = new File([blob], fileName, { type: "image/png" });
         await navigator.share({
           files: [file],
-          title: "Mon dilemme du jour sur Moi Président(e)",
           text: `J'ai tranché en ${family.shortLabel} ${family.adjective}. Et toi ?`,
         });
         track("share_card_shared", { mode: "native", family: family.shortLabel });
@@ -3098,7 +3097,7 @@ function SocialShareButtons({ family }) {
 
   const familyInclusive = genderInclusive(family.shortLabel);
   const adjectiveInclusive = genderInclusive(family.adjective);
-  const message = `J'ai tranché le dilemme du jour en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
+  const message = `J'ai géré ce sujet chaud en ${familyInclusive} ${adjectiveInclusive}. Et vous ?`;
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${message} ${siteUrl}`)}`;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}&url=${encodeURIComponent(siteUrl)}`;
