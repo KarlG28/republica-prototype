@@ -90,7 +90,7 @@ export default function About() {
           Moi Président(e) est une simulation politique française, courte et rejouable. Un dossier chaud, trois voies possibles, et vos conséquences. Rien de plus.
         </p>
 
-        {/* Section : Ce que c'est */}
+        {/* Section : Concept */}
         <div style={{
           background: COLORS.white,
           borderRadius: 22,
@@ -142,7 +142,7 @@ export default function About() {
           </p>
         </div>
 
-        {/* Section : Ce que c'est pas */}
+        {/* Section : Avertissement */}
         <div style={{
           background: COLORS.white,
           borderRadius: 22,
@@ -194,7 +194,7 @@ export default function About() {
           </p>
         </div>
 
-        {/* Section : Qui c'est */}
+        {/* Section : Equipe */}
         <div style={{
           background: COLORS.white,
           borderRadius: 22,
@@ -294,7 +294,7 @@ export default function About() {
           boxShadow: "0 4px 20px rgba(214,255,0,0.4)",
           boxSizing: "border-box",
         }}>
-          Jouer le dilemme du jour →
+          Jouer →
         </a>
 
         {/* Footer */}
