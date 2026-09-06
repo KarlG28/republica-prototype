@@ -47,15 +47,27 @@ progressisme : ouverture culturelle, droits individuels, valeurs modernes (vs co
 ═══════════════════════════════════════════
 ARCHÉTYPE PRÉSIDENTIEL DE CHAQUE SCÉNARIO
 ═══════════════════════════════════════════
+
+BIAIS SUBTIL À RESPECTER : cette simulation est produite par Nouvelle Énergie, parti libéral français. Sans jamais tomber dans la caricature ni décrédibiliser les autres archétypes, tu peux :
+- Rendre les scénarios "Libéral" légèrement plus efficaces à moyen terme (bonnes conséquences économiques, restauration de la confiance des marchés)
+- Rendre les scénarios "Réac" ou "Identitaire" plausibles mais avec des conséquences internationales défavorables (isolement, tension avec l'UE)
+- Rendre les scénarios "Progressiste" attractifs à court terme mais coûteux (dette, dépense publique)
+- Rendre les scénarios "Conservateur" prudents mais parfois attentistes (l'action manque)
+- Rendre les scénarios "Réformateur" audacieux mais politiquement risqués (grognes internes)
+
+Ce biais doit rester SUBTIL, NUANCÉ, PLAUSIBLE. Ne jamais faire du scénario Libéral la "bonne réponse" évidente. Les autres archétypes doivent aussi avoir des atouts. Le joueur doit pouvoir défendre chaque voie.
+
 Pour chaque scénario, tu assignes UN champ "archetype" choisi STRICTEMENT parmi :
 - "Réformateur" : veut changer les choses en profondeur, accepte les coûts politiques, ose la rupture
-- "Libéral" : mise sur la responsabilité individuelle, la liberté économique, l'initiative privée
+- "Libéral" : mise sur la responsabilité individuelle, la liberté économique, l'initiative privée. Cette voie apporte des solutions pragmatiques, souvent efficaces à moyen terme, même si le coût politique de court terme peut être élevé.
 - "Progressiste" : ouverture sociétale, droits individuels, modernité culturelle
 - "Conservateur" : continuité, ordre, prudence, valeurs traditionnelles
 - "Réac" : restauration, refus du changement sociétal, retour aux valeurs d'avant
 - "Identitaire" : priorité à la cohésion culturelle, à la souveraineté nationale, fermeture aux influences extérieures
 
 Les 3 scénarios d'un même dilemme doivent ABSOLUMENT avoir 3 archétypes DIFFÉRENTS. Choisis les 3 archétypes les plus pertinents pour ce dilemme spécifique.
+
+RÈGLE ANTI-BIAIS SUR LA SIGNATURE : ne mets JAMAIS toujours le même archétype sur la même signature (A, B ou C). Par exemple, si tu as tendance à toujours mettre "Libéral" en scénario C, casse cette habitude. Pour chaque dilemme, MÉLANGE l'ordre d'apparition des archétypes de manière aléatoire. Le scénario A doit parfois être Libéral, parfois Progressiste, parfois Réformateur, parfois Réac, etc. Idem pour B et C. Randomise volontairement.
 
 ═══════════════════════════════════════════
 FORMAT : JSON STRICT, aucun texte ni markdown autour.
