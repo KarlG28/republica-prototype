@@ -857,30 +857,98 @@ function Welcome({ onContinue }) {
     </div>
   );
 }
-
 function Header({ section, currentIdx, total }) {
-  const stepLabel = section === SECTIONS.intro ? "INVESTITURE"
-    : section === SECTIONS.profile ? "BILAN DU MANDAT"
+  const stepLabel = section === SECTIONS.intro ? "AVANT D'ENTRER"
+    : section === SECTIONS.profile ? "VERDICT"
     : section === SECTIONS.loading ? "EN COURS..."
-    : `DÉCISION ${currentIdx + 1} / ${total}`;
+    : section === SECTIONS.scenarioDetail ? "APPROFONDISSEMENT"
+    : section === SECTIONS.consequence ? "CONSÉQUENCES"
+    : "LE SUJET CHAUD";
+
+  // Progression : 0, 1, 2, 3 selon l'étape
+  let progress = 0;
+  if (section === SECTIONS.intro) progress = 1;
+  else if (section === SECTIONS.dossier || section === SECTIONS.scenarioDetail) progress = 2;
+  else if (section === SECTIONS.consequence) progress = 3;
+  else if (section === SECTIONS.profile) progress = 4;
+  else if (section === SECTIONS.loading) progress = 1.5;
+
+  const totalSteps = 4;
+  const progressPct = Math.min(1, progress / totalSteps);
+
+  // Path SVG : trait manuscrit irrégulier (bézier avec petits soubresauts)
+  // Full path complet du trait de fond
+  const fullPath = "M 4,14 C 60,10 120,17 180,12 S 300,15 380,11 S 520,16 600,13 S 720,10 820,15 S 920,12 996,14";
+  // Longueur approximative pour l'animation de "dash" progressif
+  const pathLength = 1000;
+  const drawnLength = pathLength * progressPct;
+
   return (
-    <div style={{ marginBottom: 24, paddingBottom: 14, borderBottom: `1px solid ${COLORS.border}` }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+    <div style={{ marginBottom: 24, paddingBottom: 6 }}>
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        marginBottom: 10,
+        flexWrap: "wrap",
+        gap: 8,
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ display: "inline-block", width: 7, height: 7, background: COLORS.gold, borderRadius: "50%" }}></span>
-          <span style={{ color: COLORS.navy, fontSize: 11, letterSpacing: "0.2em", textTransform: "uppercase", fontWeight: 600 }}>Moi Président(e) </span>
+          <span style={{
+            display: "inline-block",
+            width: 8,
+            height: 8,
+            background: COLORS.lime,
+            borderRadius: "50%",
+          }} />
+          <span style={{
+            color: COLORS.white,
+            fontSize: 12,
+            letterSpacing: "0.15em",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}>Moi Président(e)</span>
         </div>
-        <span style={{ color: COLORS.textDim, fontFamily: "ui-monospace, monospace", fontSize: 10, letterSpacing: "0.1em" }}>{stepLabel}</span>
+        <span style={{
+          color: COLORS.whiteSoft,
+          fontSize: 10,
+          letterSpacing: "0.15em",
+          fontWeight: 600,
+        }}>{stepLabel}</span>
       </div>
-      <div style={{ display: "flex", gap: 4 }}>
-        {Array.from({ length: total + 1 }).map((_, i) => {
-          let filled = false;
-          if (section === SECTIONS.intro) filled = i === 0;
-          else if (section === SECTIONS.profile) filled = true;
-          else filled = i <= currentIdx + 1;
-          return <div key={i} style={{ flex: 1, height: 3, background: filled ? COLORS.navy : COLORS.border, transition: "background 0.3s" }} />;
-        })}
-      </div>
+
+      {/* Trait manuscrit SVG */}
+      <svg
+        viewBox="0 0 1000 28"
+        preserveAspectRatio="none"
+        style={{
+          width: "100%",
+          height: 20,
+          display: "block",
+          overflow: "visible",
+        }}
+      >
+        {/* Trait de fond (fantôme, très pâle) */}
+        <path
+          d={fullPath}
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="4"
+          strokeLinecap="round"
+          fill="none"
+        />
+        {/* Trait de progression (noir marker, dessiné jusqu'à progress) */}
+        <path
+          d={fullPath}
+          stroke={COLORS.ink}
+          strokeWidth="5"
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${drawnLength} ${pathLength}`}
+          style={{
+            transition: "stroke-dasharray 0.5s ease-out",
+          }}
+        />
+      </svg>
     </div>
   );
 }
