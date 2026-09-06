@@ -1263,29 +1263,38 @@ function DossierView({ dossier, indicators, onSelectScenario, fallbackError }) {
           </p>
         )}
 
-        {/* Acteurs en mini cartes inline */}
+               {/* Acteurs impliqués */}
         {(dossier.agents || []).length > 0 && (
           <div style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 6,
             marginTop: 16,
             paddingTop: 14,
             borderTop: "1px solid rgba(255,255,255,0.1)",
           }}>
-            {(dossier.agents || []).slice(0, 4).map((a, i) => (
-              <span key={i} style={{
-                fontSize: 11,
-                color: COLORS.white,
-                background: "rgba(255,255,255,0.1)",
-                padding: "5px 10px",
-                borderRadius: 14,
-                fontWeight: 500,
-              }}>{a.name}</span>
-            ))}
+            <p style={{
+              fontSize: 10,
+              color: "rgba(255,255,255,0.55)",
+              fontWeight: 500,
+              letterSpacing: "1.5px",
+              margin: "0 0 10px",
+            }}>ACTEURS IMPLIQUÉS</p>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 6,
+            }}>
+              {(dossier.agents || []).slice(0, 4).map((a, i) => (
+                <span key={i} style={{
+                  fontSize: 11,
+                  color: COLORS.white,
+                  background: "rgba(255,255,255,0.1)",
+                  padding: "5px 10px",
+                  borderRadius: 14,
+                  fontWeight: 500,
+                }}>{a.name}</span>
+              ))}
+            </div>
           </div>
         )}
-      </div>
 
       {/* ═══ Instruction de jeu ═══ */}
       <div style={{
