@@ -181,7 +181,7 @@ const FALLBACK_DOSSIER = {
   },
 };
 
-const FALLBACK_PARTNER_SUMMARY = `Vous avez gouverné quatre décisions sous tension. Voici comment Nouvelle Énergie aurait abordé ces mêmes choix.
+const FALLBACK_PARTNER_SUMMARY = `Vous avez gouverné quatre décisions sous tension. Voici comment les Energiseurs IA auraient abordé ces mêmes choix.
 
 Chez Nouvelle Énergie, nous croyons qu'une France plus libre est une France qui respire, décide et agit davantage. Notre boussole : libérer avant d'encadrer, faire confiance avant de contrôler.
 
@@ -852,7 +852,7 @@ function Welcome({ onContinue }) {
         fontSize: 12,
         color: COLORS.whiteDim,
       }}>
-        par <span style={{ color: COLORS.white, fontWeight: 500 }}>Nouvelle Énergie</span>
+                par <span style={{ color: COLORS.white, fontWeight: 500 }}>Les énergiseurs IA de la France</span>
       </p>
     </div>
   );
@@ -2127,7 +2127,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
         })}
       </div>
 
-      {/* ═══ BLOC NOUVELLE ÉNERGIE ═══ */}
+      {/* ═══ BLOC ENERGISEURS IA ═══ */}
       <p style={{
         fontSize: 11,
         color: COLORS.whiteSoft,
@@ -2161,7 +2161,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
             color: COLORS.ink,
             fontWeight: 700,
             letterSpacing: "1.5px",
-          }}>NOUVELLE ÉNERGIE</span>
+          }}>LES ENERGISEURS IA</span>
         </div>
 
         {partnerLoading && (
@@ -2175,7 +2175,7 @@ function Profile({ choices, dossiers, indicators, scores, onRestart, partnerSumm
               animation: "spin 1s linear infinite",
             }} />
             <span style={{ fontSize: 13, color: COLORS.inkSoft, fontStyle: "italic" }}>
-              Nouvelle Énergie analyse votre mandat...
+              LES ENERGISEURS IA analysent votre mandat...
             </span>
           </div>
         )}
