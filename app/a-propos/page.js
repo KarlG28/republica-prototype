@@ -234,7 +234,7 @@ export default function About() {
             lineHeight: 1.6,
             margin: "0 0 10px",
           }}>
-            Moi Président(e) est une production de <a href="https://www.unenouvelleenergie.fr/" target="_blank" rel="noopener noreferrer" style={{ color: COLORS.magenta, fontWeight: 500, textDecoration: "underline" }}>Nouvelle Énergie</a>, mouvement politique français d'inspiration libérale.
+            Moi Président(e) est une production des Energiseurs, noyau IA des militants Nouvelle Energie.
           </p>
           <p style={{
             fontSize: 14.5,
@@ -305,7 +305,7 @@ export default function About() {
           color: COLORS.whiteDim,
           letterSpacing: "1px",
         }}>
-          MOI PRÉSIDENT(E) · UNE PRODUCTION NOUVELLE ÉNERGIE
+          MOI PRÉSIDENT(E)
         </p>
       </div>
     </main>
